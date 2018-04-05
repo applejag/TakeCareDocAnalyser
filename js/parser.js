@@ -254,7 +254,7 @@
         timer = setTimeout(parser.parseInput, 300);
     }
 
-    input.addEventListener("DOMNodeInserted", startParseTimer, false);
-    input.addEventListener("DOMNodeRemoved", startParseTimer, false);
-    input.addEventListener("DOMCharacterDataModified", startParseTimer, false);
+    // input.addEventListener("DOMNodeInserted", startParseTimer, false);
+    // input.addEventListener("DOMNodeRemoved", startParseTimer, false);
+    // input.addEventListener("DOMCharacterDataModified", startParseTimer, false);
 })();
