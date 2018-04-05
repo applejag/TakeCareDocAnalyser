@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="sv" dir="ltr">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=100" />
+        <meta charset="utf-8">
+        <title>VRI dokument analyserare</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/code_g1ant.css">
+    </head>
+    <body>
+        <div id="container">
+            <h1>Analysera dokumenten</h1>
+            <noscript>
+                <div class="danger">
+                    <h2>Var god aktivera JavaScript!</h2>
+                    <p>Parse algoritmerna behöver kunna köra kod. Var god aktivera JavaScript om du önskar använda parsern.</p>
+                </div>
+            </noscript>
+            <div class="row">
+                <div class="col-6">
+                    <h2>Input:</h2>
+                    <button id="input_clear" class="input" type="button" onclick="clearContent('input')">Clear field</button>
+                    <button id="input_select_all" class="input" type="button" onclick="focusAll('input')">Select all</button>
+                    <button id="input_select_end" class="input" type="button" onclick="focusEnd('input')">Select end</button>
+                    <button id="input_parse" class="input" type="button" onclick="parser.parseInput()">Parse</button>
+                    <div id="input" class="codefield" contenteditable="true"></div>
+                </div>
+                <div class="col-6">
+                    <h2>Output:</h2>
+                    <button id="output_clear" class="input" type="button" onclick="clearContent('output')">Clear field</button>
+                    <button id="output_select_all" class="input" type="button" onclick="focusAll('output')">Select all</button>
+                    <button id="output_select_end" class="input" type="button" onclick="focusEnd('output')">Select end</button>
+                    <select id="output_type" class="input">
+                        <option id="output_type_template" disabled="disabled" class="input">Select output type...</option>
+                    </select>
+                    <pre id="output" class="codefield mono" contenteditable="true"></pre>
+                    <div id="output_error" style="display: none;">
+                        <h3 id="output_error_title"></h3>
+                        <pre id="output_error_para"></pre>
+                        <p>Please check the console to debug the error!</p>
+                    </div>
+
+                    <span id="output_status">(Press <a href="javascript:parser.parseInput()">parse</a> to parse the data.)</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h2>G1ANT protip:</h2>
+                    <div class="codefield ">
+                        <code class="g1ant">
+                            <span class="command">ie.waitforvalue</span>
+                            script
+                            <span class="text">‴parser.isParsed‴</span>
+                            expectedvalue
+                            <span class="text">‴true‴</span>
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="js/ie_sucks.js"></script>
+        <script type="text/javascript" src="js/tools.js"></script>
+        <script type="text/javascript" src="js/parser.js"></script>
+        <script type="text/javascript" src="js/output.js"></script>
+    </body>
+</html>
