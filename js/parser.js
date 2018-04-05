@@ -100,7 +100,6 @@
         else
         {
             status.innerText = "(Parsed " + parsed.length + " documents in " + dt + " ms)";
-            focusAll('output');
             parser.isParsed = true;
         }
     };
