@@ -11,8 +11,7 @@
     var timer = null;
     var outputFunctions = [];
 
-    parser.addOutput = function(name, func) {
-        var id = outputFunctions.length;
+    parser.addOutput = function(name, id, func) {
         outputFunctions.push({
             name: name,
             func: func
@@ -22,13 +21,13 @@
         var template = document.getElementById('output_type_template');
 
         var clone = template.cloneNode(true);
-        clone.id = '';
+        clone.id = id;
         clone.disabled = false;
         clone.innerText = name;
         clone.value = id;
         select.appendChild(clone);
 
-        if (id === 0)
+        if (outputFunctions.length === 0)
             select.value = clone.value;
     };
 

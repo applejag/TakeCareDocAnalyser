@@ -44,7 +44,9 @@ documentsData: [
 ]
 */
 
-parser.addOutput("Vårdtillfällen", function(parsed) {
+// parser.addOutput = function(name, id, func)
+
+parser.addOutput("Vårdtillfällen", "vård_sluten", function(parsed) {
     var output = "";
 
     for (var i = 0; i < parsed.length; i++) {
@@ -63,7 +65,7 @@ parser.addOutput("Vårdtillfällen", function(parsed) {
     return output;
 });
 
-parser.addOutput("Öppna vårdkontakter", function(parsed) {
+parser.addOutput("Öppna vårdkontakter", "vård_öppen", function(parsed) {
     var output = "";
 
     for (var i = 0; i < parsed.length; i++) {
@@ -78,7 +80,7 @@ parser.addOutput("Öppna vårdkontakter", function(parsed) {
     return output;
 });
 
-parser.addOutput("JSON", function(parsed) {
+parser.addOutput("JSON", "json", function(parsed) {
     return JSON.stringify(parsed, null, 4);
 });
 
