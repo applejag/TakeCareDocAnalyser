@@ -76,20 +76,20 @@
         clearContent('output');
 
         //-- WITHOUT TRY-CATCH
-        parsed = getParsedDocuments();
-        output.innerText = runOutput(parsed);
+        // parsed = getParsedDocuments();
+        // output.innerText = runOutput(parsed);
         //-- WITH TRY-CATCH
-        // try {
-        //     parsed = getParsedDocuments();
-        //
-        //     try {
-        //         output.innerText = runOutput(parsed);
-        //     } catch (e) {
-        //         setError("Error while assembling output!", e);
-        //     }
-        // } catch (e) {
-        //     setError("Error while parsing documents!", e);
-        // }
+        try {
+            parsed = getParsedDocuments();
+
+            try {
+                output.innerText = runOutput(parsed);
+            } catch (e) {
+                setError("Error while assembling output!", e);
+            }
+        } catch (e) {
+            setError("Error while parsing documents!", e);
+        }
         //-------------------
 
         var dt = Date.now() - start;
