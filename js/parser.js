@@ -14,6 +14,7 @@
     parser.addOutput = function(name, id, func) {
         outputFunctions.push({
             name: name,
+            id: id,
             func: func
         });
 
@@ -33,15 +34,18 @@
 
     function runOutput(parsed) {
         var selectElem = document.getElementById('output_type');
-        var selected = selectElem.value;
+        var selectValue = selectElem.value;
+        var selectFunc = outputFunctions.find(function(o) {
+            return o.id == selectValue;
+        });
 
-        if (!outputFunctions[selected])
+        if (!selectFunc)
         {
             return "No output method selected!";
         }
         else
         {
-            return outputFunctions[selected].func(parsed);
+            return selectFunc.func(parsed);
         }
     }
 
