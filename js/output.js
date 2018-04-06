@@ -46,6 +46,34 @@ documentsData: [
 
 // parser.addOutput = function(name, id, func)
 
+parser.addOutput("Hitta ESBL", "hitta_esbl", function(parsed) {
+    var output = "";
+    var needle = "ESBL";
+
+    // foreach document
+    for (var di = 0; di < parsed.length; di++) {
+        var doc = parsed[di];
+        // Foreach row
+        for (var ri = 0; ri < doc.body.length; ri++) {
+            var row = doc.body[ri];
+            // Foreach cell
+            for (var ci = 0; ci < row.length; ci++) {
+                var cell = row[ci];
+
+                if (cell.text.toUpperCase().indexOf(needle) !== -1)
+                {
+                    output += doc.head.category + "|" +
+                        doc.head.data1 + "|" +
+                        doc.head.data2 + "|" +
+                        doc.head.datestring + "\n";
+                }
+            }
+        }
+    }
+
+    return output;
+});
+
 parser.addOutput("Vårdtillfällen", "vård_sluten", function(parsed) {
     var output = "";
 
