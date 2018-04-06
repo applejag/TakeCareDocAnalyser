@@ -83,7 +83,8 @@
             parsed = getParsedDocuments();
 
             try {
-                output.innerText = runOutput(parsed);
+                var text = runOutput(parsed);
+                output.innerText = text === "" ? " " : text;
             } catch (e) {
                 setError("Error while assembling output!", e);
             }
