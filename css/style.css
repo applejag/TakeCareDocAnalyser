@@ -50,6 +50,18 @@ body > #container {
     padding: 1.5em;
 }
 
+.center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.danger {
+    color: red;
+    border: 1px solid red;
+    border-radius: 8px;
+    padding: 12px;
+}
+
 .row {
     width: 100%;
 }
@@ -79,4 +91,4 @@ body > #container {
 .col-9 { width: 75%; }
 .col-10 { width: 83.333%; }
 .col-11 { width: 91.666%; }
-.col-12 { width: 100%; }
+.col, .col-12 { width: 100%; }

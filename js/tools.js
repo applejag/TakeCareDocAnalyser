@@ -37,7 +37,8 @@ String.prototype.splitSentences = (function() {
     }
 
     return function () {
-        return this.match(regex).map(trimmer);
+        var matches = this.match(regex);
+        return matches ? matches.map(trimmer) : [];
     };
 })();
 

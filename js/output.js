@@ -46,12 +46,24 @@ documentsData: [
 
 // parser.addOutput = function(name, id, func)
 
-parser.addOutput("Hitta ESBL", "hitta_esbl", function(parsed) {
-    var output = "";
-    var needle = "ESBL";
+parser.addOutput("Hitta text sträng", "hitta_sträng", function(parsed, needle) {
 
-    forEachCell(function(cell, row, doc) {
-        if (cell.text.toUpperCase().indexOf(needle) !== -1)
+    if (needle === "")
+        return "";
+
+    var reg = /^\/(.+)\/((?:g(?:im?|mi?)?|i(?:gm?|mg?)?|m(?:gi?|ig?)?)?)$/.exec(needle);
+    var exp;
+    if (reg) {
+        exp = new RegExp(reg[1], reg[2]);
+    } else {
+        needle = needle.trim().toUpperCase();
+    }
+
+    var output = "";
+
+    forEachCell(parsed, function(cell, row, doc) {
+        if (exp ? cell.text.search(exp) !== -1
+                : cell.text.toUpperCase().indexOf(needle) !== -1)
         {
             output += [
                 doc.head.category,
@@ -59,6 +71,8 @@ parser.addOutput("Hitta ESBL", "hitta_esbl", function(parsed) {
                 doc.head.data2,
                 doc.head.datestring
             ].join('|') + "\n";
+
+            return true;
         }
     });
 
@@ -119,7 +133,8 @@ function forEachCell(parsed, callback) {
             // Foreach cell
             for (var ci = 0; ci < row.length; ci++) {
                 var cell = row[ci];
-                callback(cell, row, doc);
+                if (callback(cell, row, doc))
+                    return;
             }
         }
     }

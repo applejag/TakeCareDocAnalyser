@@ -7,6 +7,7 @@
 
     var input = document.getElementById("input");
     var output = document.getElementById("output");
+    var output_arg = document.getElementById("parse_argument");
     var status = document.getElementById("output_status");
     var timer = null;
     var outputFunctions = [];
@@ -18,8 +19,8 @@
             func: func
         });
 
-        var select = document.getElementById('output_type');
-        var template = document.getElementById('output_type_template');
+        var select = document.getElementById('parse_type');
+        var template = document.getElementById('parse_type_template');
 
         var clone = template.cloneNode(true);
         clone.id = id;
@@ -33,7 +34,7 @@
     };
 
     function runOutput(parsed) {
-        var selectElem = document.getElementById('output_type');
+        var selectElem = document.getElementById('parse_type');
         var selectValue = selectElem.value;
         var selectFunc = outputFunctions.find(function(o) {
             return o.id == selectValue;
@@ -45,7 +46,7 @@
         }
         else
         {
-            return selectFunc.func(parsed);
+            return selectFunc.func(parsed, output_arg.value);
         }
     }
 
