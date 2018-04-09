@@ -50,26 +50,17 @@ parser.addOutput("Hitta ESBL", "hitta_esbl", function(parsed) {
     var output = "";
     var needle = "ESBL";
 
-    // foreach document
-    for (var di = 0; di < parsed.length; di++) {
-        var doc = parsed[di];
-        // Foreach row
-        for (var ri = 0; ri < doc.body.length; ri++) {
-            var row = doc.body[ri];
-            // Foreach cell
-            for (var ci = 0; ci < row.length; ci++) {
-                var cell = row[ci];
-
-                if (cell.text.toUpperCase().indexOf(needle) !== -1)
-                {
-                    output += doc.head.category + "|" +
-                        doc.head.data1 + "|" +
-                        doc.head.data2 + "|" +
-                        doc.head.datestring + "\n";
-                }
-            }
+    forEachCell(function(cell, row, doc) {
+        if (cell.text.toUpperCase().indexOf(needle) !== -1)
+        {
+            output += [
+                doc.head.category,
+                doc.head.data1,
+                doc.head.data2,
+                doc.head.datestring
+            ].join('|') + "\n";
         }
-    }
+    });
 
     return output;
 });
@@ -77,6 +68,7 @@ parser.addOutput("Hitta ESBL", "hitta_esbl", function(parsed) {
 parser.addOutput("Vårdtillfällen", "vård_sluten", function(parsed) {
     var output = "";
 
+    // foreach document
     for (var i = 0; i < parsed.length; i++) {
         var doc = parsed[i];
         if (doc.head.category !== "Vårdtillfälle") continue;
@@ -84,11 +76,12 @@ parser.addOutput("Vårdtillfällen", "vård_sluten", function(parsed) {
         var tab = findTableFirstRow(doc.tables, "Vårdenhet");
         if (!tab) continue;
 
-        output += tab.Vårdenhet.text + "|" +
-            tab.Inskrivningsdatum.text + "|" +
-            tab.Utskrivningsdatum.text + "|" +
-            findTableFirstColumnJoined(doc.tables, "Diagnoser") +
-            "\n";
+        output += [
+            tab.Vårdenhet.text,
+            tab.Inskrivningsdatum.text,
+            tab.Utskrivningsdatum.text,
+            findTableFirstColumnJoined(doc.tables, "Diagnoser")
+        ].join('|') + "\n";
     }
     return output;
 });
@@ -96,14 +89,16 @@ parser.addOutput("Vårdtillfällen", "vård_sluten", function(parsed) {
 parser.addOutput("Öppna vårdkontakter", "vård_öppen", function(parsed) {
     var output = "";
 
+    // foreach document
     for (var i = 0; i < parsed.length; i++) {
         var doc = parsed[i];
         if (doc.head.category !== "Öppen vårdkontakt") continue;
 
-        output += doc.head.data2 + "|" +
-            doc.head.datestring + "|" +
-            findTableFirstColumnJoined(doc.tables, "Diagnoser") +
-            "\n";
+        output += [
+            doc.head.data2,
+            doc.head.datestring,
+            findTableFirstColumnJoined(doc.tables, "Diagnoser")
+        ].join('|') + "\n";
     }
     return output;
 });
@@ -114,18 +109,34 @@ parser.addOutput("JSON", "json", function(parsed) {
 
 /* HELPER FUNCTIONS */
 
-// returns
+function forEachCell(parsed, callback) {
+    // foreach document
+    for (var di = 0; di < parsed.length; di++) {
+        var doc = parsed[di];
+        // Foreach row
+        for (var ri = 0; ri < doc.body.length; ri++) {
+            var row = doc.body[ri];
+            // Foreach cell
+            for (var ci = 0; ci < row.length; ci++) {
+                var cell = row[ci];
+                callback(cell, row, doc);
+            }
+        }
+    }
+}
+
+// returns cell[] || null
 function findTableFirstRow(tables, firstColumnName) {
     var tab = tables.find(function(tbl) {
         return tbl.head[0].text === firstColumnName;
     });
 
-    if (!tab) return "";
+    if (!tab) return null;
 
     return tab.rows[0];
 }
 
-// returns cell[]
+// returns ; sep. string
 function findTableFirstColumnJoined(tables, firstColumnName) {
     var tab = findTableFirstColumn(tables, firstColumnName);
 
@@ -136,6 +147,7 @@ function findTableFirstColumnJoined(tables, firstColumnName) {
         .join(';');
 }
 
+// return cell[] || null
 function findTableFirstColumn(tables, firstColumnName) {
     var tab = tables.find(function(tbl) {
         return tbl.head[0].text === firstColumnName;
