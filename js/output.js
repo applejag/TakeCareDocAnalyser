@@ -44,7 +44,23 @@ documentsData: [
 ]
 */
 
-// parser.addOutput = function(name, id, func)
+// parser.addOutput = function(name, id, func(parsed, parse_argument))
+
+parser.addOutput("TEST", "test", function(parsed) {
+    var docs = [];
+
+    // foreach document
+    for (var i = 0; i < parsed.length; i++) {
+        var doc = parsed[i];
+
+        docs.push({
+            rubrik : doc.head.category,
+            datum : doc.head.datestring
+        });
+    }
+
+    return JSON.stringify(docs, null, 4);
+});
 
 parser.addOutput("Hitta text sträng", "hitta_sträng", function(parsed, needle) {
 
