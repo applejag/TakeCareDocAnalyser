@@ -1,47 +1,39 @@
 
 /*
-cell: {
-    text: string,
-    html: string,
+
+cell = {
+    text: "" string,
+    html: "" string,
     isItalic: bool,
     isBold: bool
 }
 
-documentsData: [
-    [0..n]: {
-        head: {
-            category: string,
-            data1: string,
-            data2: string,
-            datestring: string
-        },
-        body: [
-            [0..n]: [
-                [1..n]: cell
-            ]
-        ],
-        tables: [
-            [0..n]: {
-                head: [
-                    [1..n]: cell
-                ],
-                rows: [
-                    [1..n]: {
-                        columns: [
-                            [1..n]: cell
-                        ],
-                        [th text]: cell
-                    }
-                ],
-                columns: {
-                    [th text]: [
-                        [0..n]: cell
-                    ]
-                }
-            }
-        ]
+parsed = []
+parsed[0..n]: {
+    head: {
+        category: "" string
+        data1: "" string
+        data2: "" string
+        datestring: "" string
     }
-]
+
+    body[0..n]:
+        [1..n]: cell
+
+    tables[0..n]: {
+        head[1..n]: cell
+
+        rows[1..n]: {
+            columns[1..n]: cell
+            _th_cell_text: cell
+        }
+
+        columns: {
+            _th_cell_text[0..n]: cell
+        }
+    }
+}
+
 */
 
 // parser.addOutput = function(name, id, func(parsed, parse_argument))
@@ -139,20 +131,37 @@ parser.addOutput("JSON", "json", function(parsed) {
 
 /* HELPER FUNCTIONS */
 
+// callback(cell, row, doc)
 function forEachCell(parsed, callback) {
-    // foreach document
-    for (var di = 0; di < parsed.length; di++) {
-        var doc = parsed[di];
-        // Foreach row
-        for (var ri = 0; ri < doc.body.length; ri++) {
-            var row = doc.body[ri];
-            // Foreach cell
-            for (var ci = 0; ci < row.length; ci++) {
-                var cell = row[ci];
-                if (callback(cell, row, doc))
-                    return;
-            }
+    forEachRow(parsed, function(row, doc) {
+        // foreach cell
+        for (var i = 0; i < row.length; i++) {
+            var cell = row[i];
+            var ret = callback(cell, row, doc);
+            if (ret) return ret;
         }
+    });
+}
+
+// callback(row, doc)
+function forEachRow(parsed, callback) {
+    forEachDocument(parsed, function(doc) {
+        // foreach row
+        for (var i = 0; i < doc.body.length; i++) {
+            var row = doc.body[i];
+            var ret = callback(row, doc);
+            if (ret) return ret;
+        }
+    });
+}
+
+// callback(doc)
+function forEachDocument(parsed, callback) {
+    // foreach document
+    for (var i = 0; i < parsed.length; i++) {
+        var doc = parsed[i];
+        var ret = callback(doc);
+        if (ret) return ret;
     }
 }
 

@@ -1,5 +1,5 @@
 
-String.prototype.splitSentences = (function() {
+Object.defineProperty(String.prototype, "splitSentences", (function() {
     // very kind/non restrictive url matching
     var urls = "(https?:\\/\\/.)?(www\\.)?([-a-zA-Z0-9@:%._\\+~#=]{2,256})(\\.[a-z]{2,6})\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)";
 
@@ -40,7 +40,7 @@ String.prototype.splitSentences = (function() {
         var matches = this.match(regex);
         return matches ? matches.map(trimmer) : [];
     };
-})();
+})());
 
 function clearContent(elemId) {
     var elem = document.getElementById(elemId);
