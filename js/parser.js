@@ -4,6 +4,7 @@
     window.parser = parser;
     parser.isParsed = false;
     parser.isCrashed = false;
+    parser.lastParse = [];
 
     var input = document.getElementById("input");
     var output = document.getElementById("output");
@@ -66,8 +67,8 @@
 
     parser.parseInput = function() {
         var start = Date.now();
-        var parsed;
         var preParseCount = parsedDocumentIds.length;
+        var parsed;
 
         //-- WITHOUT TRY-CATCH
         // parsed = getParsedDocuments();
@@ -75,6 +76,7 @@
         //-- WITH TRY-CATCH
         try {
             parsed = getParsedDocuments();
+            parser.lastParse = parsed;
 
             try {
                 var text = runReader(parsed);
@@ -112,13 +114,19 @@
             var head = getDocHeader(doc);
             var body = getDocBody(doc);
             var notes = getDocNotes(doc);
-            var tables = getDocBodyTables(body);
+            var tables, trees;
+
+            if (body) {
+                tables = getDocBodyTables(body);
+                trees = getDocBodyTrees(body);
+            }
 
             var obj = {
                 head: head,
                 body: body,
                 notes: notes,
-                tables: tables
+                tables: tables,
+                trees: trees
             };
 
             if (obj.header !== null && obj.body !== null)
@@ -129,11 +137,17 @@
     }
 
     function elemToCellObj(elem) {
+        var firstChild = elem.children[0];
+        var p = firstChild && firstChild.tagName == "P" ? firstChild : null;
+        var padding = p ? p.style.paddingLeft : "";
+        var indent = parseFloat(padding) * 2;
+
         return {
-            text: elem.innerText,
+            text: elem.innerText.trim(),
             html: elem.innerHTML,
             isItalic: elem.getElementsByTagName('i').length > 0,
-            isBold: elem.getElementsByTagName('b').length > 0
+            isBold: elem.getElementsByTagName('b').length > 0,
+            indentation: isNaN(indent) ? 0 : indent
         };
     }
 
@@ -266,6 +280,52 @@
         }
 
         return tables;
+    }
+
+    function getDocBodyTrees(body) {
+        var trees = [];
+        var i = 0;
+
+        function getNextTree(indent) {
+            var children = [];
+
+            while (true) {
+                if (i+1 >= body.length) break;
+
+                var title = body[i+1][0];
+                var content = body[i+1][1];
+
+                if (title.indentation > indent)
+                {
+                    i++;
+                    children.push({
+                        title: title,
+                        content: content,
+                        children: getNextTree(indent+1)
+                    });
+                } else {
+                    break;
+                }
+
+            }
+
+            return children;
+        }
+
+        while (i < body.length) {
+            if (!body[i][0].isBold) {
+                i++;
+                continue;
+            }
+            trees.push({
+                title: body[i][0],
+                content: body[i][1],
+                children: getNextTree(0)
+            });
+            i++;
+        }
+
+        return trees;
     }
 
     function startParseTimer() {
