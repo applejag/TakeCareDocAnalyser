@@ -42,10 +42,27 @@ doc: {
 var read = {
     Vårdtillfällen: [],
     ÖppnaVårdkontakter: [],
-    Mätvärden: []
+    Mätvärden: [],
+    Journaltexter: []
 };
 
 // parser.addReader = function(category, func(parsed))
+
+parser.addReader("Journaltext", function(doc) {
+    // Måste ha ett journaldokument textträd
+    var tree = doc.trees[0];
+    if (!tree) return;
+
+    var signCell = doc.body[0][1];
+    var sign = signCell.text;
+
+    read.Journaltexter.push({
+        Rubrik: doc.head.data2,
+        Datum: doc.head.datetime,
+        Signeringsansvarig: sign,
+        Fritext: "not implemented"
+    });
+});
 
 parser.addReader("Mätvärde", function(doc) {
     // Vårdenhet tabellen innehåller in/ut datum
