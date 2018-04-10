@@ -1,0 +1,29 @@
+
+code.js {
+    color: #000000;
+    font-family: monospace;
+}
+
+code.js .keyword {
+    color: rgb(171, 12, 144);
+}
+
+code.js .number {
+    color: rgb(27, 0, 209);
+}
+
+code.js .variable {
+    color: rgb(27, 0, 209);
+}
+
+code.js .regex {
+    color: rgb(198, 4, 0);
+}
+
+code.js .operator {
+    color: rgb(153, 69, 0);
+}
+
+code.js .indent {
+    white-space: pre;
+}

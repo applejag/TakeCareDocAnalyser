@@ -20,11 +20,8 @@
             </noscript>
             <div class="row">
                 <div class="col">
-                    <select id="parse_type" class="input">
-                        <option id="parse_type_template" disabled="disabled" class="input">Select output type...</option>
-                    </select>
-                    <!-- <input id="parse_argument" class="input" type="text" name="parse_input" placeholder="Parser argument" /> -->
                     <button id="parse_run" class="input" type="button" onclick="parser.parseInput()">Parse documents</button>
+                    <button id="analyser_run" class="input" type="button" onclick="analyseData()">Analyse saved data</button>
                 </div>
             </div>
             <div class="row">
@@ -45,13 +42,14 @@
                     <div id="input" class="codefield" contenteditable="true"></div>
                 </div>
                 <div class="col-6">
-                    <h2>Output:</h2>
+                    <h2>Saved data:</h2>
                     <button id="output_clear" class="input" type="button" onclick="clearContent('output')">Clear field</button>
                     <button id="output_select_all" class="input" type="button" onclick="focusAll('output')">Select all</button>
                     <button id="output_select_end" class="input" type="button" onclick="focusEnd('output')">Select end</button>
                     <pre id="output" class="codefield mono" contenteditable="true"></pre>
-
-                    <span id="output_status">(Press <a href="javascript:parser.parseInput()">parse</a> to parse the data.)</span>
+                </div>
+                <div class="col">
+                    <div id="output_status" style="text-align: center;">(Press <a href="javascript:parser.parseInput()">parse</a> to parse the data.)</div>
                 </div>
             </div>
             <div class="row">
@@ -101,5 +99,6 @@
         <script type="text/javascript" src="js/tools.js"></script>
         <script type="text/javascript" src="js/parser.js"></script>
         <script type="text/javascript" src="js/readers.js"></script>
+        <script type="text/javascript" src="js/analyser.js"></script>
     </body>
 </html>

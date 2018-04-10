@@ -25,7 +25,6 @@
             // Already read?
             if (parsedDocumentIds.indexOf(doc.head.id) !== -1) {
                 rereads++;
-                console.log("Already read `"+doc.head.id+"`");
                 continue;
             }
 
