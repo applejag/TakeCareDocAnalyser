@@ -1,4 +1,13 @@
 
+function parseDate(str) {
+    var reg = /(?:Den )?(\d+) (\w+) (\d+) (?:kl )?(\d+:\d+)/i.exec(str);
+    if (reg) {
+        return new Date(reg[2]+" "+reg[1]+" "+reg[3]+" "+reg[4]);
+    } else {
+        return new Date(str);
+    }
+}
+
 Object.defineProperty(String.prototype, "splitSentences", (function() {
     // very kind/non restrictive url matching
     var urls = "(https?:\\/\\/.)?(www\\.)?([-a-zA-Z0-9@:%._\\+~#=]{2,256})(\\.[a-z]{2,6})\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)";

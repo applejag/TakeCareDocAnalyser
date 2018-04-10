@@ -10,44 +10,39 @@
     var reader_arg = document.getElementById("parse_argument");
     var reader_status = document.getElementById("output_status");
     var timer = null;
-    var readerFunctions = [];
+    var readerFunctions = {};
+    var parsedDocumentIds = [];
 
-    parser.addReader = function(name, id, func) {
-        readerFunctions.push({
-            name: name,
-            id: id,
-            func: func
-        });
-
-        var select = document.getElementById('parse_type');
-        var template = document.getElementById('parse_type_template');
-
-        var clone = template.cloneNode(true);
-        clone.id = id;
-        clone.disabled = false;
-        clone.innerText = name;
-        clone.value = id;
-        select.appendChild(clone);
-
-        if (readerFunctions.length === 0)
-            select.value = clone.value;
+    parser.addReader = function(category, func) {
+        readerFunctions[category] = func;
     };
 
     function runReader(parsed) {
-        var selectElem = document.getElementById('parse_type');
-        var selectValue = selectElem.value;
-        var selectFunc = readerFunctions.find(function(o) {
-            return o.id == selectValue;
-        });
+        var rereads = 0;
 
-        if (!selectFunc)
-        {
-            return "No output method selected!";
+        for (var i = 0; i < parsed.length; i++) {
+            var doc = parsed[i];
+            // Already read?
+            if (parsedDocumentIds.indexOf(doc.head.id) !== -1) {
+                rereads++;
+                console.log("Already read `"+doc.head.id+"`");
+                continue;
+            }
+
+            var reader = readerFunctions[doc.head.category];
+            if (reader) {
+                reader(doc);
+                // Stash the id, dont read it again
+                parsedDocumentIds.push(doc.head.id);
+            } else {
+                console.log("Unknown document category, `"+doc.head.category+"`. Document data ignored.");
+            }
         }
-        else
-        {
-            return selectFunc.func(parsed, reader_arg.value);
-        }
+
+        if (rereads > 0)
+            console.log("There were "+rereads+" documents that were already read!");
+
+        return JSON.stringify(read, null, 4);
     }
 
     function setError(title, error)
@@ -73,8 +68,7 @@
     parser.parseInput = function() {
         var start = Date.now();
         var parsed;
-
-        clearContent('output');
+        var preParseCount = parsedDocumentIds.length;
 
         //-- WITHOUT TRY-CATCH
         // parsed = getParsedDocuments();
@@ -85,9 +79,10 @@
 
             try {
                 var text = runReader(parsed);
+                clearContent('output');
                 output.innerText = text === "" ? " " : text;
             } catch (e) {
-                setError("Error while assembling output!", e);
+                setError("Error while reading data!", e);
             }
         } catch (e) {
             setError("Error while parsing documents!", e);
@@ -101,7 +96,9 @@
         }
         else
         {
-            reader_status.innerText = "(Parsed " + parsed.length + " documents in " + dt + " ms)";
+            var readCount = parsedDocumentIds.length - preParseCount;
+
+            reader_status.innerText = "(Found " + parsed.length + " documents, read "+readCount+" in " + dt + " ms. Read "+parsedDocumentIds.length+" documents in total)";
             parser.isParsed = true;
         }
     };
@@ -141,10 +138,17 @@
             .replace('--:--', '00:00');
 
         return {
+            id: [
+                spans[0].innerText,
+                spans[1].innerText,
+                spans[2].innerText,
+                date
+            ].join('|'),
             category: spans[0].innerText,
             data1: spans[1].innerText,
             data2: spans[2].innerText,
-            datestring: date
+            datestring: date,
+            datetime: parseDate(date)
         };
     }
 

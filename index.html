@@ -6,6 +6,7 @@
         <title>VRI dokument analyserare</title>
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/code_g1ant.css">
+        <link rel="stylesheet" href="css/code_js.css">
         <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
     </head>
     <body>
@@ -22,8 +23,8 @@
                     <select id="parse_type" class="input">
                         <option id="parse_type_template" disabled="disabled" class="input">Select output type...</option>
                     </select>
-                    <input id="parse_argument" class="input" type="text" name="parse_input" placeholder="Parser argument" />
-                    <button id="parse_run" class="input" type="button" onclick="parser.parseInput()">Parse</button>
+                    <!-- <input id="parse_argument" class="input" type="text" name="parse_input" placeholder="Parser argument" /> -->
+                    <button id="parse_run" class="input" type="button" onclick="parser.parseInput()">Parse documents</button>
                 </div>
             </div>
             <div class="row">
@@ -67,8 +68,35 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col">
+                    <h2>JavaScript protip:</h2>
+                    <div class="codefield ">
+                        <code class="js">
+                            <span class="keyword">var</span>
+                            <span class="variable">data</span>
+                            <span class="operator">=</span>
+                            JSON.parse(b,
+                            <span class="keyword">function</span>
+                            (<span class="variable">key</span>,
+                            <span class="variable">value</span>) {<br/>
+                            <span class="indent">    </span><span class="keyword">if</span>
+                            (<span class="variable">key</span>.search(<span class="regex">/datum/i</span>)
+                            <span class="operator">!==</span>
+                            <span class="operator">-</span><span class="number">1</span>)</br>
+                            <span class="indent">        </span><span class="keyword">return</span>
+                                <span class="keyword">new</span>
+                                Date(<span class="variable">value</span>);<br/>
+                        	<span class="indent">    </span><span class="keyword">return</span>
+                            <span class="variable">value</span>;<br/>
+                            });
+                        </code>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <script type="text/javascript" src="js/date-se-SE.js"></script>
         <script type="text/javascript" src="js/ie_sucks.js"></script>
         <script type="text/javascript" src="js/tools.js"></script>
         <script type="text/javascript" src="js/parser.js"></script>
