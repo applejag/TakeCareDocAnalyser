@@ -7,13 +7,13 @@
 
     var input = document.getElementById("input");
     var output = document.getElementById("output");
-    var output_arg = document.getElementById("parse_argument");
-    var status = document.getElementById("output_status");
+    var reader_arg = document.getElementById("parse_argument");
+    var reader_status = document.getElementById("output_status");
     var timer = null;
-    var outputFunctions = [];
+    var readerFunctions = [];
 
-    parser.addOutput = function(name, id, func) {
-        outputFunctions.push({
+    parser.addReader = function(name, id, func) {
+        readerFunctions.push({
             name: name,
             id: id,
             func: func
@@ -29,14 +29,14 @@
         clone.value = id;
         select.appendChild(clone);
 
-        if (outputFunctions.length === 0)
+        if (readerFunctions.length === 0)
             select.value = clone.value;
     };
 
-    function runOutput(parsed) {
+    function runReader(parsed) {
         var selectElem = document.getElementById('parse_type');
         var selectValue = selectElem.value;
-        var selectFunc = outputFunctions.find(function(o) {
+        var selectFunc = readerFunctions.find(function(o) {
             return o.id == selectValue;
         });
 
@@ -46,7 +46,7 @@
         }
         else
         {
-            return selectFunc.func(parsed, output_arg.value);
+            return selectFunc.func(parsed, reader_arg.value);
         }
     }
 
@@ -78,13 +78,13 @@
 
         //-- WITHOUT TRY-CATCH
         // parsed = getParsedDocuments();
-        // output.innerText = runOutput(parsed);
+        // output.innerText = runReader(parsed);
         //-- WITH TRY-CATCH
         try {
             parsed = getParsedDocuments();
 
             try {
-                var text = runOutput(parsed);
+                var text = runReader(parsed);
                 output.innerText = text === "" ? " " : text;
             } catch (e) {
                 setError("Error while assembling output!", e);
@@ -97,11 +97,11 @@
         var dt = Date.now() - start;
         if (parser.isCrashed)
         {
-            status.innerText = "(Parsing failed after " + dt + " ms)";
+            reader_status.innerText = "(Parsing failed after " + dt + " ms)";
         }
         else
         {
-            status.innerText = "(Parsed " + parsed.length + " documents in " + dt + " ms)";
+            reader_status.innerText = "(Parsed " + parsed.length + " documents in " + dt + " ms)";
             parser.isParsed = true;
         }
     };
@@ -249,7 +249,7 @@
         clearTimeout(timer);
         parser.isCrashed = false;
         parser.isParsed = false;
-        status.innerText = "(Parsing, please wait...)";
+        reader_status.innerText = "(Parsing, please wait...)";
         setError(null, null);
 
         timer = setTimeout(parser.parseInput, 300);
