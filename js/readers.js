@@ -21,6 +21,8 @@ doc: {
     body[0..n]:
         [1..n]: cell
 
+    notes[0..n]: cell,
+
     tables[0..n]: {
         head[1..n]: cell,
 
@@ -39,10 +41,39 @@ doc: {
 
 var read = {
     Vårdtillfällen: [],
-    ÖppnaVårdkontakter: []
+    ÖppnaVårdkontakter: [],
+    Mätvärden: []
 };
 
 // parser.addReader = function(category, func(parsed))
+
+parser.addReader("Mätvärde", function(doc) {
+    // Vårdenhet tabellen innehåller in/ut datum
+    var tab = findTable(doc.tables, "Term");
+    if (!tab) return; // next doc plz
+
+    var värden = {};
+
+    // foreach row
+    for (var i = 0; i < tab.rows.length; i++) {
+        var row = tab.rows[i];
+        var num = parseFloat(row.Mätvärde.text.replace(",", "."));
+
+        värden[row.Term.text] = isNaN(num) ? row.Mätvärde.text : num;
+    }
+
+    var registCell = doc.notes[0];
+    var registMatch = /^Registrerad av:\s*(.*)$/.exec(registCell.text);
+    var regist = registMatch ? registMatch[1] : "<UNKNOWN>";
+
+    // Spara grejer
+    read.Mätvärden.push({
+        Rubrik: doc.head.data2,
+        Datum: doc.head.datetime,
+        RegistreradAv: regist,
+        Värden: värden
+    });
+});
 
 parser.addReader("Vårdtillfälle", function(doc) {
     // Vårdenhet tabellen innehåller in/ut datum
@@ -105,11 +136,17 @@ function forEachDocument(parsed, callback) {
     }
 }
 
-// returns cell[] || null
-function findTableFirstRow(tables, firstColumnName, textOnly) {
+// returns doctable || null
+function findTable(tables, firstColumnName) {
     var tab = tables.find(function(tbl) {
         return tbl.head[0].text === firstColumnName;
     });
+    return tab || null;
+}
+
+// returns cell[] || null
+function findTableFirstRow(tables, firstColumnName, textOnly) {
+    var tab = findTable(tables, firstColumnName);
 
     if (!tab) return null;
     if (textOnly) return tab.rows[firstColumnName].map(function(x) {
@@ -121,9 +158,7 @@ function findTableFirstRow(tables, firstColumnName, textOnly) {
 
 // return cell[] || null
 function findTableFirstColumn(tables, firstColumnName, textOnly) {
-    var tab = tables.find(function(tbl) {
-        return tbl.head[0].text === firstColumnName;
-    });
+    var tab = findTable(tables, firstColumnName);
 
     if (!tab) return null;
     if (textOnly) return tab.columns[firstColumnName].map(function(x) {

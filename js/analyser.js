@@ -13,7 +13,7 @@ var read = {
                 [0..n]: "" string
             ]
         }
-    ]
+    ],
 
     ÖppnaVårdkontakter: [
         [0..n]: {
@@ -25,6 +25,17 @@ var read = {
             Åtgärder: [
                 [0..n]: "" string
             ]
+        }
+    ],
+
+    Mätvärden: [
+        [0..n]: {
+            Rubrik: "" string,
+            Datum: Date,
+            RegistreradAv: "" string,
+            Värden: {
+                ["värdenamn"]: string|number
+            }
         }
     ]
 };

@@ -111,11 +111,13 @@
 
             var head = getDocHeader(doc);
             var body = getDocBody(doc);
+            var notes = getDocNotes(doc);
             var tables = getDocBodyTables(body);
 
             var obj = {
                 head: head,
                 body: body,
+                notes: notes,
                 tables: tables
             };
 
@@ -124,6 +126,15 @@
         }
 
         return documentsData;
+    }
+
+    function elemToCellObj(elem) {
+        return {
+            text: elem.innerText,
+            html: elem.innerHTML,
+            isItalic: elem.getElementsByTagName('i').length > 0,
+            isBold: elem.getElementsByTagName('b').length > 0
+        };
     }
 
     function getDocHeader(doc) {
@@ -151,6 +162,21 @@
         };
     }
 
+    function getDocNotes(doc) {
+        var dataList = doc.getElementsByClassName('data');
+        if (dataList.length == 0) return null;
+        var data = dataList[0];
+
+        var notes = [];
+        for (var i = 0; i < data.children.length; i++) {
+            var child = data.children[i];
+            if (child.tagName !== "P") break;
+            notes.push(elemToCellObj(child));
+        }
+
+        return notes;
+    }
+
     function getDocBody(doc) {
         var dataList = doc.getElementsByClassName('data');
         if (dataList.length == 0) return null;
@@ -164,13 +190,7 @@
             var rowData = [];
             var cols = rows[i].getElementsByTagName('td');
             for (var j=0; j<cols.length; j++) {
-                var elem = cols[j];
-                rowData.push({
-                    text: elem.innerText,
-                    html: elem.innerHTML,
-                    isItalic: elem.getElementsByTagName('i').length > 0,
-                    isBold: elem.getElementsByTagName('b').length > 0
-                });
+                rowData.push(elemToCellObj(cols[j]));
             }
             if (rowData.length > 0)
                 body.push(rowData);
