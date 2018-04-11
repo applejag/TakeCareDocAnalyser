@@ -4,7 +4,9 @@
     window.parser = parser;
     parser.isParsed = false;
     parser.isCrashed = false;
+    parser.isAnalysed = false;
     parser.lastParse = [];
+    parser.parsedDocuments = [];
 
     var input = document.getElementById("input");
     var output = document.getElementById("output");
@@ -12,7 +14,6 @@
     var reader_status = document.getElementById("output_status");
     var timer = null;
     var readerFunctions = {};
-    var parsedDocumentIds = [];
 
     parser.addReader = function(category, func) {
         readerFunctions[category] = func;
@@ -24,7 +25,7 @@
         for (var i = 0; i < parsed.length; i++) {
             var doc = parsed[i];
             // Already read?
-            if (parsedDocumentIds.indexOf(doc.head.id) !== -1) {
+            if (parser.parsedDocuments.indexOf(doc.head.id) !== -1) {
                 rereads++;
                 continue;
             }
@@ -33,7 +34,7 @@
             if (reader) {
                 reader(doc);
                 // Stash the id, dont read it again
-                parsedDocumentIds.push(doc.head.id);
+                parser.parsedDocuments.push(doc.head.id);
             } else {
                 console.log("Unknown document category, `"+doc.head.category+"`. Document data ignored.");
             }
@@ -65,9 +66,32 @@
         }
     }
 
+    parser.analyse = function() {
+        var start = Date.now();
+        parser.isAnalysed = false;
+
+        try {
+            analyseData();
+        } catch (e) {
+            setError("Error while analysing data!", e);
+        }
+
+        var dt = Date.now() - start;
+
+        if (parser.isCrashed)
+        {
+            reader_status.innerText = "(Analyse failed after " + dt + " ms)";
+        }
+        else
+        {
+            reader_status.innerText = "(Analysed " + parser.parsedDocuments.length + " documents in " + dt + " ms)";
+        }
+        parser.isAnalysed = true;
+    }
+
     parser.parseInput = function() {
         var start = Date.now();
-        var preParseCount = parsedDocumentIds.length;
+        var preParseCount = parser.parsedDocuments.length;
         var parsed;
 
         //-- WITHOUT TRY-CATCH
@@ -97,11 +121,11 @@
         }
         else
         {
-            var readCount = parsedDocumentIds.length - preParseCount;
-
-            reader_status.innerText = "(Found " + parsed.length + " documents, read "+readCount+" in " + dt + " ms. Read "+parsedDocumentIds.length+" documents in total)";
-            parser.isParsed = true;
+            var readCount = parser.parsedDocuments.length - preParseCount;
+            reader_status.innerText = "(Found " + parsed.length + " documents, read "+readCount+" in " + dt + " ms. Read "+parser.parsedDocuments.length+" documents in total)";
         }
+        
+        parser.isParsed = true;
     };
 
     function getParsedDocuments() {
