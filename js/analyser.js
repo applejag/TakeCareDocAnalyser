@@ -40,6 +40,17 @@ var read = {
         Undersökning: "" string,
         Provmaterial: "" string,
         Svar: "" string
+    },
+
+    RöntgenSvar[0..n]: {
+        Rubrik: "" string,
+        Datum: Date,
+        Remittent: "" string,
+        Beställning: "" string,
+        ÖnskadUndersökning: "" string,
+        Frågeställning: "" string,
+        Svar: "" string,
+        Utlåtande: "" string
     }
 };
 //*/

@@ -52,19 +52,33 @@ var read = {
     ÖppnaVårdkontakter: [],
     Mätvärden: [],
     Journaltexter: [],
-    MikrobiologiSvar: []
+    MikrobiologiSvar: [],
+    RöntgenSvar: []
 };
 
 // parser.addReader = function(category, func(parsed))
+
+parser.addReader("Röntgen svar", function(doc) {
+    read.RöntgenSvar.push({
+        Rubrik: doc.head.data2,
+        Datum: doc.head.datetime,
+        Remittent: findBodySecondColumn(doc.body, /^Remittent:?\s*$/i, true) || "",
+        Beställning: findBodySecondColumn(doc.body, /^Beställning:?\s*$/i, true) || "",
+        ÖnskadUndersökning: findBodySecondColumn(doc.body, /^Önskad\s*undersökning:?\s*$/i, true) || "",
+        Frågeställning: findBodySecondColumn(doc.body, /^Frågeställning:?\s*$/i, true) || "",
+        Svar: findBodySecondColumn(doc.body, /^Svar:?\s*$/i, true) || "",
+        Utlåtande: findBodySecondColumn(doc.body, /^Utlåtande:?\s*$/i, true) || ""
+    });
+});
 
 parser.addReader("Mikrobiologi svar", function(doc) {
     read.MikrobiologiSvar.push({
         Rubrik: doc.head.data2,
         Datum: doc.head.datetime,
-        Remittent: findBodySecondColumn(doc.body, /^Remittent:\s*$/i, true),
-        Undersökning: findBodySecondColumn(doc.body, /^Undersökning:\s*$/i, true),
-        Provmaterial: findBodySecondColumn(doc.body, /^Provmaterial:\s*$/i, true),
-        Svar: findBodySecondColumn(doc.body, /^Svar:\s*$/i, true)
+        Remittent: findBodySecondColumn(doc.body, /^Remittent:?\s*$/i, true) || "",
+        Undersökning: findBodySecondColumn(doc.body, /^Undersökning:?\s*$/i, true) || "",
+        Provmaterial: findBodySecondColumn(doc.body, /^Provmaterial:?\s*$/i, true) || "",
+        Svar: findBodySecondColumn(doc.body, /^Svar:?\s*$/i, true) || ""
     });
 });
 
