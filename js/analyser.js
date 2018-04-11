@@ -1,43 +1,46 @@
 
 /*
 var read = {
-    Vårdtillfällen: [
-        [0..n]: {
+    Vårdtillfällen[0..n]: {
             Rubrik: "" string,
             Inskrivningsdatum: Date,
             Utskrivningsdatum: Date,
-            Diagnoser: [
-                [0..n]: "" string
-            ],
-            Åtgärder: [
-                [0..n]: "" string
-            ]
+            Diagnoser[0..n]: "" string
+            Åtgärder[0..n]: "" string
         }
     ],
 
-    ÖppnaVårdkontakter: [
-        [0..n]: {
-            Rubrik: "" string,
-            Datum: Date,
-            Diagnoser: [
-                [0..n]: "" string
-            ],
-            Åtgärder: [
-                [0..n]: "" string
-            ]
-        }
-    ],
+    ÖppnaVårdkontakter[0..n]: {
+        Rubrik: "" string,
+        Datum: Date,
+        Diagnoser[0..n]: "" string
+        Åtgärder[0..n]: "" string
+    }
 
-    Mätvärden: [
-        [0..n]: {
-            Rubrik: "" string,
-            Datum: Date,
-            RegistreradAv: "" string,
-            Värden: {
-                ["värdenamn"]: string|number
-            }
+    Mätvärden[0..n]: {
+        Rubrik: "" string,
+        Datum: Date,
+        RegistreradAv: "" string,
+        Värden: {
+            ["värdenamn"]: string|number
         }
-    ]
+    }
+
+    Journaltexter[0..n]: {
+        Rubrik: "" string,
+        Datum: Date,
+        Signeringsansvarig: "" string,
+        Fritext: "" string
+    }
+
+    MikrobiologiSvar[0..n]: {
+        Rubrik: "" string,
+        Datum: Date,
+        Remittent: "" string,
+        Undersökning: "" string,
+        Provmaterial: "" string,
+        Svar: "" string
+    }
 };
 //*/
 
