@@ -43,8 +43,8 @@ var read = {
 
 function analyseData() {
     console.log("[!] PATIANT DATA GET IN LINE FOR INSPECTION\n[!] THIS IS YOUR EVALUATION DAY");
-
-    checkLongestVårdtillfälle();
+    findFeberMätvärden();
+    //checkLongestVårdtillfälle();
 }
 
 function checkLongestVårdtillfälle() {
@@ -72,4 +72,49 @@ function checkLongestVårdtillfälle() {
         "Från: " + longest.Inskrivningsdatum + "\n" +
         "Till " + longest.Utskrivningsdatum + "\n" +
         "(" + Math.round(days) + " dagar!)");
+}
+
+function findFeberMätvärden() {
+    var feberdok = read.Mätvärden;
+    var tmpFeberdok = [];
+
+    for (var i = 0; i < feberdok.length; i++) {
+        if (feberdok[i].Värden.Kroppstemperatur >= 38) {
+            tmpFeberdok.push(feberdok[i]);
+        }
+    }
+
+    if (tmpFeberdok.length>0) {
+        funnitsFeber = true;
+    }
+    feberdok = tmpFeberdok;
+
+    for (var j = 0; j < feberdok.length; j++) {
+        console.log(feberdok[j].Datum + " " + feberdok[j].Värden.Kroppstemperatur);
+    }
+}
+
+function formateraMikrobiologi() {
+    list = [
+        "positiv",
+        "fynd",
+        "påvisa",
+        "funne",
+        "växt"
+    ];
+
+    var positives = new RegExp("("+list.join('|')+")", "i");
+    var negatives = /(ej|inte|ingen|inga)\s+(positiv|fynd|påvisa|funne|växt)/gi;
+
+    var newMikroB = [];
+    var tmp = "";
+
+    for (var i = 0; i < mikroBdok.length; i++) {
+        tmp = mikroBdok[i].svar.replace(negatives, "");
+
+        if(positives.test(tmp)){
+            newMikroB.push(mikroBdok[i]);
+        }
+    }
+    mikroBdok = newMikroB;
 }

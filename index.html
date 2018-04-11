@@ -23,6 +23,9 @@
                     <button id="parse_run" class="input" type="button" onclick="parser.parseInput()">Parse documents</button>
                     <button id="parse_analyse" class="input" type="button" onclick="parser.analyse()">Analyse saved data</button>
                 </div>
+                <div class="col">
+                    <div id="output_status">(Press <a href="javascript:parser.parseInput()">parse</a> to parse the data.)</div>
+                </div>
             </div>
             <div class="row">
                 <div class="col">
@@ -47,9 +50,6 @@
                     <button id="output_select_all" class="input" type="button" onclick="focusAll('output')">Select all</button>
                     <button id="output_select_end" class="input" type="button" onclick="focusEnd('output')">Select end</button>
                     <pre id="output" class="codefield mono" contenteditable="true"></pre>
-                </div>
-                <div class="col">
-                    <div id="output_status" style="text-align: center;">(Press <a href="javascript:parser.parseInput()">parse</a> to parse the data.)</div>
                 </div>
             </div>
             <div class="row">
