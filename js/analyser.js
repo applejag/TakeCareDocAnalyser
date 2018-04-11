@@ -22,7 +22,7 @@ var read = {
         Datum: Date,
         RegistreradAv: "" string,
         Värden: {
-            ["värdenamn"]: string|number
+            ["värdenamn"]: number|string
         }
     }
 
@@ -51,6 +51,21 @@ var read = {
         Frågeställning: "" string,
         Svar: "" string,
         Utlåtande: "" string
+    }
+
+    KemlabSvar[0..n] {
+        Rubrik: "" string,
+        Datum: Date,
+        Sjukhus: "" string,
+        Remittent: "" string,
+        UtanförNågotIntervall: true|false,
+        Värden[1..n]: {
+            Analysnamn: "" string,
+            Resultat: number|string,
+            UtanförIntervall: true|false,
+            ReferensLägre: number|null,
+            ReferensÖvre: number|null,
+        },
     }
 };
 //*/

@@ -1,4 +1,12 @@
 
+function isRegExp(val) {
+    return val instanceof RegExp;
+}
+
+function isString(val) {
+    return typeof val == "string" || val instanceof String;
+}
+
 function parseDate(str) {
     var reg = /(?:Den )?(\d+) (\w+) (\d+) (?:kl )?(\d+:\d+)/i.exec(str);
     if (reg) {

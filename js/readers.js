@@ -53,10 +53,63 @@ var read = {
     Mätvärden: [],
     Journaltexter: [],
     MikrobiologiSvar: [],
-    RöntgenSvar: []
+    RöntgenSvar: [],
+    KemlabSvar: []
 };
 
 // parser.addReader = function(category, func(parsed))
+
+parser.addReader(/^Kemlab svar/i, function(doc) {
+    var remittCell = doc.notes[0];
+    var remittMatch = /^Remittent:\s*(.*)$/i.exec(remittCell.text);
+    var remitt = remittMatch ? remittMatch[1] : "";
+
+    var sjuk = doc.head.category.match(/^Kemlab svar\s*(.*)$/);
+
+    var tab = findTable(doc.tables, "Analysnamn");
+    if (!tab) return;
+
+    var outAny = false;
+    var värden = [];
+    for (var i = 0; i < tab.rows.length; i++) {
+        var row = tab.rows[i];
+
+        var out = row.Resultat.text.indexOf('*') !== -1;
+        if (out) outAny = true;
+
+        var result = parseFloat(row.Resultat.text.replace(/,/g, '.').match(/[\d\.]+/));
+        if (isNaN(result)) result = row.Resultat.text;
+
+        var refText = row.Referensintervall.text.replace(/,/g, ".");
+        var ref = /^(-?[\d.]+)-(-?[\d.]+)|>(-?[\d.]+)|<(-?[\d.]+)$/i.exec(refText);
+        var lower = null;
+        var upper = null;
+
+        if (ref) {
+            if (ref[1] !== undefined) lower = parseFloat(ref[1]);
+            if (ref[2] !== undefined) upper = parseFloat(ref[2]);
+            if (ref[3] !== undefined) lower = parseFloat(ref[3]);
+            if (ref[4] !== undefined) upper = parseFloat(ref[4]);
+        }
+
+        värden.push({
+            Analysnamn: row.Analysnamn.text,
+            Resultat: result,
+            UtanförIntervall: out,
+            ReferensLägre: lower,
+            ReferensÖvre: upper
+        });
+    }
+
+    read.KemlabSvar.push({
+        Rubrik: doc.head.data2,
+        Datum: doc.head.datetime,
+        Sjukhus: sjuk ? sjuk[1] : "",
+        Remittent: remitt,
+        UtanförNågotIntervall: outAny,
+        Värden: värden
+    });
+});
 
 parser.addReader("Röntgen svar", function(doc) {
     read.RöntgenSvar.push({
@@ -115,7 +168,7 @@ parser.addReader("Mätvärde", function(doc) {
 
     var registCell = doc.notes[0];
     var registMatch = /^Registrerad av:\s*(.*)$/.exec(registCell.text);
-    var regist = registMatch ? registMatch[1] : "<UNKNOWN>";
+    var regist = registMatch ? registMatch[1] : "";
 
     // Spara grejer
     read.Mätvärden.push({

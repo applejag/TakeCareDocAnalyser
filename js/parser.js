@@ -13,14 +13,33 @@
     var reader_arg = document.getElementById("parse_argument");
     var reader_status = document.getElementById("output_status");
     var timer = null;
-    var readerFunctions = {};
+    var readerFunctions = [];
 
-    parser.addReader = function(category, func) {
-        readerFunctions[category] = func;
+    parser.addReader = function(search, func) {
+        readerFunctions.push({
+            search: search,
+            func: func
+        });
     };
+
+    function getReader(category) {
+        for (var i = 0; i < readerFunctions.length; i++) {
+            var reader = readerFunctions[i];
+
+            if (isString(reader.search)) {
+                if (category == reader.search) return reader;
+            } else if (isRegExp(reader.search)) {
+                if (reader.search.test(category)) return reader;
+            } else {
+                throw new Error("Invalid reader function search type!");
+            }
+        }
+        return null;
+    }
 
     function runReader(parsed) {
         var rereads = 0;
+        var unknownCategories = [];
 
         for (var i = 0; i < parsed.length; i++) {
             var doc = parsed[i];
@@ -30,12 +49,13 @@
                 continue;
             }
 
-            var reader = readerFunctions[doc.head.category];
+            var reader = getReader(doc.head.category);
             if (reader) {
-                reader(doc);
+                reader.func(doc);
                 // Stash the id, dont read it again
                 parser.parsedDocuments.push(doc.head.id);
-            } else {
+            } else if (unknownCategories.indexOf(doc.head.category) === -1) {
+                unknownCategories.push(doc.head.category);
                 console.log("Unknown document category, `"+doc.head.category+"`. Document data ignored.");
             }
         }
@@ -87,7 +107,7 @@
             reader_status.innerText = "(Analysed " + parser.parsedDocuments.length + " documents in " + dt + " ms)";
         }
         parser.isAnalysed = true;
-    }
+    };
 
     parser.parseInput = function() {
         var start = Date.now();
@@ -124,7 +144,7 @@
             var readCount = parser.parsedDocuments.length - preParseCount;
             reader_status.innerText = "(Found " + parsed.length + " documents, read "+readCount+" in " + dt + " ms. Read "+parser.parsedDocuments.length+" documents in total)";
         }
-        
+
         parser.isParsed = true;
     };
 
