@@ -34,7 +34,15 @@ doc: {
         columns: {
             _th_cell_text[0..n]: cell
         }
-    }
+    },
+
+    trees[0..n]: tree
+}
+
+tree: {
+    title: cell,
+    content: cell,
+    children[0..n]: tree
 }
 
 */
@@ -60,7 +68,7 @@ parser.addReader("Journaltext", function(doc) {
         Rubrik: doc.head.data2,
         Datum: doc.head.datetime,
         Signeringsansvarig: sign,
-        Fritext: "not implemented"
+        Fritext: flattenTreeContentText(tree)
     });
 });
 
@@ -118,6 +126,20 @@ parser.addReader("Öppen vårdkontakt", function(doc) {
 });
 
 /* HELPER FUNCTIONS */
+
+function flattenTreeContentText(tree) {
+    var output = tree.content.text;
+
+    for (var i = 0; i < tree.children.length; i++) {
+        var childtext = flattenTreeContentText(tree.children[i]);
+        
+        if (childtext == "") continue;
+        if (output == "") output = childtext;
+        else output += "\n" + childtext;
+    }
+
+    return output;
+}
 
 // callback(cell, row, doc)
 function forEachCell(parsed, callback) {
