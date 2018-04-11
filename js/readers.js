@@ -51,10 +51,22 @@ var read = {
     Vårdtillfällen: [],
     ÖppnaVårdkontakter: [],
     Mätvärden: [],
-    Journaltexter: []
+    Journaltexter: [],
+    MikrobiologiSvar: []
 };
 
 // parser.addReader = function(category, func(parsed))
+
+parser.addReader("Mikrobiologi svar", function(doc) {
+    read.MikrobiologiSvar.push({
+        Rubrik: doc.head.data2,
+        Datum: doc.head.datetime,
+        Remittent: findBodySecondColumn(doc.body, /^Remittent:\s*$/i, true),
+        Undersökning: findBodySecondColumn(doc.body, /^Undersökning:\s*$/i, true),
+        Provmaterial: findBodySecondColumn(doc.body, /^Provmaterial:\s*$/i, true),
+        Svar: findBodySecondColumn(doc.body, /^Svar:\s*$/i, true)
+    });
+});
 
 parser.addReader("Journaltext", function(doc) {
     // Måste ha ett journaldokument textträd
@@ -127,52 +139,28 @@ parser.addReader("Öppen vårdkontakt", function(doc) {
 
 /* HELPER FUNCTIONS */
 
+function findBodySecondColumn(body, firstColumnSearch, textOnly) {
+    for (var i = 0; i < body.length; i++) {
+        var row = body[i];
+        if (row[0].text.search(firstColumnSearch) !== -1) {
+            return textOnly ? row[1].text : row[1];
+        }
+    }
+    return null;
+}
+
 function flattenTreeContentText(tree) {
     var output = tree.content.text;
 
     for (var i = 0; i < tree.children.length; i++) {
         var childtext = flattenTreeContentText(tree.children[i]);
-        
+
         if (childtext == "") continue;
         if (output == "") output = childtext;
         else output += "\n" + childtext;
     }
 
     return output;
-}
-
-// callback(cell, row, doc)
-function forEachCell(parsed, callback) {
-    forEachRow(parsed, function(row, doc) {
-        // foreach cell
-        for (var i = 0; i < row.length; i++) {
-            var cell = row[i];
-            var ret = callback(cell, row, doc);
-            if (ret) return ret;
-        }
-    });
-}
-
-// callback(row, doc)
-function forEachRow(parsed, callback) {
-    forEachDocument(parsed, function(doc) {
-        // foreach row
-        for (var i = 0; i < doc.body.length; i++) {
-            var row = doc.body[i];
-            var ret = callback(row, doc);
-            if (ret) return ret;
-        }
-    });
-}
-
-// callback(doc)
-function forEachDocument(parsed, callback) {
-    // foreach document
-    for (var i = 0; i < parsed.length; i++) {
-        var doc = parsed[i];
-        var ret = callback(doc);
-        if (ret) return ret;
-    }
 }
 
 // returns doctable || null
