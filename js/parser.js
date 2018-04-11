@@ -6,7 +6,7 @@
     parser.isCrashed = false;
     parser.isAnalysed = false;
     parser.lastParse = [];
-    parser.parsedDocuments = [];
+    // read.ParsedDocuments = [];
 
     var input = document.getElementById("input");
     var output = document.getElementById("output");
@@ -44,7 +44,7 @@
         for (var i = 0; i < parsed.length; i++) {
             var doc = parsed[i];
             // Already read?
-            if (parser.parsedDocuments.indexOf(doc.head.id) !== -1) {
+            if (read.ParsedDocuments.indexOf(doc.head.id) !== -1) {
                 rereads++;
                 continue;
             }
@@ -53,7 +53,7 @@
             if (reader) {
                 reader.func(doc);
                 // Stash the id, dont read it again
-                parser.parsedDocuments.push(doc.head.id);
+                read.ParsedDocuments.push(doc.head.id);
             } else if (unknownCategories.indexOf(doc.head.category) === -1) {
                 unknownCategories.push(doc.head.category);
                 console.log("Unknown document category, `"+doc.head.category+"`. Document data ignored.");
@@ -86,11 +86,72 @@
         }
     }
 
+    parser.importJSON = function() {
+        var start = Date.now();
+
+        parser.isCrashed = false;
+        var fieldCount = 0;
+        var itemCount = 0;
+
+        try {
+            setError();
+            var toParse = output.innerText.trim();
+            if (toParse == "")
+                throw new Error("Nothing to import!");
+
+            var data = JSON.parse(toParse, function (key, value) {
+                if (key.search(/datum/i) !== -1)
+                    return parseDate(value);
+                return value;
+            });
+
+            if (!(data instanceof Object))
+                throw new Error("Parsed data is not valid object!");
+
+            for (var dfield in data) {
+                if (data.hasOwnProperty(dfield)) {
+                    if (!(data[dfield] instanceof Array))
+                        throw new Error("Parsed field `"+dfield+"` is invalid data type! Expected array.");
+
+                    if (!(read[dfield] instanceof Array))
+                        throw new Error("Unsupported field name `"+dfield+"`!");
+
+                    read[dfield] = data[dfield];
+                    fieldCount++;
+                    itemCount += data[dfield].length;
+                }
+            }
+            for (var rfield in read) {
+                if (read.hasOwnProperty(rfield)) {
+                    if (read[rfield] instanceof Array &&
+                        !(data[rfield] instanceof Array))
+                    {
+                        read[rfield] = [];
+                    }
+                }
+            }
+
+            output.innerText = JSON.stringify(read, null, 4);
+        } catch (e) {
+            setError("Error while importing data!", e);
+        }
+
+        var dt = Date.now() - start;
+
+        if (parser.isCrashed) {
+            reader_status.innerText = "(Import failed after "+dt+" ms)";
+        } else {
+            reader_status.innerText = "(Imported "+fieldCount+" fields and a total of "+itemCount+" documents in "+dt+" ms)";
+        }
+    };
+
     parser.analyse = function() {
         var start = Date.now();
         parser.isAnalysed = false;
+        parser.isCrashed = false;
 
         try {
+            setError();
             analyseData();
         } catch (e) {
             setError("Error while analysing data!", e);
@@ -104,14 +165,14 @@
         }
         else
         {
-            reader_status.innerText = "(Analysed " + parser.parsedDocuments.length + " documents in " + dt + " ms)";
+            reader_status.innerText = "(Analysed " + read.ParsedDocuments.length + " documents in " + dt + " ms)";
         }
         parser.isAnalysed = true;
     };
 
     parser.parseInput = function() {
         var start = Date.now();
-        var preParseCount = parser.parsedDocuments.length;
+        var preParseCount = read.ParsedDocuments.length;
         var parsed;
 
         //-- WITHOUT TRY-CATCH
@@ -119,6 +180,7 @@
         // output.innerText = runReader(parsed);
         //-- WITH TRY-CATCH
         try {
+            setError();
             parsed = getParsedDocuments();
             parser.lastParse = parsed;
 
@@ -141,8 +203,8 @@
         }
         else
         {
-            var readCount = parser.parsedDocuments.length - preParseCount;
-            reader_status.innerText = "(Found " + parsed.length + " documents, read "+readCount+" in " + dt + " ms. Read "+parser.parsedDocuments.length+" documents in total)";
+            var readCount = read.ParsedDocuments.length - preParseCount;
+            reader_status.innerText = "(Found " + parsed.length + " documents, read "+readCount+" in " + dt + " ms. Read "+read.ParsedDocuments.length+" documents in total)";
         }
 
         parser.isParsed = true;

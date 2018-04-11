@@ -10,9 +10,9 @@ function isString(val) {
 function parseDate(str) {
     var reg = /(?:Den )?(\d+) (\w+) (\d+) (?:kl )?(\d+:\d+)/i.exec(str);
     if (reg) {
-        return Date.parse(reg[2]+" "+reg[1]+" "+reg[3]+" "+reg[4]);
+        return new Date(reg[2]+" "+reg[1]+" "+reg[3]+" "+reg[4]);
     } else {
-        return Date.parse(str);
+        return new Date(str);
     }
 }
 

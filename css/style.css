@@ -29,8 +29,7 @@ html {
 
     width: 100%;
 
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: auto;
     word-wrap: break-word;
 
     background-color: #ffffff;
@@ -192,7 +191,28 @@ body > #container {
     color: red;
     border: 1px solid red;
     border-radius: 8px;
+}
+
+div.danger {
     padding: 12px;
+}
+
+button.danger {
+    border: 1px solid red;
+    border-radius: 0;
+}
+
+button.close {
+    float: right;
+    font-size: 150%;
+    background-color: unset;
+    border: none;
+    color: inherit;
+    outline: none;
+}
+
+button.close:hover {
+    color: black;
 }
 
 .row {

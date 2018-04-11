@@ -20,7 +20,6 @@
             </noscript>
             <div class="row">
                 <div class="col">
-                    <button id="parse_run" class="input" type="button" onclick="parser.parseInput()">Parse documents</button>
                     <button id="parse_analyse" class="input" type="button" onclick="parser.analyse()">Analyse saved data</button>
                 </div>
                 <div class="col">
@@ -30,6 +29,7 @@
             <div class="row">
                 <div class="col">
                     <div id="output_error" class="danger" style="display: none;">
+                        <button id="output_error_close" class="close" type="button" onclick="output_error.style.display='none';">&times;</button>
                         <h3 id="output_error_title"></h3>
                         <pre id="output_error_para"></pre>
                         <p>Please check the console to debug the error!</p>
@@ -39,16 +39,18 @@
             <div class="row">
                 <div class="col-6">
                     <h2>Input:</h2>
-                    <button id="input_clear" class="input" type="button" onclick="clearContent('input')">Clear field</button>
+                    <button id="input_clear" class="input danger" type="button" onclick="clearContent('input')">&times; Clear field</button>
                     <button id="input_select_all" class="input" type="button" onclick="focusAll('input')">Select all</button>
                     <button id="input_select_end" class="input" type="button" onclick="focusEnd('input')">Select end</button>
+                    <button id="parse_run" class="input" type="button" onclick="parser.parseInput()">Parse documents</button>
                     <div id="input" class="codefield" contenteditable="true"></div>
                 </div>
                 <div class="col-6">
                     <h2>Saved data:</h2>
-                    <button id="output_clear" class="input" type="button" onclick="clearContent('output')">Clear field</button>
+                    <button id="output_clear" class="input danger" type="button" onclick="clearContent('output')">&times; Clear field</button>
                     <button id="output_select_all" class="input" type="button" onclick="focusAll('output')">Select all</button>
                     <button id="output_select_end" class="input" type="button" onclick="focusEnd('output')">Select end</button>
+                    <button id="output_import" class="input" type="button" onclick="parser.importJSON()">Import data</button>
                     <pre id="output" class="codefield mono" contenteditable="true"></pre>
                 </div>
             </div>

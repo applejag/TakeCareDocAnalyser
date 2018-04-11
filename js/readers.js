@@ -54,7 +54,9 @@ var read = {
     Journaltexter: [],
     MikrobiologiSvar: [],
     RöntgenSvar: [],
-    KemlabSvar: []
+    KemlabSvar: [],
+
+    ParsedDocuments: []
 };
 
 // parser.addReader = function(category, func(parsed))
