@@ -62,8 +62,6 @@
 
         if (rereads > 0)
             console.log("There were "+rereads+" documents that were already read!");
-
-        return JSON.stringify(read, null, 4);
     }
 
     function setError(title, error)
@@ -85,6 +83,11 @@
             parser.isCrashed = false;
         }
     }
+
+    parser.exportJSON = function() {
+        parser.isCrashed = false;
+        output.innerText = JSON.stringify(read, null, 4);
+    };
 
     parser.importJSON = function() {
         var start = Date.now();
@@ -133,16 +136,11 @@
 
             output.innerText = JSON.stringify(read, null, 4);
         } catch (e) {
+            reader_status.innerText = "(Import failed after "+(Date.now() - start)+" ms)";
             setError("Error while importing data!", e);
         }
 
-        var dt = Date.now() - start;
-
-        if (parser.isCrashed) {
-            reader_status.innerText = "(Import failed after "+dt+" ms)";
-        } else {
-            reader_status.innerText = "(Imported "+fieldCount+" fields and a total of "+itemCount+" documents in "+dt+" ms)";
-        }
+        reader_status.innerText = "(Imported "+fieldCount+" fields and a total of "+itemCount+" documents in "+(Date.now() - start)+" ms)";
     };
 
     parser.analyse = function() {
@@ -154,30 +152,23 @@
             setError();
             analyseData();
         } catch (e) {
+            reader_status.innerText = "(Analyse failed after " + (Date.now() - start) + " ms)";
             setError("Error while analysing data!", e);
         }
 
-        var dt = Date.now() - start;
-
-        if (parser.isCrashed)
-        {
-            reader_status.innerText = "(Analyse failed after " + dt + " ms)";
-        }
-        else
-        {
-            reader_status.innerText = "(Analysed " + read.ParsedDocuments.length + " documents in " + dt + " ms)";
-        }
+        reader_status.innerText = "(Analysed " + read.ParsedDocuments.length + " documents in " + (Date.now() - start) + " ms)";
         parser.isAnalysed = true;
     };
 
     parser.parseInput = function() {
         var start = Date.now();
+        parser.isCrashed = false;
         var preParseCount = read.ParsedDocuments.length;
         var parsed;
 
         //-- WITHOUT TRY-CATCH
         // parsed = getParsedDocuments();
-        // output.innerText = runReader(parsed);
+        // runReader(parsed);
         //-- WITH TRY-CATCH
         try {
             setError();
@@ -185,27 +176,19 @@
             parser.lastParse = parsed;
 
             try {
-                var text = runReader(parsed);
-                clearContent('output');
-                output.innerText = text === "" ? " " : text;
+                runReader(parsed);
             } catch (e) {
+                reader_status.innerText = "(Parsing failed after " + (Date.now() - start) + " ms)";
                 setError("Error while reading data!", e);
             }
         } catch (e) {
+            reader_status.innerText = "(Parsing failed after " + (Date.now() - start) + " ms)";
             setError("Error while parsing documents!", e);
         }
         //-------------------
 
-        var dt = Date.now() - start;
-        if (parser.isCrashed)
-        {
-            reader_status.innerText = "(Parsing failed after " + dt + " ms)";
-        }
-        else
-        {
-            var readCount = read.ParsedDocuments.length - preParseCount;
-            reader_status.innerText = "(Found " + parsed.length + " documents, read "+readCount+" in " + dt + " ms. Read "+read.ParsedDocuments.length+" documents in total)";
-        }
+        var readCount = read.ParsedDocuments.length - preParseCount;
+        reader_status.innerText = "(Read "+readCount+" documents in " + (Date.now() - start) + " ms. Read "+read.ParsedDocuments.length+" documents in total)";
 
         parser.isParsed = true;
     };
