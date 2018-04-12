@@ -66,6 +66,10 @@ body > #container {
     text-decoration: none;
 }
 
+#input .document .header u {
+    text-decoration: none;
+}
+
 #input .document .header span {
     border: 1px dotted lightgray;
     margin-right: 0.5em;
@@ -158,9 +162,10 @@ body > #container {
     border-radius: 8px;
     padding-left: 4px;
     padding-top: 0.8em;
-    border-collapse: collapse;
-    display:block;
+    border-collapse: separate;
+    border-spacing: 0;
     overflow-x: auto;
+    width: 100%;
 }
 
 #input table td {
@@ -181,18 +186,6 @@ body > #container {
 }
 #input table td:first-child {
     border-left: none;
-}
-
-#input table tbody,
-#input table tbody > tr {
-    display: -webkit-flex; /* Safari */
-    display: flex;
-    width: 100%;
-}
-
-#input table tbody > tr td {
-    -webkit-flex-grow: 1;
-    flex-grow: 1;
 }
 
 .center {
