@@ -88,7 +88,7 @@ function analyzeInfectionData() {
     var odlingar = hittaOdlingarMikrobiologi();
     var infektionstexter = findInfInJournaltext();
     var funnaDKoder = findInfInVtf();
-    //hittaInfarter();
+    var hittadeInfarter = hittaInfarter();
     // var dåligaKemSvar = findIrregularKemSvar();
 
 
@@ -105,12 +105,31 @@ function analyzeInfectionData() {
     console.log("Antal journaltexter som tyder på infektion: " + infektionstexter.length);
     console.log("");
     console.log("Funna diagnoskoder för infektion: " + funnaDKoder.join(", "));
+    console.log();
+    console.log("Insatta infarter: ");
+    for (var k = 0; k < hittadeInfarter.length; k++) {
+        console.log(hittadeInfarter[k]);
+    }
 }
 
 
 function hittaInfarter() {         // FIXA SEN TILL allaFiltreradeReads
     var journaltexter = read.Journaltexter;
-    var infarter = [];
+    var infarter = ["KAD", "suprapubiskateter", "urinavledning", "CVK",
+     "picc", "SVP", "CDK", "cvk", "cdk", "svp"];
+    var hittadeInfarter = [];
+
+    for (var i = 0; i < journaltexter.length; i++) {
+
+        var journaltext = journaltexter[i].Fritext;
+
+        for (var j = 0; j < infarter.length; j++) {
+            if(journaltext.indexOf(infarter[j]) !== -1) {
+                hittadeInfarter.push( "" + infarter[j].toUpperCase() + " " + journaltexter[i].Datum);
+            }
+        }
+    }
+    return hittadeInfarter;
 }
 
 
@@ -262,7 +281,7 @@ function findInfInJournaltext() {
     var journaltexter = read.Journaltexter; // FIXA SEN TILL allaFiltreradeReads
     var infekteradeTexter = [];
 
-    var negativInf = /(ej|inte|ingen|inga tecken på)\s+(infektion|infektionstecken|sepsis|infektera)|infektionsklinik/i;
+    var negativInf = /(ej|inte|ingen|inga tecken på|inga kända)\s+(infektion|infektionstecken|sepsis|infektera)|infektionsklinik|desinfekt/i;
     //NANDA 00004 - risk för infektion
     var positivInf = /(infektion|NANDA 00004|sepsis|infektera)/i;
 
