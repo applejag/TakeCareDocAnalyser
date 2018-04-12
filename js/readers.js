@@ -55,11 +55,36 @@ var read = {
     MikrobiologiSvar: [],
     RöntgenSvar: [],
     KemlabSvar: [],
+    Läkemedelsordinationer: [],
 
     ParsedDocuments: []
 };
 
 // parser.addReader = function(category, func(parsed))
+
+parser.addReader("Läkemedelsordination", function(doc) {
+    var utdatum = null;
+    var läkemedel = [];
+    for (var i = 0; i < doc.body.length; i++) {
+        var row = doc.body[i];
+
+        if (/^Utsättningsdatum:?\s*$/i.test(row[0].text)) {
+            utdatum = parseDate(row[1].text);
+        } else {
+            läkemedel.push(row[1].text);
+        }
+    }
+
+    if (läkemedel.length == 0)
+        return;
+
+    read.Läkemedelsordinationer.push({
+        Rubrik: doc.head.data2,
+        Datum: doc.head.datetime,
+        Utsättningsdatum: utdatum,
+        Läkemedel: läkemedel
+    });
+});
 
 parser.addReader(/^Kemlab svar/i, function(doc) {
     var remittCell = doc.notes[0];
