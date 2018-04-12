@@ -8,15 +8,14 @@ function isString(val) {
 }
 
 function parseDate(str) {
-    var reg = /(?:Den )?(\d+) (\w+) (\d+) (?:kl )?(\d+:\d+)/i.exec(str);
-    if (reg) {
-        return new Date(reg[2]+" "+reg[1]+" "+reg[3]+" "+reg[4]);
-    } else {
-        return new Date(str);
-    }
+    str=str.trim();
+    var reg = /(?:Den\s*)?(\d+)\s*(\w+)\s*(\d+)?(?:(?:kl\s*|\D+)?(\d+:\d+))?/i.exec(str);
+    var date = reg ? Date.parse(reg[2]+" "+reg[1]+" "+(reg[3]||'')+" "+(reg[4]||'')) : Date.parse(str);
+    if (!date) throw new Error("Unable to parse date `"+JSON.stringify(str)+"`!");
+    return date;
 }
 
-Object.defineProperty(String.prototype, "splitSentences", (function() {
+String.prototype.splitSentences = (function() {
     // very kind/non restrictive url matching
     var urls = "(https?:\\/\\/.)?(www\\.)?([-a-zA-Z0-9@:%._\\+~#=]{2,256})(\\.[a-z]{2,6})\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)";
 
@@ -57,7 +56,7 @@ Object.defineProperty(String.prototype, "splitSentences", (function() {
         var matches = this.match(regex);
         return matches ? matches.map(trimmer) : [];
     };
-})());
+})();
 
 function clearContent(elemId) {
     var elem = document.getElementById(elemId);

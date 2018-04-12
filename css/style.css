@@ -200,6 +200,15 @@ div.danger {
 button.danger {
     border: 1px solid red;
     border-radius: 0;
+    background: linear-gradient(#ffefef, #ecc7c7);
+}
+
+button.danger:hover {
+    border-color: darkred;
+}
+
+button.danger:active {
+    background: linear-gradient(#ecc7c7, #ffefef);
 }
 
 button.close {
