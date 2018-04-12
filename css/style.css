@@ -70,6 +70,7 @@ body > #container {
     border: 1px dotted lightgray;
     margin-right: 0.5em;
 }
+#input table td:empty::before,
 #input .document .header > span:empty::before {
     content: "N/A";
     color: lightgray;
@@ -157,13 +158,13 @@ body > #container {
     border-radius: 8px;
     padding-left: 4px;
     padding-top: 0.8em;
-    border-spacing: 0;
+    border-collapse: collapse;
     display:block;
     overflow-x: auto;
 }
 
 #input table td {
-    border: 0.5px dotted lightgray;
+    border: 1px dotted lightgray;
 }
 #input table td:hover {
     border-color: gray;
@@ -180,6 +181,16 @@ body > #container {
 }
 #input table td:first-child {
     border-left: none;
+}
+
+#input table tbody,
+#input table tbody > tr {
+    display: flex;
+    width: 100%;
+}
+
+#input table tbody > tr td {
+    flex-grow: 1;
 }
 
 .center {
