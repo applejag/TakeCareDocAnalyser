@@ -11,7 +11,7 @@ html {
 }
 
 #input, #output {
-    max-height: 400px;
+    max-height: 300px;
     min-height: 50px;
 }
 
@@ -66,24 +66,24 @@ body > #container {
     text-decoration: none;
 }
 
-#input .document .header > span {
+#input .document .header span {
     border: 1px dotted lightgray;
     margin-right: 0.5em;
 }
 #input table td:empty::before,
-#input .document .header > span:empty::before {
+#input .document .header span:empty::before {
     content: "N/A";
     color: lightgray;
     font-style: italic;
     font-family: monospace;
 }
-#input .document .header > span:hover {
+#input .document .header span:hover {
     border-color: gray;
 }
-#input .document .header > span.col_4 {
+#input .document .header span.col_4 {
     font-family: monospace;
 }
-#input .document .header > span.col_1 {
+#input .document .header span.col_1 {
     font-weight: bolder;
 }
 
