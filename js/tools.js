@@ -15,6 +15,18 @@ function parseDate(str) {
     return date;
 }
 
+// http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+String.prototype.hashCode = function(){
+	var hash = 0;
+	if (this.length == 0) return hash;
+	for (i = 0; i < this.length; i++) {
+		code = this.charCodeAt(i);
+		hash = ((hash<<5)-hash)+code;
+		hash = hash & hash; // Convert to 32bit integer
+	}
+	return hash;
+};
+
 String.prototype.splitSentences = (function() {
     // very kind/non restrictive url matching
     var urls = "(https?:\\/\\/.)?(www\\.)?([-a-zA-Z0-9@:%._\\+~#=]{2,256})(\\.[a-z]{2,6})\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)";

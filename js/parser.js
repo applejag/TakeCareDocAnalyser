@@ -43,8 +43,9 @@
 
         for (var i = 0; i < parsed.length; i++) {
             var doc = parsed[i];
-            // Already read?
-            if (read.ParsedDocuments.indexOf(doc.head.id) !== -1) {
+
+            // Already parsed before?
+            if (read.ParsedDocuments.indexOf(doc.id) !== -1) {
                 rereads++;
                 continue;
             }
@@ -53,15 +54,15 @@
             if (reader) {
                 reader.func(doc);
                 // Stash the id, dont read it again
-                read.ParsedDocuments.push(doc.head.id);
+                read.ParsedDocuments.push(doc.id);
             } else if (unknownCategories.indexOf(doc.head.category) === -1) {
                 unknownCategories.push(doc.head.category);
-                console.log("Unknown document category, `"+doc.head.category+"`. Document data ignored.");
+                console.warn("Unknown document category, `"+JSON.stringify(doc.head.category)+"`. Document data ignored.");
             }
         }
 
         if (rereads > 0)
-            console.log("There were "+rereads+" documents that were already read!");
+            console.warn("There were "+rereads+" documents that were already parsed, or was identical with a previously parsed document.");
     }
 
     function setError(title, error)
@@ -189,7 +190,13 @@
         //-------------------
 
         var readCount = read.ParsedDocuments.length - preParseCount;
-        reader_status.innerText = "(Read "+readCount+" documents in " + (Date.now() - start) + " ms. Read "+read.ParsedDocuments.length+" documents in total)";
+        var log = readCount===0 ?
+            (parsed.length === 0 ?
+                "No documents were found.":
+                "No new data were found among " + parsed.length + " parsed documents.") :
+            "Data read from "+readCount+" documents in " + (Date.now() - start) + " ms.";
+        console.log("[!] "+log);
+        reader_status.innerText = "("+log+" Read "+read.ParsedDocuments.length+" documents in total)";
 
         parser.isParsed = true;
     };
@@ -212,6 +219,7 @@
             }
 
             var obj = {
+                id: getDocId(doc),
                 head: head,
                 body: body,
                 notes: notes,
@@ -241,6 +249,10 @@
         };
     }
 
+    function getDocId(doc) {
+        return doc.innerHTML.hashCode();
+    }
+
     function getDocHeader(doc) {
         var headList = doc.getElementsByClassName('header');
         if (headList.length == 0) return null;
@@ -252,12 +264,6 @@
             .replace('--:--', '00:00');
 
         return {
-            id: [
-                spans[0].innerText,
-                spans[1].innerText,
-                spans[2].innerText,
-                date
-            ].join('|'),
             category: spans[0].innerText,
             data1: spans[1].innerText,
             data2: spans[2].innerText,
