@@ -168,6 +168,7 @@
 
         //-- WITHOUT TRY-CATCH
         // parsed = getParsedDocuments();
+        // parser.lastParse = parsed;
         // runReader(parsed);
         //-- WITH TRY-CATCH
         try {

@@ -2,13 +2,12 @@
 /*
 var read = {
     Vårdtillfällen[0..n]: {
-            Rubrik: "" string,
-            Inskrivningsdatum: Date,
-            Utskrivningsdatum: Date,
-            Diagnoser[0..n]: "" string
-            Åtgärder[0..n]: "" string
-        }
-    ],
+        Rubrik: "" string,
+        Inskrivningsdatum: Date,
+        Utskrivningsdatum: Date,
+        Diagnoser[0..n]: "" string
+        Åtgärder[0..n]: "" string
+    }
 
     ÖppnaVårdkontakter[0..n]: {
         Rubrik: "" string,
