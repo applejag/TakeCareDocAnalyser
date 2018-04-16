@@ -65,6 +65,27 @@ var read = {
             ReferensLägre: number|null,
             ReferensÖvre: number|null,
         },
+    },
+
+    MultidisciplinäraSvar[0..n] {
+        Rubrik: "" string,
+        Datum: Date,
+        Remittent: "" string,
+        UtanförNågotIntervall: true|false,
+        Värden[1..n]: {
+            Analysnamn: "" string,
+            Resultat: number|string,
+            UtanförIntervall: true|false,
+            ReferensLägre: number|null,
+            ReferensÖvre: number|null,
+        },
+    },
+
+    Läkemedelsordinationer[0..n]: {
+        Rubrik: "" string,
+        Datum: Date,
+        Utsättningsdatum: Date,
+        Läkemedel[1..n]: "" string
     }
 };
 //*/
