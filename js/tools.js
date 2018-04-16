@@ -11,7 +11,9 @@ function parseDate(str) {
     str=str.trim();
     var reg = /(?:Den\s*)?(\d+)\s+(\w+)\s+(\d+)?(?:(?:kl\s*|\D+)?(\d+:\d+))?/i.exec(str);
     var date = reg ? Date.parse(reg[2]+" "+reg[1]+" "+(reg[3]||'')+" "+(reg[4]||'')) : Date.parse(str);
-    if (!date) throw new Error("Unable to parse date `"+JSON.stringify(str)+"`!");
+    if (!date) date = new Date(str);
+    if (!date || date.toString() === "Invalid Date")
+        throw new Error("Unable to parse date `"+JSON.stringify(str)+"`!");
     return date;
 }
 
