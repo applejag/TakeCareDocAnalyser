@@ -113,25 +113,28 @@
                 throw new Error("Parsed data is not valid object!");
 
             for (var dfield in data) {
-                if (data.hasOwnProperty(dfield)) {
-                    if (!(data[dfield] instanceof Array))
-                        throw new Error("Parsed field `"+dfield+"` is invalid data type! Expected array.");
+                if (!data.hasOwnProperty(dfield))
+                    continue;
 
-                    if (!(read[dfield] instanceof Array))
-                        throw new Error("Unsupported field name `"+dfield+"`!");
+                if (!(data[dfield] instanceof Array))
+                    throw new Error("Parsed field `"+dfield+"` is invalid data type! Expected array.");
 
-                    read[dfield] = data[dfield];
-                    fieldCount++;
-                    itemCount += data[dfield].length;
-                }
+                if (!(read[dfield] instanceof Array))
+                    throw new Error("Unsupported field name `"+dfield+"`!");
+
+                read[dfield] = data[dfield];
+                fieldCount++;
+                itemCount += data[dfield].length;
             }
+
             for (var rfield in read) {
-                if (read.hasOwnProperty(rfield)) {
-                    if (read[rfield] instanceof Array &&
-                        !(data[rfield] instanceof Array))
-                    {
-                        read[rfield] = [];
-                    }
+                if (!read.hasOwnProperty(rfield))
+                    continue;
+
+                if (read[rfield] instanceof Array &&
+                    !(data[rfield] instanceof Array))
+                {
+                    read[rfield] = [];
                 }
             }
 
