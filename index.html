@@ -92,9 +92,7 @@
                             (<span class="variable">key</span>,
                             <span class="variable">value</span>) {<br/>
                             <span class="indent">    </span><span class="keyword">if</span>
-                            (<span class="variable">key</span>.search(<span class="regex">/datum/i</span>)
-                            <span class="operator">!==</span>
-                            <span class="operator">-</span><span class="number">1</span>)</br>
+                            (<span class="regex">/datum/i</span>.test(<span class="variable">key</span>))</br>
                             <span class="indent">        </span><span class="keyword">return</span>
                                 <span class="keyword">new</span>
                                 Date(<span class="variable">value</span>);<br/>
