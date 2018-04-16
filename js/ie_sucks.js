@@ -1,6 +1,24 @@
 
+if (!Array.prototype.some) {
+    Array.prototype.some = function(predicate) {
+        for(var i=0; i<this.length; i++)
+            if(predicate(this[i]))
+                return true;
+        return false;
+    };
+}
+
+if (!Array.prototype.every) {
+    Array.prototype.every = function(predicate) {
+        for(var i=0; i<this.length; i++)
+            if(!predicate(this[i]))
+                return false;
+        return true;
+    };
+}
+
 // https://stackoverflow.com/questions/7350912/16680415#16680415
-if (!Array.prototype.find) {
+if (!Array.prototype.map) {
     Array.prototype.map = function(converter) {
         var r=[];
         for(var i=0; i<this.length; i++)

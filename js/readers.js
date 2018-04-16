@@ -55,6 +55,7 @@ var read = {
     MikrobiologiSvar: [],
     RöntgenSvar: [],
     KemlabSvar: [],
+    MultidisciplinäraSvar: [],
     Läkemedelsordinationer: [],
 
     ParsedDocuments: []
@@ -93,45 +94,32 @@ parser.addReader(/^Kemlab svar/i, function(doc) {
 
     var sjuk = doc.head.category.match(/^Kemlab svar\s*(.*)$/);
 
-    var tab = findTable(doc.tables, "Analysnamn");
-    if (!tab) return;
-
-    var outAny = false;
-    var värden = [];
-    for (var i = 0; i < tab.rows.length; i++) {
-        var row = tab.rows[i];
-
-        var out = row.Resultat.text.indexOf('*') !== -1;
-        if (out) outAny = true;
-
-        var result = parseFloat(row.Resultat.text.replace(/,/g, '.').match(/[\d\.]+/));
-        if (isNaN(result)) result = row.Resultat.text;
-
-        var refText = row.Referensintervall.text.replace(/,/g, ".");
-        var ref = /^(-?[\d.]+)-(-?[\d.]+)|>(-?[\d.]+)|<(-?[\d.]+)$/i.exec(refText);
-        var lower = null;
-        var upper = null;
-
-        if (ref) {
-            if (ref[1] !== undefined) lower = parseFloat(ref[1]);
-            if (ref[2] !== undefined) upper = parseFloat(ref[2]);
-            if (ref[3] !== undefined) lower = parseFloat(ref[3]);
-            if (ref[4] !== undefined) upper = parseFloat(ref[4]);
-        }
-
-        värden.push({
-            Analysnamn: row.Analysnamn.text,
-            Resultat: result,
-            UtanförIntervall: out,
-            ReferensLägre: lower,
-            ReferensÖvre: upper
-        });
-    }
+    var värden = readAnalysisResultTable(doc.tables);
+    if (värden.length === 0) return;
+    var outAny = värden.some(function(v) { return v.UtanförIntervall; });
 
     read.KemlabSvar.push({
         Rubrik: doc.head.data2,
         Datum: doc.head.datetime,
         Sjukhus: sjuk ? sjuk[1] : "",
+        Remittent: remitt,
+        UtanförNågotIntervall: outAny,
+        Värden: värden
+    });
+});
+
+parser.addReader("Multidisciplinärt svar", function(doc) {
+    var remittCell = doc.notes[0];
+    var remittMatch = /^Remittent:\s*(.*)$/i.exec(remittCell.text);
+    var remitt = remittMatch ? remittMatch[1] : "";
+
+    var värden = readAnalysisResultTable(doc.tables);
+    if (värden.length === 0) return;
+    var outAny = värden.some(function(v) { return v.UtanförIntervall; });
+
+    read.MultidisciplinäraSvar.push({
+        Rubrik: doc.head.data2,
+        Datum: doc.head.datetime,
         Remittent: remitt,
         UtanförNågotIntervall: outAny,
         Värden: värden
@@ -232,6 +220,43 @@ parser.addReader("Öppen vårdkontakt", function(doc) {
 });
 
 /* HELPER FUNCTIONS */
+
+function readAnalysisResultTable(tables) {
+    var tab = findTable(tables, "Analysnamn");
+    if (!tab) return;
+
+    var värden = [];
+    for (var i = 0; i < tab.rows.length; i++) {
+        var row = tab.rows[i];
+
+        var out = row.Resultat.text.indexOf('*') !== -1;
+
+        var result = parseFloat(row.Resultat.text.replace(/,/g, '.').match(/[\d\.]+/));
+        if (isNaN(result)) result = row.Resultat.text;
+
+        var refText = row.Referensintervall.text.replace(/,/g, ".");
+        var ref = /^(-?[\d.]+)-(-?[\d.]+)|>(-?[\d.]+)|<(-?[\d.]+)$/i.exec(refText);
+        var lower = null;
+        var upper = null;
+
+        if (ref) {
+            if (ref[1] !== undefined) lower = parseFloat(ref[1]);
+            if (ref[2] !== undefined) upper = parseFloat(ref[2]);
+            if (ref[3] !== undefined) lower = parseFloat(ref[3]);
+            if (ref[4] !== undefined) upper = parseFloat(ref[4]);
+        }
+
+        värden.push({
+            Analysnamn: row.Analysnamn.text,
+            Resultat: result,
+            UtanförIntervall: out,
+            ReferensLägre: lower,
+            ReferensÖvre: upper
+        });
+    }
+
+    return värden;
+}
 
 function findBodySecondColumn(body, firstColumnSearch, textOnly) {
     for (var i = 0; i < body.length; i++) {
