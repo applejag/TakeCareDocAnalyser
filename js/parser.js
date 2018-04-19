@@ -88,7 +88,7 @@
     parser.exportJSON = function() {
         var start = Date.now();
         parser.isCrashed = false;
-        
+
         try {
             setError();
             output.innerText = JSON.stringify(read, null, 4);
@@ -212,12 +212,16 @@
         //-------------------
 
         var readCount = read.ParsedDocuments.length - preParseCount;
-        var log = readCount===0 ?
-            (parsed.length === 0 ?
-                "No documents were found.":
-                "No new data were found among " + parsed.length + " parsed documents.") :
-            "Data read from "+readCount+" documents in " + (Date.now() - start) + " ms.";
-        console.log("[!] "+log);
+        var log;
+        if (readCount === 0) {
+            log = parsed.length === 0 ?
+                "No documents were found." :
+                "No new data were found among " + parsed.length + " parsed documents.";
+            console.warn("[!] " + log);
+        } else {
+            log = "Data read from "+readCount+" documents in " + (Date.now() - start) + " ms.";
+            console.log("[!] " + log);
+        }
         reader_status.innerText = "("+log+" Read "+read.ParsedDocuments.length+" documents in total)";
 
         parser.isParsed = true;
