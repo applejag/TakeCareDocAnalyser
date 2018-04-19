@@ -86,8 +86,18 @@
     }
 
     parser.exportJSON = function() {
+        var start = Date.now();
         parser.isCrashed = false;
-        output.innerText = JSON.stringify(read, null, 4);
+        
+        try {
+            setError();
+            output.innerText = JSON.stringify(read, null, 4);
+        } catch (e) {
+            reader_status.innerText = "(Export failed after "+(Date.now() - start)+" ms)";
+            setError("Error while exporting data!", e);
+        }
+
+        reader_status.innerText = "(Exported data in "+(Date.now() - start)+" ms)";
     };
 
     parser.importJSON = function() {
@@ -103,15 +113,22 @@
             if (toParse == "")
                 throw new Error("Nothing to import!");
 
+            // Read json
             var data = JSON.parse(toParse, function (key, value) {
-                if (key.search(/datum/i) !== -1)
-                    return parseDate(value);
+                if (key.search(/datum/i) !== -1 && isString(value)) {
+                    try {
+                        return parseDate(value);
+                    } catch (e) {
+                        return value;
+                    }
+                }
                 return value;
             });
 
             if (!(data instanceof Object))
                 throw new Error("Parsed data is not valid object!");
 
+            // Transfer data to read obj
             for (var dfield in data) {
                 if (!data.hasOwnProperty(dfield))
                     continue;
@@ -127,6 +144,7 @@
                 itemCount += data[dfield].length;
             }
 
+            // Clear omitted fields
             for (var rfield in read) {
                 if (!read.hasOwnProperty(rfield))
                     continue;
@@ -138,7 +156,8 @@
                 }
             }
 
-            output.innerText = JSON.stringify(read, null, 4);
+            // Export again
+            // output.innerText = JSON.stringify(read, null, 4);
         } catch (e) {
             reader_status.innerText = "(Import failed after "+(Date.now() - start)+" ms)";
             setError("Error while importing data!", e);
