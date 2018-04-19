@@ -17,6 +17,20 @@ function parseDate(str) {
     return date;
 }
 
+String.prototype.countMatchingChars = function(other) {
+    if (!isString(other))
+        throw new Error("Cannot compare string with " + typeof other);
+
+    var limit = Math.min(this.length, other.length);
+
+    for (var i = 0; i < limit; i++) {
+        if (this[i] !== other[i])
+            return i;
+    }
+
+    return limit;
+};
+
 // http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
 String.prototype.hashCode = function(){
 	var hash = 0;

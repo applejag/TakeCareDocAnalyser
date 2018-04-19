@@ -1,3 +1,4 @@
+/* jshint ignore:start */
 
 var read = {
     Vårdtillfällen[0..n]: {
