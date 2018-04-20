@@ -1,5 +1,7 @@
 html {
     box-sizing: border-box;
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    font-size: small;
 }
 *, *:before, *:after {
     box-sizing: inherit;
@@ -21,7 +23,7 @@ html {
 }
 
 .input {
-    height: 2em;
+    min-height: 2em;
 }
 
 .codefield {
@@ -60,6 +62,7 @@ html {
 body > #container {
     border: 1px solid lightgray;
     padding: 1.5em;
+    overflow-x: hidden;
 }
 
 #input .document {
@@ -210,6 +213,7 @@ button {
     border: 1px solid darkgray;
     border-radius: 0;
     background: linear-gradient(#f4f4f4, #dbdbdb);
+    font: inherit;
 }
 
 button:hover {
