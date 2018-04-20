@@ -85,33 +85,37 @@
         }
     }
 
-    parser.exportJSON = function() {
+    function execFunc(verb, func) {
         var start = Date.now();
-        parser.isCrashed = false;
-
         try {
+            parser.isCrashed = false;
             setError();
-            output.innerText = JSON.stringify(read, null, 4);
+            var out = func(start);
+            if (out) {
+                reader_status.innerText = out;
+            } else {
+                reader_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
+            }
         } catch (e) {
-            reader_status.innerText = "(Export failed after "+(Date.now() - start)+" ms)";
-            setError("Error while exporting data!", e);
+            reader_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
+            setError("Error while " + verb.toLowerCase() + "!", e);
         }
+    }
 
-        reader_status.innerText = "(Exported data in "+(Date.now() - start)+" ms)";
+    parser.exportJSON = function() {
+        execFunc("Export", function(start) {
+            output.innerText = JSON.stringify(read, null, 4);
+        });
     };
 
     parser.importJSON = function() {
-        var start = Date.now();
+        execFunc("Import", function(start) {
+            var fieldCount = 0;
+            var itemCount = 0;
 
-        parser.isCrashed = false;
-        var fieldCount = 0;
-        var itemCount = 0;
-
-        try {
-            setError();
             var toParse = output.innerText.trim();
             if (toParse == "")
-                throw new Error("Nothing to import!");
+            throw new Error("Nothing to import!");
 
             // Read json
             var data = JSON.parse(toParse, function (key, value) {
@@ -126,18 +130,18 @@
             });
 
             if (!(data instanceof Object))
-                throw new Error("Parsed data is not valid object!");
+            throw new Error("Parsed data is not valid object!");
 
             // Transfer data to read obj
             for (var dfield in data) {
                 if (!data.hasOwnProperty(dfield))
-                    continue;
+                continue;
 
                 if (!(data[dfield] instanceof Array))
-                    throw new Error("Parsed field `"+dfield+"` is invalid data type! Expected array.");
+                throw new Error("Parsed field `"+dfield+"` is invalid data type! Expected array.");
 
                 if (!(read[dfield] instanceof Array))
-                    throw new Error("Unsupported field name `"+dfield+"`!");
+                throw new Error("Unsupported field name `"+dfield+"`!");
 
                 read[dfield] = data[dfield];
                 fieldCount++;
@@ -147,7 +151,7 @@
             // Clear omitted fields
             for (var rfield in read) {
                 if (!read.hasOwnProperty(rfield))
-                    continue;
+                continue;
 
                 if (read[rfield] instanceof Array &&
                     !(data[rfield] instanceof Array))
@@ -156,75 +160,62 @@
                 }
             }
 
-            // Export again
-            // output.innerText = JSON.stringify(read, null, 4);
-        } catch (e) {
-            reader_status.innerText = "(Import failed after "+(Date.now() - start)+" ms)";
-            setError("Error while importing data!", e);
-        }
-
-        reader_status.innerText = "(Imported "+fieldCount+" fields and a total of "+itemCount+" documents in "+(Date.now() - start)+" ms)";
+            return "(Imported "+fieldCount+" fields and a total of "+itemCount+" documents in "+(Date.now() - start)+" ms)";
+        });
     };
 
     parser.analyse = function() {
-        var start = Date.now();
-        parser.isAnalysed = false;
-        parser.isCrashed = false;
+        execFunc("Analyse", function(start) {
+            parser.isAnalysed = false;
+            var any = false;
 
-        try {
-            setError();
-            analyseData();
-        } catch (e) {
-            reader_status.innerText = "(Analyse failed after " + (Date.now() - start) + " ms)";
-            setError("Error while analysing data!", e);
-        }
+            for (var field in read) {
+                if (read.hasOwnProperty(field) && field !== "ParsedDocuments") {
+                    if (read[field].length > 0)
+                    {
+                        any = true;
+                        break;
+                    }
+                }
+            }
 
-        reader_status.innerText = "(Analysed " + read.ParsedDocuments.length + " documents in " + (Date.now() - start) + " ms)";
-        parser.isAnalysed = true;
+            if (!any) {
+                console.warn("[!] NO PATIENT DATA TO ANALYSE");
+                parser.isAnalysed = true;
+                return "(No data to analyse)";
+            } else {
+                analyseData();
+                parser.isAnalysed = true;
+                return "(Analysed " + read.ParsedDocuments.length + " documents in " + (Date.now() - start) + " ms)";
+            }
+        });
     };
 
     parser.parseInput = function() {
-        var start = Date.now();
-        parser.isCrashed = false;
-        var preParseCount = read.ParsedDocuments.length;
-        var parsed;
+        execFunc("Parsing documents", function(start) {
+            var preParseCount = read.ParsedDocuments.length;
+            var parsed;
 
-        //-- WITHOUT TRY-CATCH
-        // parsed = getParsedDocuments();
-        // parser.lastParse = parsed;
-        // runReader(parsed);
-        //-- WITH TRY-CATCH
-        try {
             setError();
             parsed = getParsedDocuments();
             parser.lastParse = parsed;
+            runReader(parsed);
+            parser.isParsed = true;
 
-            try {
-                runReader(parsed);
-            } catch (e) {
-                reader_status.innerText = "(Parsing failed after " + (Date.now() - start) + " ms)";
-                setError("Error while reading data!", e);
-            }
-        } catch (e) {
-            reader_status.innerText = "(Parsing failed after " + (Date.now() - start) + " ms)";
-            setError("Error while parsing documents!", e);
-        }
-        //-------------------
-
-        var readCount = read.ParsedDocuments.length - preParseCount;
-        var log;
-        if (readCount === 0) {
-            log = parsed.length === 0 ?
+            var readCount = read.ParsedDocuments.length - preParseCount;
+            var log;
+            if (readCount === 0) {
+                log = parsed.length === 0 ?
                 "No documents were found." :
                 "No new data were found among " + parsed.length + " parsed documents.";
-            console.warn("[!] " + log);
-        } else {
-            log = "Data read from "+readCount+" documents in " + (Date.now() - start) + " ms.";
-            console.log("[!] " + log);
-        }
-        reader_status.innerText = "("+log+" Read "+read.ParsedDocuments.length+" documents in total)";
+                console.warn("[!] " + log);
+            } else {
+                log = "Data read from "+readCount+" documents in " + (Date.now() - start) + " ms.";
+                console.log("[!] " + log);
+            }
 
-        parser.isParsed = true;
+            return "("+log+" Read "+read.ParsedDocuments.length+" documents in total)";
+        });
     };
 
     function getParsedDocuments() {
