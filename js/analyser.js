@@ -2,65 +2,200 @@
 var hasInfection = false;
 var allaFiltreradeReads = [];
 
+var infarter = ["KAD", "suprapubiskateter", "urinavledning", "CVK",
+                    "picc", "Picc", "SVP", "CDK", "cvk", "cdk", "svp", "kateter", "venport"];
+
+var intressantaDKoder = ["A419", "T814", "A415", "A410", "A403", "A418", "A409", "A411", "P369",
+                            "A400", "A408", "A414", "A402", "A021", "A401", "A412", "B377", "A413", "P360",
+                            "T802", "A392", "A483", "A327", "P364", "P368", "A394", "P362", "G019", "N080",
+                            "G079", "I390", "M492", "I398"];
+
 function analyseData() {
     console.log("[!] PATIANT DATA GET IN LINE FOR INSPECTION\n[!] THIS IS YOUR EVALUATION DAY");
-    //sorteraVTF();
+    sorteraVTF();
     analyzeInfectionData();
-    checkLongestVårdtillfälle();
+    //checkLongestVårdtillfälle();
+    hittaInfarter();
+    hittaKemSvar();
+    hittaDrän();
+    hittaKirurgi();
+    hittaRespirator();
+    printData();
+
+
 }
 
 
 // Ska kolla utifrån resultat från epikrisen, feber, mikrobiologi svar
 // och kemlab svar om patienten har infektion.
 function analyzeInfectionData() {
-    // Om infektion finnes i journaltexten sätt hasInfection=true
-    // och hoppa över resten
-    var feberdagar = findFeberMätvärden();
-    var odlingar = hittaOdlingarMikrobiologi();
-    var infektionstexter = findInfInJournaltext();
-    var funnaDKoder = findInfInVtf();
-    var hittadeInfarter = hittaInfarter();
-    // var dåligaKemSvar = findIrregularKemSvar();
+    findFeberMätvärden();
+    hittaOdlingarMikrobiologi();
+    findInfInJournaltext();
+    findDKoderInVtf();
+
+}
+
+function hittaRespirator() {
+    var ventilationSökord = /andningsstöd|respirator|intubera|tracheostomi|ventilatorstöd/gi;
+
+    for(var j = 0; j < allaFiltreradeReads.length; j++) {
+        var journaltexter = allaFiltreradeReads[j].Journaltexter;
+        allaFiltreradeReads[j].hittadRespirator = [];
+        var tmpString = "";
+
+        for (var i = 0; i < journaltexter.length; i++) {
+            var journaltext = journaltexter[i].Fritext;
+            var execList = [];
+            var tmpList = [];
+
+            while((execList = ventilationSökord.exec(journaltext)) !== null){
+                tmpString = execList[0].charAt().toUpperCase() + execList[0].substr(1).toLowerCase();
+                tmpList.push(tmpString);
+            }
+            if(tmpList.length > 0){
+                var vent = {respTyp: tmpList, datum: journaltexter[i].Datum};
+                allaFiltreradeReads[j].hittadRespirator.push(vent);
+            }
+        }
+
+    }
+}
+
+function hittaKirurgi() {
+
+    var åtgärdskoder = [];
+    for (var v = 0; v < allaFiltreradeReads.length; v++) {
+        allaFiltreradeReads[v].hittadeKirurgKoder = [];
+
+        for(var j = 0; j < allaFiltreradeReads[v].ÖppnaVårdkontakter.length; j++){
+            åtgärdskoder = allaFiltreradeReads[v].ÖppnaVårdkontakter[j].Åtgärder;
+            compareKoder(åtgärdskoder, "Öppenvård", allaFiltreradeReads[v].ÖppnaVårdkontakter[j].Datum, v, 0, "hittadeKirurgKoder");
+        }
+
+        åtgärdskoder = allaFiltreradeReads[v].Vårdtillfälle.Åtgärder;
+        compareKoder(åtgärdskoder, "Vårdtillfälle", allaFiltreradeReads[v].Vårdtillfälle.Utskrivningsdatum, v, 0, "hittadeKirurgKoder");
+    }
+}
+
+function findDKoderInVtf() {
+
+    for (var i = 0; i < allaFiltreradeReads.length; i++) {
+        allaFiltreradeReads[i].hittadeDKoder = [];
+
+        var diagnoserVTF = allaFiltreradeReads[i].Vårdtillfälle.Diagnoser;
+        var ÖVård = allaFiltreradeReads[i].ÖppnaVårdkontakter;
+
+        compareKoder(diagnoserVTF, "Vårdtillfälle", allaFiltreradeReads[i].Vårdtillfälle.Utskrivningsdatum, i, 1, "hittadeDKoder");
+
+        for (var l = 0; l < ÖVård.length; l++) {
+            compareKoder(ÖVård[l].Diagnoser, "Öppenvård", allaFiltreradeReads[i].ÖppnaVårdkontakter[l].Datum, i, 1, "hittadeDKoder");
+        }
+    }
+}
+
+function compareKoder(kodLista, tillfälleTyp, datumet, index, chosenSearchList, pushHere){
+    var kirurgkoder = /^\D{3,}/;
+    var regexDKoder = new RegExp("(" + intressantaDKoder.join('|') + ")");
+    var sökListor = [kirurgkoder, regexDKoder];
+    //var kirurgKoder1 = /^(H|B|J|L|P|E|M|N|F|K|C|Y|T|U|GB|GC|GE|GW|XA|XC|XF|XG|XJ|XK|XL|XN|XP|XX|YC|YF|YG|YJ|YK|YN|YP|YQ|YW)/;
+    //var kirurgKoder2 = /^(A|Q|P|D)+\D{2,}|^(GA|GD)+\D/;
+
+    for (var s = 0; s < kodLista.length; s++) {
+        if (sökListor[chosenSearchList].test(kodLista[s])) {
+            var koddata = {kod: kodLista[s], tillfälle: tillfälleTyp, datum: datumet};
+            allaFiltreradeReads[index][pushHere].push(koddata);
+        }
+    }
+}
+
+        //var åKoderVTF = allaFiltreradeReads[v].Vårdtillfälle.Åtgärder.join(" ");
+        //var tmpArray = [];
+        // var journaltexter = allaFiltreradeReads[v].Journaltexter;
+        // for (var i = 0; i < journaltexter.length; i++) {
+        //     var journaltext = journaltexter[i];
+        // while ((tmpArray = kirurgKoder1.exec(åKoderVTF)) !== null) {
+        //     console.log(`Found ${array1[0]}. Next starts at ${regex1.lastIndex}.`);
+        //
+        // }
+        //         var kodData2 = {kod: "???", kodtyp: "Kirurgi", tillfälle: "Vårdtillfälle", datum: journaltext.Datum};
+        //         allaFiltreradeReads[i].hittadeKirurgKoder.push(kodData2);
+        //     }
+        // }
 
 
-    console.log("Dagar med feber:");
-    for (var j = 0; j < feberdagar.length; j++) {
-        console.log(feberdagar[j].Datum + " " + feberdagar[j].Värden.Kroppstemperatur);
-    }
-    console.log("");
-    console.log("Odlingar och tester:\n");
-    for (var i = 0; i < odlingar.length; i++) {
-        console.log(odlingar[i].Datum, odlingar[i].Stycken);
-    }
-    console.log("");
-    console.log("Antal journaltexter som tyder på infektion: " + infektionstexter.length);
-    console.log("");
-    console.log("Funna diagnoskoder för infektion: " + funnaDKoder.join(", "));
-    console.log();
-    console.log("Insatta infarter: ");
-    for (var k = 0; k < hittadeInfarter.length; k++) {
-        console.log(hittadeInfarter[k]);
+
+
+function hittaKemSvar() {
+
+    for (var v = 0; v < allaFiltreradeReads.length; v++) {
+        var kemSvarLista = allaFiltreradeReads[v].KemlabSvar;
+        allaFiltreradeReads[v].hittadeKemSvar = [];
+
+
+        for (var i = 0; i < kemSvarLista.length; i++) {
+            var kemSvar = kemSvarLista[i];
+
+            for (var j = 0; j < kemSvar.Värden.length; j++) {
+                var analys = kemSvar.Värden[j];
+
+                if (/P-CRP|B-Leukocyter/.test(analys.Analysnamn)) {
+                    if (analys.Resultat > 9) {
+                        var kemSvarData = {analysNamn: analys.Analysnamn, värde: analys.Resultat};
+                        allaFiltreradeReads[v].hittadeKemSvar.push(kemSvarData);
+                    }
+                }
+            }
+
+        }
     }
 }
 
 
-function hittaInfarter() {         // FIXA SEN TILL allaFiltreradeReads
-    var journaltexter = read.Journaltexter;
-    var infarter = ["KAD", "suprapubiskateter", "urinavledning", "CVK",
-     "picc", "SVP", "CDK", "cvk", "cdk", "svp"];
-    var hittadeInfarter = [];
 
-    for (var i = 0; i < journaltexter.length; i++) {
+function hittaDrän() {
 
-        var journaltext = journaltexter[i].Fritext;
+    for (var v = 0; v < allaFiltreradeReads.length; v++) {
+        var journaltexter = allaFiltreradeReads[v].Journaltexter;
+        allaFiltreradeReads[v].hittadeDrän = [];
 
-        for (var j = 0; j < infarter.length; j++) {
-            if(journaltext.indexOf(infarter[j]) !== -1) {
-                hittadeInfarter.push( "" + infarter[j].toUpperCase() + " " + journaltexter[i].Datum);
+        for (var i = 0; i < journaltexter.length; i++) {
+            var journaltext = journaltexter[i].Fritext;
+
+            if(/drän|dränera|dränage/i.test(journaltext)) {
+                allaFiltreradeReads[v].hittadeDrän.push(journaltexter[i].Datum);
             }
+
         }
     }
-    return hittadeInfarter;
+}
+
+
+function hittaInfarter() {
+    var tmpStrings = [];
+    for (var v = 0; v < allaFiltreradeReads.length; v++) {
+        var journaltexter = allaFiltreradeReads[v].Journaltexter;
+        allaFiltreradeReads[v].hittadeInfarter = [];
+
+        for (var i = 0; i < journaltexter.length; i++) {
+            var journaltext = journaltexter[i].Fritext;
+
+            for (var j = 0; j < infarter.length; j++) {
+                if(journaltext.indexOf(infarter[j]) !== -1 && tmpStrings.join(" ").toLowerCase().indexOf(infarter[j].toLowerCase()) == -1) {
+                    if(infarter[j].length > 3){
+                        tmpStrings.push(infarter[j].charAt().toUpperCase() + infarter[j].substr(1).toLowerCase());
+                    } else {
+                        tmpStrings.push(infarter[j].toUpperCase());
+                    }
+                }
+            }
+            if(tmpStrings.length > 0){
+                var infartData = {typAvInfart: tmpStrings.join(", "), datum: journaltexter[i].Datum};
+                allaFiltreradeReads[v].hittadeInfarter.push(infartData);
+            }
+            tmpStrings = [];
+        }
+    }
 }
 
 
@@ -95,10 +230,17 @@ function checkLongestVårdtillfälle() {
 function sorteraVTF() {
 
     var blacklist = ["Vårdtillfällen", "ParsedDocuments"];
+    allaFiltreradeReads = [];
+
+    // Äldst först
+    read.Vårdtillfällen.sort(function(a,b) {
+        return a.Inskrivningsdatum - b.Inskrivningsdatum;
+    });
 
     for (var ti = 0; ti < read.Vårdtillfällen.length; ti++) {
         var tillfälle = read.Vårdtillfällen[ti];
-        var nästa = read.Vårdtillfällen[ti+1];
+        var yngre = read.Vårdtillfällen[ti+1];
+
         // new read obj per tillfälle
         var filtreradRead = {
             Vårdtillfälle: tillfälle
@@ -115,13 +257,13 @@ function sorteraVTF() {
             filtreradRead[dokTyp] = [];
 
             var origDokLista = read[dokTyp];
-            for (var di = origDokLista.length-1; di > -1 ; di--) {
+            for (var di = 0; di < origDokLista.length; di++) {
                 var dok = origDokLista[di];
-                // Skippa om för tidig
-                if (dok.Datum < tillfälle.Inskrivningsdatum)
+                // Skippa om för tidig, om inte är första tillfället
+                if (dok.Datum < tillfälle.Inskrivningsdatum && ti !== 0)
                     continue;
-                // Skippa om det "tillhör" nästa
-                if (nästa && dok.Datum >= nästa.Inskrivningsdatum)
+                // Skippa om det "tillhör" yngre
+                if (yngre && dok.Datum >= yngre.Inskrivningsdatum)
                     continue;
 
                 filtreradRead[dokTyp].push(dok);
@@ -129,114 +271,123 @@ function sorteraVTF() {
         }
 
     }
-
 }
 
 
-function findInfInVtf() {
-    var vtf = read.Vårdtillfällen; // FIXA SEN TILL allaFiltreradeReads
-    var resultatKoder = [];
-    var dKoder = ["A419", "T814", "A415", "A410", "A403", "A418", "A409",
-                    "A411", "P369", "A400", "A408", "A414", "A402", "A021",
-                    "A401", "A412", "B377", "A413", "P360", "T802", "A392",
-                    "A483", "A327", "P364", "P368", "A394", "P362", "G019*",
-                    "N080*", "G079*", "I390*", "M492*", "I398*"];
-
-    for (var i = 0; i < vtf.length; i++) {
-        for (var j = 0; j < vtf[i].Diagnoser.length; j++) {
-            for (var k = 0; k < dKoder.length; k++) {
-                if(vtf[i].Diagnoser[j] == dKoder[k]) {
-                    resultatKoder.push(dKoder[k]);
-                }
-            }
-        }
-    }
-    return resultatKoder;
-}
 
 
 // Kollar om patienten haft feber under vårdtiden
 // När och vilken temperatur
 function findFeberMätvärden() {
-    var feberdok = read.Mätvärden; // FIXA SEN TILL allaFiltreradeReads
-    var tmpFeberdok = [];
 
-    for (var i = 0; i < feberdok.length; i++) {
-        if (feberdok[i].Värden.Kroppstemperatur >= 38) {
-            tmpFeberdok.push(feberdok[i]);
+    for (var v = 0; v < allaFiltreradeReads.length; v++) {
+        var feberDok = allaFiltreradeReads[v].Mätvärden;
+        allaFiltreradeReads[v].hittadFeber = [];
+
+        for (var i = 0; i < feberDok.length; i++) {
+            if (feberDok[i].Värden.Kroppstemperatur >= 38) {
+                var feberData = {temp: feberDok[i].Värden.Kroppstemperatur, datum: feberDok[i].Datum};
+                allaFiltreradeReads[v].hittadFeber.push(feberData);
+            }
         }
     }
-
-    if (tmpFeberdok.length>0) {
-        funnitsFeber = true;
-    }
-    feberdok = tmpFeberdok;
-
-    return feberdok;
 }
 
 function hittaOdlingarMikrobiologi() {
-    var mikroBdok = read.MikrobiologiSvar; // FIXA SEN TILL allaFiltreradeReads
-
     // Solla ut negativa resultat
+    var negatives = /(ej|inte|ingen|inga)\s+(positiv|fynd|påvisa|funne|växt)|Negativ|flora/i;
 
-    var negatives = /(ej|inte|ingen|inga)\s+(positiv|fynd|påvisa|funne|växt)|Negativ|blandflora|uretraflora/i;
+    for (var v = 0; v < allaFiltreradeReads.length; v++) {
+        var mikroBdok = allaFiltreradeReads[v].MikrobiologiSvar;
+        allaFiltreradeReads[v].hittadeOdlingar = [];
 
-    for (var i = 0; i < mikroBdok.length; i++) {
+        for (var i = 0; i < mikroBdok.length; i++) {
+            var stycken = mikroBdok[i].Svar.split("\r\n\r\n");
+            mikroBdok[i].Stycken = [];
 
-        var stycken = mikroBdok[i].Svar.split("\r\n\r\n");
-        mikroBdok[i].Stycken = [];
+            for (var s = 0; s < stycken.length; s++) {
+                var stycke = stycken[s];
 
-        for (var s = 0; s < stycken.length; s++) {
-            var stycke = stycken[s];
-
-            if (negatives.test(stycke)) {
-                continue;
+                if (negatives.test(stycke)) {
+                    continue;
+                }
+                var odlingData = {svar: stycke, datum: mikroBdok[i].Datum};
+                allaFiltreradeReads[v].hittadeOdlingar.push(odlingData);
             }
-
-            mikroBdok[i].Stycken.push(stycke);
         }
     }
-
-    mikroBdok = mikroBdok.filter(function(d) {
-        return d.Stycken.length>0;
-    });
-
-    // Echo
-
-    return mikroBdok;
 }
 
 
 function findInfInJournaltext() {
-    var journaltexter = read.Journaltexter; // FIXA SEN TILL allaFiltreradeReads
-    var infekteradeTexter = [];
 
     var negativInf = /(ej|inte|ingen|inga tecken på|inga kända)\s+(infektion|infektionstecken|sepsis|infektera)|infektionsklinik|desinfekt/i;
     //NANDA 00004 - risk för infektion
     var positivInf = /(infektion|NANDA 00004|sepsis|infektera)/i;
 
-    for (var i = 0; i < journaltexter.length; i++) {
+    for (var v = 0; v < allaFiltreradeReads.length; v++) {
+        var journaltexter = allaFiltreradeReads[v].Journaltexter;
+        allaFiltreradeReads[v].infekteradeTexter = [];
 
-        var journaltext = journaltexter[i].Fritext;
-        journaltext.replace(negativInf, "");
+        for (var i = 0; i < journaltexter.length; i++) {
+            var journaltext = journaltexter[i].Fritext;
+            journaltext.replace(negativInf, "");
 
-        if(positivInf.test(journaltext)) {
-            infekteradeTexter.push(journaltexter[i]);
+            if(positivInf.test(journaltext)) {
+                allaFiltreradeReads[v].infekteradeTexter.push(journaltexter[i]);
+            }
         }
     }
-
-    return infekteradeTexter;
 }
 
-// Om infection = false kolla framåt i akutjournaler, telefonkontakt
-// efter infektionstecken. Därefter kolla nästa vtf.
-
-// Om sant borde man kolla när den uppstått under vårdtillfället
-
-/*Funktion för
-    Vilka vtf
-    När uppstod Infektionen
-    Har åtgärder gjorts (infarter, drän, operationer) och när
-    jämför inlägging/åtgärd med uppkomst - [tid]
-*/
+function printData(){
+    for (var v = 0; v < allaFiltreradeReads.length; v++) {
+        console.log("Vårdtillfälle: " + allaFiltreradeReads[v].Vårdtillfälle.Inskrivningsdatum.toString().substring(0, 15));
+        console.log("");
+        console.log("Feber: ");
+        for (var kf = 0; kf < allaFiltreradeReads[v].hittadFeber.length; kf++) {
+            console.log(allaFiltreradeReads[v].hittadFeber[kf].temp);
+        }
+        console.log("");
+        console.log("Hittade odlingar:");
+        for (var ko = 0; ko < allaFiltreradeReads[v].hittadeOdlingar.length; ko++) {
+            console.log(allaFiltreradeReads[v].hittadeOdlingar[ko].svar);
+        }
+        console.log("");
+        console.log("Texter som tyder på infektion:");
+        for (var ki = 0; ki < allaFiltreradeReads[v].infekteradeTexter.length; ki++) {
+            console.log(allaFiltreradeReads[v].infekteradeTexter[ki].Datum.toString().substring(0, 15));
+        }
+        console.log("");
+        console.log("Hittade diagnoskoder:");
+        for (var kd = 0; kd < allaFiltreradeReads[v].hittadeDKoder.length; kd++) {
+            console.log(allaFiltreradeReads[v].hittadeDKoder[kd].kod);
+        }
+        console.log("");
+        console.log("Insatta infarter:");
+        for (var ii = 0; ii < allaFiltreradeReads[v].hittadeInfarter.length; ii++) {
+            console.log(allaFiltreradeReads[v].hittadeInfarter[ii].typAvInfart + " " + allaFiltreradeReads[v].hittadeInfarter[ii].datum.toString().substring(0, 15));
+        }
+        console.log("");
+        console.log("Kemsvar:");
+        for (var kk = 0; kk < allaFiltreradeReads[v].hittadeKemSvar.length; kk++) {
+            console.log(allaFiltreradeReads[v].hittadeKemSvar[kk].analysNamn);
+        }
+        console.log("");
+        console.log("Insatta drän:");
+        for (var id = 0; id < allaFiltreradeReads[v].hittadeDrän.length; ii++) {
+            console.log(allaFiltreradeReads[v].hittadeDrän[id].toString().substring(0, 14));
+        }
+        console.log("");
+        console.log("Kirurgiska ingrepp:");
+        for (var k = 0; k < allaFiltreradeReads[v].hittadeKirurgKoder.length; k++) {
+            console.log(allaFiltreradeReads[v].hittadeKirurgKoder[k].kod);
+        }
+        console.log("");
+        console.log("Hittad respirator:");
+        for (var l = 0; l < allaFiltreradeReads[v].hittadRespirator.length; l++) {
+            console.log(allaFiltreradeReads[v].hittadRespirator[l].respTyp + " " + allaFiltreradeReads[v].hittadRespirator[l].datum.toString().substring(0, 15));
+        }
+        console.log("");
+    }
+}
