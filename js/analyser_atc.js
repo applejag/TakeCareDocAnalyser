@@ -9,7 +9,8 @@ ATC: {
     },
 
     findATC: function(läkemedel), ret String|null
-    findMatchingATCs: function(läkemedel), ret [0..n]: {
+    findATCs: function(läkemedel), ret [0..n]: "" String
+    findATCMatches: function(läkemedel), ret [0..n]: {
         ATC: "" String,
         match: Number,
         medel[1..n]: "" String
@@ -22,15 +23,25 @@ ATC: {
  * @returns {String|null} Bästa matchande ATC kod, if any
 */
 ATC.findATC = function(läkemedel) {
-    var best = ATC.findMatchingATCs(läkemedel)[0];
+    var best = ATC.findATCMatches(läkemedel)[0];
     return best ? best.ATC : null;
+};
+
+/**
+ * @param {String} läkemedel
+ * @returns {String[]} Alla matchande ATC kod, eller tom lista
+*/
+ATC.findATCs = function(läkemedel) {
+    return ATC.findATCMatches(läkemedel).map(function(atc) {
+        return atc.ATC;
+    });
 };
 
 /**
  * @param {String} läkemedel
  * @returns {{ATC:String, match:Number, medel:String[]}[]} Matchande ATC koder
 */
-ATC.findMatchingATCs = function(läkemedel) {
+ATC.findATCMatches = function(läkemedel) {
     läkemedel = läkemedel.trim().toLowerCase();
     var firstWordLength = läkemedel.match(/[\wåäáàöóòíìïúùüéèë]*/i)[0].length;
 
