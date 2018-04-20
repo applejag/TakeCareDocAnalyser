@@ -1,5 +1,7 @@
 html {
     box-sizing: border-box;
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    font-size: small;
 }
 *, *:before, *:after {
     box-sizing: inherit;
@@ -211,6 +213,7 @@ button {
     border: 1px solid darkgray;
     border-radius: 0;
     background: linear-gradient(#f4f4f4, #dbdbdb);
+    font: inherit;
 }
 
 button:hover {
