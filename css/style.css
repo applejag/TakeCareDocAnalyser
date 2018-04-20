@@ -44,6 +44,19 @@ html {
     outline: none;
 }
 
+.fieldset {
+    border: none;
+    border-top: 1px solid gray;
+}
+
+.fieldset legend {
+    border-left: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    border-radius: 8px;
+    padding: 0 8px;
+    font-weight: bold;
+}
+
 body > #container {
     border: 1px solid lightgray;
     padding: 1.5em;

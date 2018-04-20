@@ -6,12 +6,11 @@
     parser.isCrashed = false;
     parser.isAnalysed = false;
     parser.lastParse = [];
-    // read.ParsedDocuments = [];
 
     var input = document.getElementById("input");
     var output = document.getElementById("output");
-    var reader_arg = document.getElementById("parse_argument");
     var reader_status = document.getElementById("output_status");
+    var catch_checkbox = document.getElementById("parse_catch");
     var timer = null;
     var readerFunctions = [];
 
@@ -87,18 +86,34 @@
 
     function execFunc(verb, func) {
         var start = Date.now();
-        try {
-            parser.isCrashed = false;
-            setError();
-            var out = func(start);
-            if (out) {
-                reader_status.innerText = out;
-            } else {
-                reader_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
+        parser.isCrashed = false;
+        setError();
+
+        if (catch_checkbox.checked) {
+            try {
+                var out = func(start);
+                if (out)
+                    reader_status.innerText = out;
+                else
+                    reader_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
+
+            } catch (e) {
+                reader_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
+                setError("Error while " + verb.toLowerCase() + "!", e);
             }
-        } catch (e) {
-            reader_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
-            setError("Error while " + verb.toLowerCase() + "!", e);
+        } else {
+            var success = false;
+            try {
+                var out2 = func(start);
+                if (out2)
+                    reader_status.innerText = out2;
+                else
+                    reader_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
+                success = true;
+            } finally {
+               if (!success)
+                   reader_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
+            }
         }
     }
 
@@ -114,8 +129,10 @@
             var itemCount = 0;
 
             var toParse = output.innerText.trim();
-            if (toParse == "")
-            throw new Error("Nothing to import!");
+            if (toParse == "") {
+                console.warn("[!] Nothing to import!");
+                return "(Nothing to import)";
+            }
 
             // Read json
             var data = JSON.parse(toParse, function (key, value) {
@@ -129,19 +146,25 @@
                 return value;
             });
 
-            if (!(data instanceof Object))
-            throw new Error("Parsed data is not valid object!");
+            if (!(data instanceof Object)) {
+                console.warn("[!] Parsed data is not valid object!");
+                return "(Parsed data is not valid object)";
+            }
 
             // Transfer data to read obj
             for (var dfield in data) {
                 if (!data.hasOwnProperty(dfield))
                 continue;
 
-                if (!(data[dfield] instanceof Array))
-                throw new Error("Parsed field `"+dfield+"` is invalid data type! Expected array.");
+                if (!(data[dfield] instanceof Array)) {
+                    console.warn("[!] Parsed field `"+dfield+"` is invalid data type! Expected array!");
+                    return "(Parsed field `"+dfield+"` is invalid data type! Expected array)";
+                }
 
-                if (!(read[dfield] instanceof Array))
-                throw new Error("Unsupported field name `"+dfield+"`!");
+                if (!(read[dfield] instanceof Array)) {
+                    console.warn("[!] Unsupported field name `"+dfield+"`!");
+                    return "(Unsupported field name `"+dfield+"`)";
+                }
 
                 read[dfield] = data[dfield];
                 fieldCount++;

@@ -20,12 +20,24 @@
             </noscript>
             <div class="row">
                 <div class="col">
-                    <div class="btn-group">
-                        <button id="parse_analyse" class="input" type="button" onclick="parser.analyse()">Analyse saved data</button>
-                    </div>
-                </div>
-                <div class="col">
                     <div id="output_status">(Press <a href="javascript:parser.parseInput()">parse</a> to parse the data.)</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <fieldset class="fieldset">
+                        <legend>Actions</legend>
+                        <div class="btn-group">
+                            <button id="parse_analyse" class="input" type="button" onclick="parser.analyse()">Analyse saved data</button>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="col-6">
+                    <fieldset class="fieldset">
+                        <legend>Settings</legend>
+                        <label for="parse_catch">Catch exceptions?</label>
+                        <input type="checkbox" id="parse_catch" name="parse_catch" checked />
+                    </fieldset>
                 </div>
             </div>
             <div class="row">
@@ -40,29 +52,33 @@
             </div>
             <div class="row">
                 <div class="col-6">
-                    <h2>Input:</h2>
-                    <div class="btn-group">
-                        <button id="parse_run" class="input" type="button" onclick="parser.parseInput()">Parse documents</button>
-                    </div>
-                    <div class="btn-group">
-                        <button id="input_clear" class="input danger" type="button" onclick="clearContent('input')">&times; Clear field</button>
-                        <button id="input_select_all" class="input" type="button" onclick="focusAll('input')">Select all</button>
-                        <button id="input_select_end" class="input" type="button" onclick="focusEnd('input')">Select end</button>
-                    </div>
-                    <div id="input" class="codefield" contenteditable="true"></div>
+                    <fieldset class="fieldset">
+                        <legend>Input</legend>
+                        <div class="btn-group">
+                            <button id="parse_run" class="input" type="button" onclick="parser.parseInput()">Parse documents</button>
+                        </div>
+                        <div class="btn-group">
+                            <button id="input_clear" class="input danger" type="button" onclick="clearContent('input')">&times; Clear field</button>
+                            <button id="input_select_all" class="input" type="button" onclick="focusAll('input')">Select all</button>
+                            <button id="input_select_end" class="input" type="button" onclick="focusEnd('input')">Select end</button>
+                        </div>
+                        <div id="input" class="codefield" contenteditable="true"></div>
+                    </fieldset>
                 </div>
                 <div class="col-6">
-                    <h2>Saved data:</h2>
-                    <div class="btn-group">
-                        <button id="output_export" class="input" type="button" onclick="parser.exportJSON()">Export data</button>
-                        <button id="output_import" class="input" type="button" onclick="parser.importJSON()">Import data</button>
-                    </div>
-                    <div class="btn-group">
-                        <button id="output_clear" class="input danger" type="button" onclick="clearContent('output')">&times; Clear field</button>
-                        <button id="output_select_all" class="input" type="button" onclick="focusAll('output')">Select all</button>
-                        <button id="output_select_end" class="input" type="button" onclick="focusEnd('output')">Select end</button>
-                    </div>
-                    <pre id="output" class="codefield mono" contenteditable="true"></pre>
+                    <fieldset class="fieldset">
+                        <legend>Saved data</legend>
+                        <div class="btn-group">
+                            <button id="output_export" class="input" type="button" onclick="parser.exportJSON()">Export data</button>
+                            <button id="output_import" class="input" type="button" onclick="parser.importJSON()">Import data</button>
+                        </div>
+                        <div class="btn-group">
+                            <button id="output_clear" class="input danger" type="button" onclick="clearContent('output')">&times; Clear field</button>
+                            <button id="output_select_all" class="input" type="button" onclick="focusAll('output')">Select all</button>
+                            <button id="output_select_end" class="input" type="button" onclick="focusEnd('output')">Select end</button>
+                        </div>
+                        <pre id="output" class="codefield mono" contenteditable="true"></pre>
+                    </fieldset>
                 </div>
             </div>
             <div class="row">
@@ -112,7 +128,7 @@
         <script type="text/javascript" src="js/tools.js"></script>
         <script type="text/javascript" src="js/parser.js"></script>
         <script type="text/javascript" src="js/readers.js"></script>
-        
+
         <script type="text/javascript" src="js/analyser_atc.js"></script>
         <script type="text/javascript" src="js/analyser.js"></script>
     </body>
