@@ -11,6 +11,8 @@
     var output = document.getElementById("output");
     var reader_status = document.getElementById("output_status");
     var catch_checkbox = document.getElementById("parse_catch");
+    var parse_time_min = document.getElementById("parse_time_min");
+    var parse_time_max = document.getElementById("parse_time_max");
     var timer = null;
     var readerFunctions = [];
 
@@ -20,6 +22,21 @@
             func: func
         });
     };
+
+    function getTimespanMinMax() {
+        function getTimespan(field, elem) {
+            var value = Date.parse(elem.value);
+            if (value) {
+                read[field] = value;
+                elem.removeAttribute('invalid');
+            } else {
+                elem.setAttribute('invalid', 'invalid');
+            }
+        }
+
+        getTimespan('DatumMin', parse_time_min);
+        getTimespan('DatumMax', parse_time_max);
+    }
 
     function getReader(category) {
         for (var i = 0; i < readerFunctions.length; i++) {
@@ -137,11 +154,7 @@
             // Read json
             var data = JSON.parse(toParse, function (key, value) {
                 if (key.search(/datum/i) !== -1 && isString(value)) {
-                    try {
-                        return parseDate(value);
-                    } catch (e) {
-                        return value;
-                    }
+                    return tryParseDate(value) || value;
                 }
                 return value;
             });
@@ -153,35 +166,38 @@
 
             // Transfer data to read obj
             for (var dfield in data) {
-                if (!data.hasOwnProperty(dfield))
-                continue;
+                if (!data.hasOwnProperty(dfield)) continue;
 
-                if (!(data[dfield] instanceof Array)) {
-                    console.warn("[!] Parsed field `"+dfield+"` is invalid data type! Expected array!");
-                    return "(Parsed field `"+dfield+"` is invalid data type! Expected array)";
-                }
-
-                if (!(read[dfield] instanceof Array)) {
+                var expected = typeof2(read[dfield]);
+                if (!expected) {
                     console.warn("[!] Unsupported field name `"+dfield+"`!");
                     return "(Unsupported field name `"+dfield+"`)";
                 }
 
+                var actual = typeof2(data[dfield]);
+                if (actual !== expected) {
+                    console.warn("[!] Parsed field `"+dfield+"` is invalid data type! Expected "+expected+", got "+actual+"!");
+                    return "(Parsed field `"+dfield+"` is invalid data type! Expected "+expected+", got "+actual+")";
+                }
+
                 read[dfield] = data[dfield];
                 fieldCount++;
-                itemCount += data[dfield].length;
+                if (data[dfield].length) itemCount += data[dfield].length;
             }
 
             // Clear omitted fields
             for (var rfield in read) {
-                if (!read.hasOwnProperty(rfield))
-                continue;
+                if (!read.hasOwnProperty(rfield)) continue;
 
-                if (read[rfield] instanceof Array &&
-                    !(data[rfield] instanceof Array))
+                if (!data[rfield])
                 {
-                    read[rfield] = [];
+                    read[rfield] = read_default[rfield];
                 }
             }
+
+            // Update timespan fields
+            parse_time_min.value = formatDate(read.DatumMin);
+            parse_time_max.value = formatDate(read.DatumMax);
 
             return "(Imported "+fieldCount+" fields and a total of "+itemCount+" documents in "+(Date.now() - start)+" ms)";
         });
@@ -464,15 +480,36 @@
         return trees;
     }
 
-    function startParseTimer() {
-        clearTimeout(timer);
+    function throttle(func, ms, onreset) {
+        var timer;
+        return function() {
+            clearTimeout(timer);
+            timer = setTimeout(func, ms);
+            if (onreset) onreset();
+        };
+    }
+
+    var startParseTimer = throttle(parser.parseInput, 300, function() {
         parser.isCrashed = false;
         parser.isParsed = false;
         reader_status.innerText = "(Parsing, please wait...)";
         setError(null, null);
+    });
 
-        timer = setTimeout(parser.parseInput, 300);
-    }
+    var convertOutputToText = throttle(function() {
+        if (output.children.length > 0)
+            output.innerHTML = output.innerText;
+    }, 100);
+
+    window.addEventListener('load', function() {
+        parse_time_min.onchange = getTimespanMinMax;
+        parse_time_max.onchange = getTimespanMinMax;
+        getTimespanMinMax();
+    });
+
+    output.addEventListener("DOMNodeInserted", convertOutputToText, false);
+    output.addEventListener("DOMNodeRemoved", convertOutputToText, false);
+    output.addEventListener("DOMCharacterDataModified", convertOutputToText, false);
 
     // input.addEventListener("DOMNodeInserted", startParseTimer, false);
     // input.addEventListener("DOMNodeRemoved", startParseTimer, false);

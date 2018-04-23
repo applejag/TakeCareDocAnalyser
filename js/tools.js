@@ -7,12 +7,31 @@ function isString(val) {
     return typeof val == "string" || val instanceof String;
 }
 
-function parseDate(str) {
+function typeof2(val) {
+    return val instanceof Array ? "Array"
+        : (val instanceof Date ? "Date" : typeof val);
+}
+
+function formatDate(date) {
+    var local = new Date(date);
+    local.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return local.toJSON().slice(0, 10);
+}
+
+function tryParseDate(str) {
+    if (!isString(str)) return null;
     str=str.trim();
     var reg = /(?:Den\s*)?(\d+)\s+(\w+)\s+(\d+)?(?:(?:kl\s*|\D+)?(\d+:\d+))?/i.exec(str);
     var date = reg ? Date.parse(reg[2]+" "+reg[1]+" "+(reg[3]||'')+" "+(reg[4]||'')) : Date.parse(str);
     if (!date) date = new Date(str);
     if (!date || date.toString() === "Invalid Date")
+        return null;
+    return date;
+}
+
+function parseDate(str) {
+    var date = tryParseDate(str);
+    if (!date)
         throw new Error("Unable to parse date `"+JSON.stringify(str)+"`!");
     return date;
 }
@@ -109,19 +128,25 @@ String.prototype.splitSentences = (function() {
 
 function clearContent(elemId) {
     var elem = document.getElementById(elemId);
-    elem.innerHTML = "";
+    if (elem.tagName == "TEXTAREA") {
+        elem.value = "";
+    } else {
+        elem.innerHTML = "";
+    }
     elem.focus();
 }
 
 function selectText(elemId) {
-    var doc = document;
-    var text = doc.getElementById(elemId);
+    var text = document.getElementById(elemId);
     var range, selection;
 
-    if (doc.body.createTextRange) {
+    if (document.body.createTextRange) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
+    } else if (text.tagName == "TEXTAREA") {
+        text.focus();
+        text.select();
     } else if (window.getSelection) {
         selection = window.getSelection();
         range = document.createRange();
@@ -137,8 +162,14 @@ function focusAll(elemId) {
 }
 
 function focusEnd(elemId) {
-    selectText(elemId);
-    var selection = document.getSelection();
-    selection.collapseToEnd();
-    document.getElementById(elemId).focus();
+    var elem = document.getElementById(elemId);
+    if (elem.tagName == "TEXTAREA") {
+        elem.focus();
+        elem.setSelectionRange(elem.value.length,elem.value.length);
+    } else {
+        selectText(elemId);
+        var selection = document.getSelection();
+        selection.collapseToEnd();
+        elem.focus();
+    }
 }

@@ -58,7 +58,25 @@ var read = {
     MultidisciplinäraSvar: [],
     Läkemedelsordinationer: [],
 
-    ParsedDocuments: []
+    ParsedDocuments: [],
+    DatumMin: Date.parse("2017-02-01"),
+    DatumMax: Date.parse("2017-02-28")
+};
+
+var read_default = {
+    Vårdtillfällen: [],
+    ÖppnaVårdkontakter: [],
+    Mätvärden: [],
+    Journaltexter: [],
+    MikrobiologiSvar: [],
+    RöntgenSvar: [],
+    KemlabSvar: [],
+    MultidisciplinäraSvar: [],
+    Läkemedelsordinationer: [],
+
+    ParsedDocuments: [],
+    DatumMin: Date.parse("2017-02-01"),
+    DatumMax: Date.parse("2017-02-28")
 };
 
 // parser.addReader = function(category, func(parsed))
