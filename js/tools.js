@@ -17,6 +17,27 @@ function parseDate(str) {
     return date;
 }
 
+Array.prototype.mapField = function(key) {
+    return this.map(function(elem) {
+        return elem[key];
+    });
+};
+
+Array.prototype.indexOfCaseInsensitive = function(value) {
+    if (!isString(value))
+        return this.indexOf(value);
+
+    value = value.toLowerCase();
+
+    for (var i = 0; i < this.length; i++) {
+        var elem = isString(this[i]) ? this[i].toLowerCase() : this[i];
+        if (elem === value)
+            return i;
+    }
+
+    return -1;
+};
+
 String.prototype.countMatchingChars = function(other) {
     if (!isString(other))
         throw new Error("Cannot compare string with " + typeof other);
