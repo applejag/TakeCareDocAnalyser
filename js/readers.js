@@ -155,6 +155,7 @@ parser.addReader("Journaltext", function(doc) {
     var tree = doc.trees[0];
     if (!tree) return;
 
+    var docType = tree.title.text;
     var signCell = doc.body[0][1];
     var sign = signCell.text;
 
@@ -162,6 +163,7 @@ parser.addReader("Journaltext", function(doc) {
         Rubrik: doc.head.data2,
         Datum: doc.head.datetime,
         Signeringsansvarig: sign,
+        Mall: docType,
         Fritext: flattenTreeContentText(tree)
     });
 });

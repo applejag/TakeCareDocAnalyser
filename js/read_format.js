@@ -29,6 +29,7 @@ var read = {
         Rubrik: "" String,
         Datum: Date,
         Signeringsansvarig: "" String,
+        Mall: "" String,
         Fritext: "" String
     }
 

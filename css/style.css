@@ -49,6 +49,8 @@ html {
 .fieldset {
     border: none;
     border-top: 1px solid gray;
+    min-width: unset;
+    padding-right: 0;
 }
 
 .fieldset legend {
