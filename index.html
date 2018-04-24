@@ -24,7 +24,7 @@
                 </div>
             </div>
             <div class="row">
-                <form onsubmit="parser.analyse(); return false">
+                <form onsubmit="setTimeout(parser.analyse,10); return false">
                     <div class="col-6">
                         <fieldset class="fieldset">
                             <legend>Actions</legend>
@@ -145,6 +145,7 @@
         <script type="text/javascript" src="js/parser.js"></script>
         <script type="text/javascript" src="js/readers.js"></script>
 
+        <script type="text/javascript" src="js/analyser_scoring.js"></script>
         <script type="text/javascript" src="js/analyser_atc.js"></script>
         <script type="text/javascript" src="js/analyser_sjukdomar.js"></script>
         <script type="text/javascript" src="js/analyser_infektion.js"></script>

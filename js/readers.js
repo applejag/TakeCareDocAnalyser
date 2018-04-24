@@ -63,21 +63,7 @@ var read = {
     DatumMax: Date.parse("2017-02-28")
 };
 
-var read_default = {
-    Vårdtillfällen: [],
-    ÖppnaVårdkontakter: [],
-    Mätvärden: [],
-    Journaltexter: [],
-    MikrobiologiSvar: [],
-    RöntgenSvar: [],
-    KemlabSvar: [],
-    MultidisciplinäraSvar: [],
-    Läkemedelsordinationer: [],
-
-    ParsedDocuments: [],
-    DatumMin: Date.parse("2017-02-01"),
-    DatumMax: Date.parse("2017-02-28")
-};
+var read_default = read.cloneDeep();
 
 // parser.addReader = function(category, func(parsed))
 

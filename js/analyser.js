@@ -10,8 +10,8 @@ function analyseData() {
     //checkLongestVårdtillfälle();
     printData();
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
-        console.log(allaFiltreradeReads[i].VRIscore + " " + allaFiltreradeReads[i].Vårdtillfälle.Inskrivningsdatum.toString().substring(0, 15));
-
+        addScore(i, 10, "Testing " + i);
+        console.log(allaFiltreradeReads[i].Score + " " + allaFiltreradeReads[i].Vårdtillfälle.Inskrivningsdatum.toString().substring(0, 15));
     }
 
 }
@@ -55,7 +55,7 @@ function checkLongestVårdtillfälle() {
 
 function sorteraVTF() {
 
-    var blacklist = ["Vårdtillfällen", "ParsedDocuments"];
+    var blacklist = ["Vårdtillfällen", "ParsedDocuments", "DatumMin", "DatumMax"];
     allaFiltreradeReads = [];
 
     // Äldst först
@@ -69,7 +69,9 @@ function sorteraVTF() {
 
         // new read obj per tillfälle
         var filtreradRead = {
-            Vårdtillfälle: tillfälle
+            Vårdtillfälle: tillfälle,
+            ScoringHistory: [],
+            Score: 0
         };
         allaFiltreradeReads.push(filtreradRead);
 

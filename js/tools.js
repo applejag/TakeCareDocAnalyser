@@ -7,9 +7,16 @@ function isString(val) {
     return typeof val == "string" || val instanceof String;
 }
 
+function isNumber(val) {
+    return typeof val == "number" || val instanceof Number;
+}
+
 function typeof2(val) {
-    return val instanceof Array ? "Array"
-        : (val instanceof Date ? "Date" : typeof val);
+    if (val instanceof String) return "String";
+    if (val instanceof Number) return "Number";
+    if (val instanceof Array) return "Array";
+    if (val instanceof Date) return "Date";
+    return typeof val;
 }
 
 function formatDate(date) {
@@ -35,6 +42,31 @@ function parseDate(str) {
         throw new Error("Unable to parse date `"+JSON.stringify(str)+"`!");
     return date;
 }
+
+Object.prototype.cloneDeep = function() {
+    if (this === null) return null;
+    if (typeof this === 'undefined') return this;
+    if (typeof this === 'boolean') return this;
+    if (typeof this === 'string') return this;
+    if (typeof this === 'number') return this;
+    if (typeof this === 'function') return this;
+    if (this instanceof String) return String(this);
+    if (this instanceof Number) return Number(this);
+    if (this instanceof Date) return new Date(this);
+    if (this instanceof Node) return this.cloneNode();
+
+    var clone;
+    if (this instanceof Array) clone = [];
+    else clone = {};
+
+    for (var key in this) {
+        if (this.hasOwnProperty(key)) {
+            clone[key] = Object.prototype.cloneDeep.call(this[key]);
+        }
+    }
+
+    return clone;
+};
 
 Array.prototype.mapField = function(key) {
     return this.map(function(elem) {
