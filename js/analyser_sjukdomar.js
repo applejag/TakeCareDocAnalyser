@@ -62,10 +62,10 @@ var sjukdomsRegExp = {
             /I50/ // I50
         ),
         epikris: _w(
+            // /hypertoni/,
+            // /flimmer/,
             /stroke/,
-            /hjärtsvikt/,
-            /flimmer/,
-            /hypertoni/
+            /hjärtsvikt/
         )
     }
 };
