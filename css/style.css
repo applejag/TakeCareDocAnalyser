@@ -30,6 +30,7 @@ html {
     margin: 10px 0;
 
     width: 100%;
+    resize: none;
 
     overflow: auto;
     word-wrap: break-word;
@@ -211,18 +212,21 @@ body > #container {
     margin-right: auto;
 }
 
-button {
+button, input {
     border: 1px solid darkgray;
     border-radius: 0;
-    background: linear-gradient(#f4f4f4, #dbdbdb);
     font: inherit;
 }
 
-button:hover {
+button, input[type="submit"] {
+    background: linear-gradient(#f4f4f4, #dbdbdb);
+}
+
+button:hover, input[type="submit"]:hover {
     border-color: gray;
 }
 
-button:active {
+button:active, input[type="submit"]:active {
     background: linear-gradient(#dbdbdb, #efefef);
 }
 
@@ -308,7 +312,7 @@ button.close:hover {
     clear: both;
 }
 
-.btn-group > button {
+.btn-group > * {
     margin: 0;
     float: left;
     border-left-width: 0.5px;
@@ -317,14 +321,44 @@ button.close:hover {
     vertical-align: middle;
 }
 
-.btn-group > button:first-child {
+.btn-group > *:first-child {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
     border-left-width: 1px;
 }
 
-.btn-group > button:last-child {
+.btn-group > *:last-child {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     border-right-width: 1px;
+}
+
+.form {
+    display:table;
+    table-layout: auto;
+}
+
+.form-group {
+    display: table-row;
+    width: 100%;
+}
+
+.form-group > * {
+    display: table-cell;
+    vertical-align: middle;
+}
+.form-group > label {
+    width: 100%;
+}
+
+input:valid+.validation:after {
+    content: '✓';
+    padding-left: 5px;
+}
+
+input:invalid+.validation:after,
+input[invalid]+.validation:after {
+    content: '✖';
+    padding-left: 5px;
+    color: red;
 }
