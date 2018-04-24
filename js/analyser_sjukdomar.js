@@ -91,6 +91,8 @@ function findSjukdomarInVtfAndÖvk() {
 
     // För varje sjukdomskategori...
     for (var sjukdom in sjukdomsRegExp) {
+        if (!sjukdomsRegExp.hasOwnProperty(sjukdom)) continue;
+        
         var funnaResultat = [];
         var icd10 = sjukdomsRegExp[sjukdom].icd10;
         var epikris = sjukdomsRegExp[sjukdom].epikris;
