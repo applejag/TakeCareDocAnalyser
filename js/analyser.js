@@ -5,14 +5,13 @@ var allaFiltreradeReads = [];
 function analyseData() {
     console.log("[!] PATIANT DATA GET IN LINE FOR INSPECTION\n[!] THIS IS YOUR EVALUATION DAY");
     sorteraVTF();
-    analyseInfectionData();
     analyseÅtgärder();
+    analyseInfectionData();
     //checkLongestVårdtillfälle();
     printData();
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
         addScore(i, 10, "Testing " + i);
-        console.log(allaFiltreradeReads[i].Score);
-
+        console.log(allaFiltreradeReads[i].Score + " " + allaFiltreradeReads[i].Vårdtillfälle.Inskrivningsdatum.toString().substring(0, 15));
     }
 
 }
@@ -23,8 +22,6 @@ function analyseÅtgärder(){
     hittaKirurgi();
     hittaRespirator();
 }
-
-
 
 
 
@@ -137,7 +134,7 @@ function printData(){
         console.log("");
         console.log("Kemsvar:");
         for (var kk = 0; kk < allaFiltreradeReads[v].hittadeKemSvar.length; kk++) {
-            console.log(allaFiltreradeReads[v].hittadeKemSvar[kk].analysNamn);
+            console.log(allaFiltreradeReads[v].hittadeKemSvar[kk].analysNamn + " " + allaFiltreradeReads[v].hittadeKemSvar[kk].värde);
         }
         console.log("");
         console.log("Insatta drän:");
@@ -150,9 +147,9 @@ function printData(){
             console.log(allaFiltreradeReads[v].hittadeKirurgKoder[k].kod);
         }
         console.log("");
-        console.log("Hittad respirator:");
+        console.log("Hittat andningsstöd:");
         for (var l = 0; l < allaFiltreradeReads[v].hittadRespirator.length; l++) {
-            console.log(allaFiltreradeReads[v].hittadRespirator[l].respTyp + " " + allaFiltreradeReads[v].hittadRespirator[l].datum.toString().substring(0, 15));
+            console.log(allaFiltreradeReads[v].hittadRespirator[l].datum.toString().substring(0, 15));
         }
         console.log("");
     }

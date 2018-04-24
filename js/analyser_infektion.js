@@ -13,7 +13,7 @@ function analyseInfectionData() {
         allaFiltreradeReads[i].VRIscore = 0;
         var vriPoints = 0;
         var harInf = false;
-        var crp = []; 
+        var crp = [];
         var leukocyter = [];
 
         for (var j = 0; j < allaFiltreradeReads[i].hittadeKemSvar.length; j++) {
@@ -43,10 +43,10 @@ function analyseInfectionData() {
         allaFiltreradeReads[i].InfDebut = hittaInfDebut(i);
         if(vriPoints > 32){
             harInf = true;
-            vriPoints += checkIfAfterInskrivning(i);
+            vriPoints += infITidEfterInskrivning(i);
         }
 
-        vriPoints += checkAfterUtskrivning(i);
+        vriPoints += hittasInfEfterUtskrivning(i);
 
         allaFiltreradeReads[i].VRIscore = vriPoints;
         allaFiltreradeReads[i].hasInfection = harInf;
@@ -56,7 +56,7 @@ function analyseInfectionData() {
 }
 
 // Kolla om patienten tagit kontakt med vården efter utskrivning
-function checkAfterUtskrivning(index){
+function hittasInfEfterUtskrivning(index){
     var utDatum = allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum;
     var journaltexter = allaFiltreradeReads[index].infekteradeTexter;
     var dkoder = allaFiltreradeReads[index].hittadeDKoder;
@@ -70,7 +70,7 @@ function checkAfterUtskrivning(index){
     }
     for (var j = 0; j < dkoder.length; j++) {
         if(dkoder[j].datum > utDatum){
-            bonusPoints += 30;
+            bonusPoints += 20;
             break;
         }
     }
@@ -80,28 +80,46 @@ function checkAfterUtskrivning(index){
 
 // Kollar om fevern upptstått efter Inskrivningsdatum
 // Tar i nuläget inte hänsyn till om multipla febrar förekommit under vårdtiden
-function checkIfAfterInskrivning(index){
+function infITidEfterInskrivning(index){
     var bonusPoints = 0;
 
     infDebut = allaFiltreradeReads[index].InfDebut;
-    if(infDebut - allaFiltreradeReads[index].Vårdtillfälle.Inskrivningsdatum > 172800000){
+    if(infDebut - allaFiltreradeReads[index].Vårdtillfälle.Inskrivningsdatum > 48*60*60*1000){
         bonusPoints = 30;
     } else {
-        bonusPoints = - 30;
+        if(index == 0 && finnsÅtgärderInnanFörstaVtf(index)){
+            bonusPoints = + 30;
+        }
+        else{
+            bonusPoints = - 30;
+        }
     }
     return bonusPoints;
 }
 
-// Kan behövas om patienten har feber eller inf. när de kommer in
-// function hittaFeberDebuter(){
-//     feberDagar = allaFiltreradeReads.hittadFeber;
-//
-//     for (var i = 0; i < feberDagar.length - 1; i++) {
-//         if((feberDagar[i + 1] - feberDagar[i]) > 172800000){
-//
-//         }
-//     }
-// }
+
+function finnsÅtgärderInnanFörstaVtf(index){
+    var vtf = allaFiltreradeReads[index];
+
+    for(var i = 0; i < vtf.hittadeInfarter.length - 1; i++){
+        if(vtf.hittadeInfarter[i].inDatum < vtf.Vårdtillfälle.Inskrivningsdatum)
+            return true;
+    }
+    for(var j = 0; j < vtf.hittadeDrän.length - 1; j++){
+        if(vtf.hittadeDrän[j].inDatum < vtf.Vårdtillfälle.Inskrivningsdatum)
+            return true;
+    }
+    for(var k = 0; k < vtf.hittadeKirurgKoder.length - 1; k++){
+        if(vtf.hittadeKirurgKoder[k].datum < vtf.Vårdtillfälle.Inskrivningsdatum)
+            return true;
+    }
+    for(var l = 0; l < vtf.hittadRespirator.length - 1; l++){
+        if(vtf.hittadeInfarter[l].datum < vtf.Vårdtillfälle.Inskrivningsdatum)
+            return true;
+    }
+
+    return false;
+}
 
 
 /*
@@ -114,23 +132,37 @@ function checkIfDatesMatch(index){
     var feberLista = allaFiltreradeReads[index].hittadFeber;
     var odlingLista = allaFiltreradeReads[index].hittadeOdlingar; // 3-5 dygn
     var kemLista = allaFiltreradeReads[index].hittadeKemSvar; // 1-4 h
-    var feberDebut = feberLista[feberLista.length - 1];
-    var odlingDebut = odlingLista[odlingLista.length - 1];
-    var kemDebut = kemLista[kemLista.length - 1];
+    var feberDebut, kemDebut, odlingDebut;
+    if(feberLista.length > 0){
+        feberDebut = feberLista[feberLista.length - 1].datum;
+    } else {
+        feberDebut = 0;
+    }
+    if(kemLista.length > 0){
+        kemDebut = kemLista[kemLista.length - 1].datum;
+    } else {
+        kemDebut = 0;
+    }
+    if(odlingLista.length > 0){
+        odlingDebut = odlingLista[odlingLista.length - 1].datum;
+    } else {
+        odlingDebut = 0;
+    }
+
     var bonusPoints = 0;
 
-    if(feberDebut !== undefined){
-        if(odlingDebut !== undefined){
+    if(feberDebut !== 0){
+        if(odlingDebut !== 0){
             if((odlingDebut - feberDebut) < 864000000 && odlingDebut > feberDebut) //864000000 = 10 dygn
                 bonusPoints += 9;
         }
-        if(kemDebut !== undefined){
-            if((kemDebut - feberDebut) < 86400000 && kemDebut > feberDebut) //86400000 = 24h, 14400000 = 4h
+        if(kemDebut !== 0){
+            if((kemDebut - feberDebut) < 86400000) //86400000 = 24h, 14400000 = 4h
                 bonusPoints += 9;
         }
     } else {
-        if(kemDebut !== undefined){
-            if(odlingDebut !== undefined){
+        if(kemDebut !== 0){
+            if(odlingDebut !== 0){
                 if((odlingDebut - kemDebut) < 691200000 && odlingDebut > kemDebut) //691200000 = 8 dygn
                     bonusPoints += 9;
             }
