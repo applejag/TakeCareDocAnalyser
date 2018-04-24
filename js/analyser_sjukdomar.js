@@ -55,7 +55,7 @@ var sjukdomsRegExp = {
             /Z85/ // Z85
         )
     },
-    KardiobaskuläraSjukdomar: {
+    KardiovaskuläraSjukdomar: {
         icd10: _d(
             ///I109/, // I10.9, hypertoni
             /I2[0-5]/, // I20-I25
