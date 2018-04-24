@@ -7,11 +7,11 @@ var intressantaDKoder = ["A419", "T814", "A415", "A410", "A403", "A418", "A409",
 
 function hittaInfDebut(index){
     if(allaFiltreradeReads[index].hittadFeber.length > 0)
-        return allaFiltreradeReads[index].hittadFeber[allaFiltreradeReads[index].hittadFeber.length - 1];
+        return allaFiltreradeReads[index].hittadFeber[allaFiltreradeReads[index].hittadFeber.length - 1].datum;
     if(allaFiltreradeReads[index].hittadeKemSvar.length > 0)
-        return allaFiltreradeReads[index].hittadeKemSvar[allaFiltreradeReads[index].hittadeKemSvar.length - 1];
+        return allaFiltreradeReads[index].hittadeKemSvar[allaFiltreradeReads[index].hittadeKemSvar.length - 1].datum;
     if(allaFiltreradeReads[index].hittadeOdlingar.length > 0)
-        return allaFiltreradeReads[index].hittadeOdlingar[allaFiltreradeReads[index].hittadeOdlingar.length - 1];
+        return allaFiltreradeReads[index].hittadeOdlingar[allaFiltreradeReads[index].hittadeOdlingar.length - 1].datum;
 
 
     return 0;
@@ -114,8 +114,8 @@ function hittaKemSvar() {
                 var analys = kemSvar.Värden[j];
 
                 if (/P-CRP|B-Leukocyter/.test(analys.Analysnamn)) {
-                    if (analys.Resultat > 9) {
-                        var kemSvarData = {analysNamn: analys.Analysnamn, värde: analys.Resultat};
+                    if ((analys.Analysnamn == "P-CRP" && analys.Resultat > 10) || (analys.Analysnamn == "B-Leukocyter" && analys.UtanförIntervall == true)) {
+                        var kemSvarData = {analysNamn: analys.Analysnamn, värde: analys.Resultat, datum: kemSvar.Datum};
                         allaFiltreradeReads[v].hittadeKemSvar.push(kemSvarData);
                     }
                 }
@@ -126,7 +126,7 @@ function hittaKemSvar() {
 }
 
 function hittaRespirator() {
-    var ventilationSökord = /andningsstöd|respirator|intubera|tracheostomi|ventilatorstöd/gi;
+    var ventilationSökord = /andningsstöd|respirator\b|respiratorstöd|intubera|tracheostomi|ventilatorstöd/i;
 
     for(var j = 0; j < allaFiltreradeReads.length; j++) {
         var journaltexter = allaFiltreradeReads[j].Journaltexter;
@@ -138,14 +138,16 @@ function hittaRespirator() {
             var execList = [];
             var tmpList = [];
 
-            while((execList = ventilationSökord.exec(journaltext)) !== null){
-                tmpString = execList[0].charAt().toUpperCase() + execList[0].substr(1).toLowerCase();
-                tmpList.push(tmpString);
+            if(ventilationSökord.test(journaltext)){//while((execList = ventilationSökord.exec(journaltext)) !== null){
+                //tmpString = execList[0].charAt().toUpperCase() + execList[0].substr(1).toLowerCase();
+                //tmpList.push(tmpString);
+                //var vent = {respTyp: tmpList, datum: journaltexter[i].Datum};
+                allaFiltreradeReads[j].hittadRespirator.push(journaltexter[i].Datum);
             }
-            if(tmpList.length > 0){
-                var vent = {respTyp: tmpList, datum: journaltexter[i].Datum};
-                allaFiltreradeReads[j].hittadRespirator.push(vent);
-            }
+            // if(tmpList.length > 0){
+            //     var vent = {respTyp: tmpList, datum: journaltexter[i].Datum};
+            //     allaFiltreradeReads[j].hittadRespirator.push(vent);
+            // }
         }
 
     }
@@ -185,9 +187,7 @@ function compareKoder(kodLista, tillfälleTyp, datumet, index, chosenSearchList,
 }
 
 
-
-
-function hittaDrän() { //Skulle kunna bakas in i Infarter
+function hittaDrän() {
     var inDatum = new Date();
     var utDatum = new Date();
 
@@ -199,7 +199,7 @@ function hittaDrän() { //Skulle kunna bakas in i Infarter
         for (var i = 0; i < journaltexter.length; i++) {
             var journaltext = journaltexter[i].Fritext;
 
-            if(/drän|dränera|dränage/i.test(journaltext)) {
+            if(/\bdrän\b|dränera|dränage/i.test(journaltext)) {
                 matches++;
                 if(matches == 1){
                     utDatum = journaltexter[i].Datum;
@@ -221,11 +221,13 @@ function hittaInfarter() {
     var utDatum = new Date();
     var matches = 0;
     var match = [];
+    var negatives = /(vägrar|inte|ej|förnekar|ingen)/i;
     var infartStrings = ["KAD", "Urinavledning", "CVK", "Picc", "SVP", "CDK", "Venport", "Suprapubiskateter"];
 
     for (var v = 0; v < allaFiltreradeReads.length; v++) {
         var journaltexter = allaFiltreradeReads[v].Journaltexter;
         allaFiltreradeReads[v].hittadeInfarter = [];
+        var startIndex = 0;
 
         for (var j = 0; j < infarter.length; j++) {
             matches = 0;
@@ -233,11 +235,20 @@ function hittaInfarter() {
                 var journaltext = journaltexter[i].Fritext;
 
                 if(infarter[j].test(journaltext)) {
-                    matches++;
-                    if(matches == 1){
-                        utDatum = journaltexter[i].Datum;
+                    match = infarter[j].exec(journaltext);
+                    if(match.index >= 12){
+                        startindex = match.index - 12;
+                    } else {
+                        startIndex = 0;
                     }
-                    inDatum = journaltexter[i].Datum;
+
+                    if(!negatives.test(journaltext.substr(startIndex, match.index))){
+                        matches++;
+                        if(matches == 1){
+                            utDatum = journaltexter[i].Datum;
+                        }
+                        inDatum = journaltexter[i].Datum;
+                    }
                 }
             }
             if(matches > 0){
