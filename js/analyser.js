@@ -10,7 +10,8 @@ function analyseData() {
     //checkLongestVårdtillfälle();
     printData();
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
-        console.log(allaFiltreradeReads[i].VRIscore);
+        addScore(i, 10, "Testing " + i);
+        console.log(allaFiltreradeReads[i].Score);
 
     }
 
