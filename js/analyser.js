@@ -57,7 +57,7 @@ function checkLongestVårdtillfälle() {
 
 function sorteraVTF() {
 
-    var blacklist = ["Vårdtillfällen", "ParsedDocuments"];
+    var blacklist = ["Vårdtillfällen", "ParsedDocuments", "DatumMin", "DatumMax"];
     allaFiltreradeReads = [];
 
     // Äldst först
@@ -71,7 +71,9 @@ function sorteraVTF() {
 
         // new read obj per tillfälle
         var filtreradRead = {
-            Vårdtillfälle: tillfälle
+            Vårdtillfälle: tillfälle,
+            ScoringHistory: [],
+            Score: 0
         };
         allaFiltreradeReads.push(filtreradRead);
 

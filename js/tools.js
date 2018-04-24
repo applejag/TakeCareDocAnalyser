@@ -7,9 +7,16 @@ function isString(val) {
     return typeof val == "string" || val instanceof String;
 }
 
+function isNumber(val) {
+    return typeof val == "number" || val instanceof Number;
+}
+
 function typeof2(val) {
-    return val instanceof Array ? "Array"
-        : (val instanceof Date ? "Date" : typeof val);
+    if (val instanceof String) return "String";
+    if (val instanceof Number) return "Number";
+    if (val instanceof Array) return "Array";
+    if (val instanceof Date) return "Date";
+    return typeof val;
 }
 
 function formatDate(date) {
