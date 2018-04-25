@@ -8,8 +8,8 @@
     parser.lastParse = [];
 
     var input = document.getElementById("input");
-    var output = document.getElementById("output");
-    var reader_status = document.getElementById("output_status");
+    var saved = document.getElementById("saved");
+    var parse_status = document.getElementById("parse_status");
     var catch_checkbox = document.getElementById("parse_catch");
     var parse_time_min = document.getElementById("parse_time_min");
     var parse_time_max = document.getElementById("parse_time_max");
@@ -83,9 +83,9 @@
 
     function setError(title, error)
     {
-        var div = document.getElementById("output_error");
-        var eTitle = document.getElementById("output_error_title");
-        var ePara = document.getElementById("output_error_para");
+        var div = document.getElementById("parse_error");
+        var eTitle = document.getElementById("parse_error_title");
+        var ePara = document.getElementById("parse_error_para");
 
         if (title && error) {
             div.style.display = "block";
@@ -110,12 +110,12 @@
             try {
                 var out = func(start);
                 if (out)
-                    reader_status.innerText = out;
+                    parse_status.innerText = out;
                 else
-                    reader_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
+                    parse_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
 
             } catch (e) {
-                reader_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
+                parse_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
                 setError("Error while " + verb.toLowerCase() + "!", e);
             }
         } else {
@@ -123,20 +123,20 @@
             try {
                 var out2 = func(start);
                 if (out2)
-                    reader_status.innerText = out2;
+                    parse_status.innerText = out2;
                 else
-                    reader_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
+                    parse_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
                 success = true;
             } finally {
                if (!success)
-                   reader_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
+                   parse_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
             }
         }
     }
 
     parser.exportJSON = function() {
         execFunc("Export", function(start) {
-            output.innerText = JSON.stringify(read, null, 4);
+            saved.innerText = JSON.stringify(read, null, 4);
         });
     };
 
@@ -145,7 +145,7 @@
             var fieldCount = 0;
             var itemCount = 0;
 
-            var toParse = output.innerText.trim();
+            var toParse = saved.innerText.trim();
             if (toParse == "") {
                 console.warn("[!] Nothing to import!");
                 return "(Nothing to import)";
@@ -492,13 +492,13 @@
     var startParseTimer = throttle(parser.parseInput, 300, function() {
         parser.isCrashed = false;
         parser.isParsed = false;
-        reader_status.innerText = "(Parsing, please wait...)";
+        parse_status.innerText = "(Parsing, please wait...)";
         setError(null, null);
     });
 
     var convertOutputToText = throttle(function() {
-        if (output.children.length > 0)
-            output.innerHTML = output.innerText;
+        if (saved.children.length > 0)
+            saved.innerHTML = saved.innerText;
     }, 100);
 
     window.addEventListener('load', function() {
@@ -507,9 +507,9 @@
         getTimespanMinMax();
     });
 
-    output.addEventListener("DOMNodeInserted", convertOutputToText, false);
-    output.addEventListener("DOMNodeRemoved", convertOutputToText, false);
-    output.addEventListener("DOMCharacterDataModified", convertOutputToText, false);
+    saved.addEventListener("DOMNodeInserted", convertOutputToText, false);
+    saved.addEventListener("DOMNodeRemoved", convertOutputToText, false);
+    saved.addEventListener("DOMCharacterDataModified", convertOutputToText, false);
 
     // input.addEventListener("DOMNodeInserted", startParseTimer, false);
     // input.addEventListener("DOMNodeRemoved", startParseTimer, false);

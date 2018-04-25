@@ -59,7 +59,8 @@ var sjukdomsRegExp = {
         icd10: _d(
             ///I109/, // I10.9, hypertoni
             /I2[0-5]/, // I20-I25
-            /I50/ // I50
+            /I50/, // I50
+            /I6[0-9]/ // I60-I69, tyder på stroke
         ),
         epikris: _w(
             // /hypertoni/,
@@ -92,7 +93,7 @@ function findSjukdomarInVtfAndÖvk() {
     // För varje sjukdomskategori...
     for (var sjukdom in sjukdomsRegExp) {
         if (!sjukdomsRegExp.hasOwnProperty(sjukdom)) continue;
-        
+
         var funnaResultat = [];
         var icd10 = sjukdomsRegExp[sjukdom].icd10;
         var epikris = sjukdomsRegExp[sjukdom].epikris;
