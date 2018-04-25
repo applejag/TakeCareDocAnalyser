@@ -17,7 +17,7 @@ html {
     min-height: 50px;
 }
 
-#parse_status {
+.discrete {
     font-style: italic;
     color: #808080;
 }
@@ -361,4 +361,46 @@ input[invalid]+.validation:after {
     content: '✖';
     padding-left: 5px;
     color: red;
+}
+
+.score-header {
+    margin-bottom: 0.2em;
+}
+
+.score-date {
+    font-family: monospace;
+    background: #eee;
+    padding: 0.2em 0.4em;
+}
+
+.score-list {
+    list-style: none;
+    margin: 0;
+}
+
+.score-pos, .score-neg {
+    display: inline-block;
+    padding: 0.2em 0.5em;
+    font-family: monospace;
+    font-size: 125%;
+    color: white;
+    width: 3em;
+    text-align: center;
+}
+
+.score-pos {
+    background: #22cc88;
+}
+
+.score-neg {
+    background: #dd6655;
+}
+
+.discrete .score-pos, .score-pos.discrete {
+    background: linear-gradient(#fff, #cfc, #fff);
+    color: #353;
+}
+.discrete .score-neg, .score-neg.discrete {
+    background: linear-gradient(#fff, #fcc, #fff);
+    color: #533;
 }

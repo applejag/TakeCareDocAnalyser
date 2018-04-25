@@ -134,6 +134,37 @@
         }
     }
 
+    parser.refreshScore = function() {
+        var container = document.getElementById("scoring_items");
+        var none = document.getElementById("scoring_none");
+        var template = document.getElementById("scoring_template");
+        container.innerHTML = "";
+
+        if (allaFiltreradeReads.length === 0) {
+            none.style.display = "block";
+            return;
+        }
+        none.style.display = "none";
+
+        function setTextFromClassName(elem, className, text) {
+            var children = elem.getElementsByClassName(className);
+            for (var i = 0; i < children.length; i++) {
+                children[i].innerText = text;
+            }
+        }
+
+        function addScoreToList(score) {
+            // TODO: this
+        }
+
+        for (var ri = 0; ri < allaFiltreradeReads.length; ri++) {
+            /// // TODO: !?R!T"
+            for (var si = 0; si < allaFiltreradeReads[ri].ScoringHistory.length; si++) {
+                addScoreToList(allaFiltreradeReads[ri].ScoringHistory[si]);
+            }
+        }
+    };
+
     parser.exportJSON = function() {
         execFunc("Export", function(start) {
             saved.innerText = JSON.stringify(read, null, 4);

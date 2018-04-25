@@ -20,7 +20,7 @@
             </noscript>
             <div class="row">
                 <div class="col">
-                    <div id="parse_status">(Press <a href="javascript:parser.parseInput()">parse</a> to parse the data.)</div>
+                    <div id="parse_status" class="discrete">(Press <a href="javascript:parser.parseInput()">parse</a> to parse the data.)</div>
                 </div>
             </div>
             <div class="row">
@@ -100,7 +100,23 @@
             <div class="row">
                 <div class="col">
                     <fieldset class="fieldset">
-                        <legend>Output</legend>
+                        <legend>Scoring</legend>
+                        <div class="btn-group">
+                            <button id="scoring_refresh" class="input" type="button" onclick="parser.refreshScore()">Force refresh</button>
+                        </div>
+                        <p id="scoring_none" class="discrete">(No score has been recorded.)</p>
+                        <div id="scoring_template" style="display: none;">
+                            <h3 class="score-header">
+                                <span class="score-pos">+70</span> Vårdtillfälle
+                                <span class="score-date score-date-min">2017-02-01 03:14</span> -
+                                <span class="score-date score-date-max">2017-02-28 15:36</span>
+                            </h3>
+                            <ul class="score-list">
+                                <li><span class="score-pos discrete">+100</span> <span class="score-reason discrete">Bra med poäng</span></li>
+                                <li><span class="score-neg discrete">-30</span> <span class="score-reason discrete">Jaaodå</span></li>
+                            </ul>
+                        </div>
+                        <div id="scoring_items"></div>
                     </fieldset>
                 </div>
             </div>

@@ -20,9 +20,22 @@ function typeof2(val) {
 }
 
 function formatDate(date) {
-    var local = new Date(date);
-    local.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-    return local.toJSON().slice(0, 10);
+    var year = String(date.getFullYear());
+    var month = String(date.getMonth() + 1);
+    var day = String(date.getDate());
+
+    return year.padStart(4,'0')+'-'+month.padStart(2,'0')+'-'+day.padStart(2,'0');
+}
+
+function formatTime(date) {
+    var hour = String(date.getHours());
+    var minute = String(date.getMinutes());
+
+    return hour.padStart(2, '0')+':'+minute.padStart(2,'0');
+}
+
+function formatDateTime(date) {
+    return formatDate(date)+' '+formatTime(date);
 }
 
 function tryParseDate(str) {
