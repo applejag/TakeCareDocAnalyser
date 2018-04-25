@@ -12,12 +12,12 @@ html {
     font-size: 80%;
 }
 
-#input, #output {
+#input, #saved {
     max-height: 300px;
     min-height: 50px;
 }
 
-#output-status {
+#parse_status {
     font-style: italic;
     color: #808080;
 }
@@ -257,7 +257,7 @@ button.danger:active {
 button.close {
     float: right;
     font-size: 150%;
-    background-color: unset;
+    background: unset;
     border: none;
     color: inherit;
     outline: none;
