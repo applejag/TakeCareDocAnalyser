@@ -589,9 +589,14 @@
         setError(null, null);
     });
 
-    var convertOutputToText = throttle(function() {
+    var convertSavedToText = throttle(function() {
         if (saved.children.length > 0)
             saved.innerHTML = saved.innerText;
+    }, 100);
+
+    var convertLogToText = throttle(function() {
+        if (consolelog.children.length > 0)
+            consolelog.innerHTML = consolelog.innerText;
     }, 100);
 
     window.addEventListener('load', function() {
@@ -600,9 +605,13 @@
         getTimespanMinMax();
     });
 
-    saved.addEventListener("DOMNodeInserted", convertOutputToText, false);
-    saved.addEventListener("DOMNodeRemoved", convertOutputToText, false);
-    saved.addEventListener("DOMCharacterDataModified", convertOutputToText, false);
+    saved.addEventListener("DOMNodeInserted", convertSavedToText, false);
+    saved.addEventListener("DOMNodeRemoved", convertSavedToText, false);
+    saved.addEventListener("DOMCharacterDataModified", convertSavedToText, false);
+
+    consolelog.addEventListener("DOMNodeInserted", convertLogToText, false);
+    consolelog.addEventListener("DOMNodeRemoved", convertLogToText, false);
+    consolelog.addEventListener("DOMCharacterDataModified", convertLogToText, false);
 
     // input.addEventListener("DOMNodeInserted", startParseTimer, false);
     // input.addEventListener("DOMNodeRemoved", startParseTimer, false);
