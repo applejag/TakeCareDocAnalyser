@@ -363,8 +363,14 @@ input[invalid]+.validation:after {
     color: red;
 }
 
-.score-header {
-    margin-bottom: 0.2em;
+#scoring_items th {
+    margin: 0 0.7em;
+}
+
+#scoring_items tbody::after {
+    content: '';
+    display: block;
+    height: 1em;
 }
 
 .score-date {
@@ -397,10 +403,10 @@ input[invalid]+.validation:after {
 }
 
 .discrete .score-pos, .score-pos.discrete {
-    background: linear-gradient(#fff, #cfc, #fff);
+    background: unset;
     color: #353;
 }
 .discrete .score-neg, .score-neg.discrete {
-    background: linear-gradient(#fff, #fcc, #fff);
+    background: unset;
     color: #533;
 }

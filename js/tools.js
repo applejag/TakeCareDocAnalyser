@@ -66,7 +66,7 @@ Object.prototype.cloneDeep = function() {
     if (this instanceof String) return String(this);
     if (this instanceof Number) return Number(this);
     if (this instanceof Date) return new Date(this);
-    if (this instanceof Node) return this.cloneNode();
+    if (this instanceof Node) return this.cloneNode(true);
 
     var clone;
     if (this instanceof Array) clone = [];

@@ -138,6 +138,7 @@
         var container = document.getElementById("scoring_items");
         var none = document.getElementById("scoring_none");
         var template = document.getElementById("scoring_template");
+        var item_template = document.getElementById("scoring_item_template");
         container.innerHTML = "";
 
         if (allaFiltreradeReads.length === 0) {
@@ -146,21 +147,54 @@
         }
         none.style.display = "none";
 
-        function setTextFromClassName(elem, className, text) {
+        function _setScore(score) {
+            return function(elem) {
+                if (score >= 0) {
+                    elem.classList.remove('score-neg');
+                    elem.classList.add('score-pos');
+                    elem.innerText = '+' + score.toString();
+                } else {
+                    elem.classList.remove('score-pos');
+                    elem.classList.add('score-neg');
+                    elem.innerText = score.toString();
+                }
+            };
+        }
+
+        function _setText(text) {
+            return function(elem) {
+                elem.innerText = text;
+            };
+        }
+
+        function foreachElementByClass(elem, className, callback) {
             var children = elem.getElementsByClassName(className);
             for (var i = 0; i < children.length; i++) {
-                children[i].innerText = text;
+                callback(children[i]);
             }
         }
 
-        function addScoreToList(score) {
-            // TODO: this
-        }
-
         for (var ri = 0; ri < allaFiltreradeReads.length; ri++) {
-            /// // TODO: !?R!T"
-            for (var si = 0; si < allaFiltreradeReads[ri].ScoringHistory.length; si++) {
-                addScoreToList(allaFiltreradeReads[ri].ScoringHistory[si]);
+            var fread = allaFiltreradeReads[ri];
+
+            var clone = template.cloneDeep();
+            clone.removeAttribute('id');
+            foreachElementByClass(clone, 'score-total', _setScore(fread.Score));
+            foreachElementByClass(clone, 'score-date-min', _setText(formatDateTime(fread.Vårdtillfälle.Inskrivningsdatum)));
+            foreachElementByClass(clone, 'score-date-max', _setText(formatDateTime(fread.Vårdtillfälle.Utskrivningsdatum)));
+            foreachElementByClass(clone, 'score-rubrik', _setText(fread.Vårdtillfälle.Rubrik));
+            container.appendChild(clone);
+
+            var item_container = clone.getElementsByClassName('score-list')[0];
+            item_container.innerHTML="";
+
+            for (var si = 0; si < fread.ScoringHistory.length; si++) {
+                var hist = fread.ScoringHistory[si];
+
+                var item = item_template.cloneDeep();
+                foreachElementByClass(item, 'score-delta', _setScore(hist.delta));
+                foreachElementByClass(item, 'score-reason', _setText(hist.reason));
+                item_container.appendChild(item);
             }
         }
     };
@@ -256,6 +290,7 @@
             } else {
                 analyseData();
                 parser.isAnalysed = true;
+                parser.refreshScore();
                 return "(Analysed " + read.ParsedDocuments.length + " documents in " + (Date.now() - start) + " ms)";
             }
         });
