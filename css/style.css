@@ -9,7 +9,6 @@ html {
 
 .mono {
     font-family: monospace;
-    font-size: 80%;
 }
 
 .limheight {
@@ -390,7 +389,7 @@ input[invalid]+.validation:after {
     font-family: monospace;
     font-size: 125%;
     color: white;
-    width: 3em;
+    width: 4em;
     text-align: center;
 }
 

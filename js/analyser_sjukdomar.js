@@ -1,12 +1,19 @@
 
 /*
 
-# Hämtar från `read.Vårdtillfällen`, `read.ÖppnaVårdkontakter`
-# och `read.Journaltexter`
-# Sparar resultat i `hittadeSjukdomar`
+# Hämtar från `allaFiltreradeReads[n].Vårdtillfälle`, `allaFiltreradeReads[n].ÖppnaVårdkontakter`
+# och `allaFiltreradeReads[n].Journaltexter`
+# Sparar resultat i `allaFiltreradeReads[n]`
 findSjukdomarInVtfAndÖvk();
 
-hittadeSjukdomar: {
+allaFiltreradeReads[0..n]: {
+    /..other data../
+
+    hittadeSjukdomarICD10[0..n]: {hittad sjukdom},
+    hittadeSjukdomarEpikris[0..n]: {hittad sjukdom}
+}
+
+{hittad sjukdom}: {
     ['kategori'][0..n]: {
         Värde: "" String,
         Dokument: "" String,
@@ -14,8 +21,6 @@ hittadeSjukdomar: {
     }
 }
 */
-
-var hittadeSjukdomar = {};
 
 function _d() {
     var _ = Array.from(arguments).mapField('source');
@@ -72,7 +77,6 @@ var sjukdomsRegExp = {
 };
 
 function findSjukdomarInVtfAndÖvk() {
-    hittadeSjukDKoder = {};
 
     function addResultToList(list, regex, texts, dok, datum) {
         for (var i = 0; i < texts.length; i++) {
@@ -90,47 +94,55 @@ function findSjukdomarInVtfAndÖvk() {
         }
     }
 
-    // För varje sjukdomskategori...
-    for (var sjukdom in sjukdomsRegExp) {
-        if (!sjukdomsRegExp.hasOwnProperty(sjukdom)) continue;
+    for (var ri = 0; ri < allaFiltreradeReads.length; ri++) {
+        var fread = allaFiltreradeReads[ri];
+        fread.hittadeSjukdomarICD10 = {};
+        fread.hittadeSjukdomarEpikris = {};
 
-        var funnaResultat = [];
-        var icd10 = sjukdomsRegExp[sjukdom].icd10;
-        var epikris = sjukdomsRegExp[sjukdom].epikris;
+        // För varje sjukdomskategori...
+        for (var sjukdom in sjukdomsRegExp) {
+            if (!sjukdomsRegExp.hasOwnProperty(sjukdom)) continue;
 
-        if (icd10) {
-            // För varje Vårdtillfälle...
-            for (var vi = 0; vi < read.Vårdtillfällen.length; vi++) {
+            var funnaICD10 = [];
+            var funnaEpikris = [];
+
+            var icd10 = sjukdomsRegExp[sjukdom].icd10;
+            if (icd10) {
                 // Leta efter koder
-                var vtf = read.Vårdtillfällen[vi];
-                addResultToList(funnaResultat, icd10, vtf.Diagnoser, 'Vårdtillfälle', vtf.Inskrivningsdatum);
+                var vtf = fread.Vårdtillfälle;
+                addResultToList(funnaICD10, icd10, vtf.Diagnoser, 'Vårdtillfälle', vtf.Inskrivningsdatum);
+
+                // För varje Öppen vårdkontakt...
+                for (var öi = 0; öi < fread.ÖppnaVårdkontakter.length; öi++) {
+                    // Leta efter koder
+                    var övk = fread.ÖppnaVårdkontakter[öi];
+                    addResultToList(funnaICD10, icd10, övk.Diagnoser, 'Öppen vårdkontakt', övk.Datum);
+                }
             }
 
-            // För varje Öppen vårdkontakt...
-            for (var öi = 0; öi < read.ÖppnaVårdkontakter.length; öi++) {
-                // Leta efter koder
-                var övk = read.ÖppnaVårdkontakter[öi];
-                addResultToList(funnaResultat, icd10, övk.Diagnoser, 'Öppen vårdkontakt', övk.Datum);
+            var epikris = sjukdomsRegExp[sjukdom].epikris;
+            if (epikris) {
+                // För varje journal...
+                for (var ji = 0; ji < fread.Journaltexter.length; ji++) {
+                    var j = fread.Journaltexter[ji];
+                    // Bara epikriser
+                    if (!/epikris/i.test(j.Mall)) continue;
+                    // Leta resultat
+                    addResultToList(funnaEpikris, epikris, j.Fritext.splitSentences(), 'Epikris', j.Datum);
+                }
             }
-        }
 
-        if (epikris) {
-            // För varje journal...
-            for (var ji = 0; ji < read.Journaltexter.length; ji++) {
-                var j = read.Journaltexter[ji];
-                // Bara epikriser
-                if (!/epikris/i.test(j.Mall)) continue;
-                // Leta resultat
-                addResultToList(funnaResultat, epikris, j.Fritext.splitSentences(), 'Epikris', j.Datum);
+            // Spara sjukdomens matachade diagnoser
+            fread.hittadeSjukdomarICD10[sjukdom] = funnaICD10;
+            fread.hittadeSjukdomarEpikris[sjukdom] = funnaEpikris;
+
+            if (funnaICD10.length > 0) {
+                var koder = funnaICD10.mapField('Värde').join(', ');
+                addScore(ri, Math.irandomRange(10,999), 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
             }
-        }
-
-        // Spara sjukdomens matachade diagnoser
-        hittadeSjukDKoder[sjukdom] = funnaResultat;
-
-        if (funnaResultat.length > 0) {
-            var koder = funnaResultat.map(function(o) {return o.Värde;});
-            console.log("-> hittade ("+funnaResultat.length+") " + koder.join(',') + " för " + sjukdom);
+            if (funnaEpikris.length > 0) {
+                addScore(ri, Math.irandomRange(2,666), 'Hittade spår i epikriser för ' + sjukdom);
+            }
         }
     }
 }

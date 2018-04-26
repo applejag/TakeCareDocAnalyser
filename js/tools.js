@@ -1,4 +1,14 @@
 
+Math.randomRange = function randomRange(lower, upper) {
+    return Math.random() * (upper - lower) + lower;
+};
+
+Math.irandomRange = function irandomRange(lower, upper) {
+    lower = lower>>0;
+    upper = upper>>0;
+    return (Math.random() * (upper - lower + 1) ) << 0;
+};
+
 function isRegExp(val) {
     return val instanceof RegExp;
 }

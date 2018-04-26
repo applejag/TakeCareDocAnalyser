@@ -8,6 +8,7 @@ function analyseData() {
     analyseÅtgärder();
     analyseInfectionData();
     //checkLongestVårdtillfälle();
+    findSjukdomarInVtfAndÖvk();
     printData();
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
         addScore(i, 10, "Testing " + i);
