@@ -65,12 +65,16 @@ var sjukdomsRegExp = {
             ///I109/, // I10.9, hypertoni
             /I2[0-5]/, // I20-I25
             /I50/, // I50
-            /I6[0-9]/ // I60-I69, tyder på stroke
+            /I6[0-3]/, // I60-I63, tyder på stroke
+            /I670/, // I67.0
+            /I676/, // I67.6
+            /I677/, // I67.7
+            /G45/ // G45
         ),
         epikris: _w(
-            // /hypertoni/,
-            // /flimmer/,
-            /stroke/,
+            // /hypertoni/, // borttaget pga ointressant
+            // /flimmer/, // borttaget pga ointressant
+            // /stroke/,
             /hjärtsvikt/
         )
     }
@@ -141,7 +145,8 @@ function findSjukdomarInVtfAndÖvk() {
                 addScore(ri, Math.irandomRange(10,999), 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
             }
             if (funnaEpikris.length > 0) {
-                addScore(ri, Math.irandomRange(2,666), 'Hittade spår i epikriser för ' + sjukdom);
+                var texter = funnaEpikris.mapField('Värde').join('", "');
+                addScore(ri, Math.irandomRange(2,666), 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
             }
         }
     }

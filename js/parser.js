@@ -245,6 +245,7 @@
 
             // Read json
             var data = JSON.parse(toParse, function (key, value) {
+                itemCount++;
                 if (key.search(/datum/i) !== -1 && isString(value)) {
                     return tryParseDate(value) || value;
                 }
@@ -274,7 +275,6 @@
 
                 read[dfield] = data[dfield];
                 fieldCount++;
-                if (data[dfield].length) itemCount += data[dfield].length;
             }
 
             // Clear omitted fields
@@ -291,7 +291,7 @@
             parse_time_min.value = formatDate(read.DatumMin);
             parse_time_max.value = formatDate(read.DatumMax);
 
-            return "(Imported "+fieldCount+" fields and a total of "+itemCount+" documents in "+(Date.now() - start)+" ms)";
+            return "(Imported "+fieldCount+" fields and a total of "+itemCount+" values in "+(Date.now() - start)+" ms)";
         });
     };
 
