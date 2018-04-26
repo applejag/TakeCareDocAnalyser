@@ -403,10 +403,10 @@ input[invalid]+.validation:after {
 }
 
 .discrete .score-pos, .score-pos.discrete {
-    background: unset;
+    background: transparent;
     color: #353;
 }
 .discrete .score-neg, .score-neg.discrete {
-    background: unset;
+    background: transparent;
     color: #533;
 }
