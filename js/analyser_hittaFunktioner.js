@@ -1,9 +1,8 @@
 var infarter = [/(?:^|[\s\\/\-_&.,:;])KAD(?:$|[\s\\/\-_&.,:;])/i, /Urinavledning/i, /CVK/i, /Picc/i, /SVP/i, /CDK/i, /Venport/i, /(Suprapubiskateter|sp-kateter)/i]; // KAD = urinkateter
 
-var intressantaDKoder = ["A419", "T814", "A415", "A410", "A403", "A418", "A409", "A411", "P369",
-                            "A400", "A408", "A414", "A402", "A021", "A401", "A412", "B377", "A413", "P360",
-                            "T802", "A392", "A483", "A327", "P364", "P368", "A394", "P362", "G019", "N080",
-                            "G079", "I390", "M492", "I398"];
+var intressantaDKoder = "(A|B|T814|T802|T835|T880|T802|T814|T826|T835|T836|T814|T818|R572|R651|I39|N0[0-5]|N1[0-2]|N30|N330|N34|",
+            "N35|N390|N41|O862|O863|O98|Z22|E06|L0[0-5]|L08|K12|K102|K112|K113|K130|J0[0-6]|J09|J1[0-8]|J2[0-2]|",
+            "J32|J37|J69|G0[1-8]|G61|M0[0-3]|M0[5-9]|M1[0-4]|M3[0-5]|M45|M46|M60|M63|M86|H01|H10|H16|H20|H30|H46|D709C)"]
 
 function hittaInfDebut(index){
     if(allaFiltreradeReads[index].hittadFeber.length > 0)
@@ -68,8 +67,6 @@ function hittaOdlingarMikrobiologi() {
                 if (negatives.test(stycke)) {
                     continue;
                 }
-                if(/clostridium, difficile/i.test(stycke)) // En bakterie som alltid är VRI
-                    allaFiltreradeReads.VRIscore += 500;
 
                 var odlingData = {svar: stycke, datum: mikroBdok[i].Datum};
                 allaFiltreradeReads[v].hittadeOdlingar.push(odlingData);
@@ -173,7 +170,7 @@ function hittaKirurgi() {
 
 function compareKoder(kodLista, tillfälleTyp, datumet, index, chosenSearchList, pushHere){
     var kirurgkoder = /^\D{3,}/;
-    var regexDKoder = new RegExp("(" + intressantaDKoder.join('|') + ")");
+    var regexDKoder = new RegExp(intressantaDKoder.join(''), "i");
     var sökListor = [kirurgkoder, regexDKoder];
     //var kirurgKoder1 = /^(H|B|J|L|P|E|M|N|F|K|C|Y|T|U|GB|GC|GE|GW|XA|XC|XF|XG|XJ|XK|XL|XN|XP|XX|YC|YF|YG|YJ|YK|YN|YP|YQ|YW)/;
     //var kirurgKoder2 = /^(A|Q|P|D)+\D{2,}|^(GA|GD)+\D/;

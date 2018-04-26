@@ -41,7 +41,7 @@ var sjukdomsRegExp = {
             /\w*diabetes/
         )
     },
-    Lungsjuddomar: {
+    Lungsjukdomar: {
         icd10: _d(
             /J4[0-6]/, // J40-J46
             /D860/ // D86.0
