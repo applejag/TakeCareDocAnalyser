@@ -78,7 +78,7 @@
                             <button id="input_select_all" class="input" type="button" onclick="focusAll('input')">Select all</button>
                             <button id="input_select_end" class="input" type="button" onclick="focusEnd('input')">Select end</button>
                         </div>
-                        <div id="input" class="codefield" contenteditable="true"></div>
+                        <div id="input" class="codefield limheight" contenteditable="true"></div>
                     </fieldset>
                 </div>
                 <div class="col-6">
@@ -93,7 +93,7 @@
                             <button id="saved_select_all" class="input" type="button" onclick="focusAll('saved')">Select all</button>
                             <button id="saved_select_end" class="input" type="button" onclick="focusEnd('saved')">Select end</button>
                         </div>
-                        <pre id="saved" class="codefield mono" contenteditable="true"></pre>
+                        <pre id="saved" class="codefield mono limheight" contenteditable="true"></pre>
                     </fieldset>
                 </div>
             </div>
@@ -103,31 +103,47 @@
                         <legend>Scoring</legend>
                         <div class="btn-group">
                             <button id="scoring_refresh" class="input" type="button" onclick="parser.refreshScore()">Force refresh</button>
+                            <button id="scoring_select_all" class="input" type="button" onclick="focusAll('scoring')">Select all</button>
                         </div>
-                        <p id="scoring_none" class="discrete">(No score has been recorded.)</p>
-                        <table style="display: none;">
-                            <tbody id="scoring_template">
-                                <tr>
-                                    <th><span class="score-total score-pos">+70</span></th>
-                                    <th><span>Vårdtillfälle</span></th>
-                                    <td><span class="score-rubrik discrete">(TEMPLATE)</span></td>
-                                    <th><span class="score-date score-date-min">2017-02-01 03:14</span></th>
-                                    <th><span class="score-date score-date-max">2017-02-28 15:36</span></th>
-                                </tr>
-                                <tr>
-                                    <td colspan="5">
-                                        <ul class="score-list">
-                                            <li id="scoring_item_template">
-                                                <span class="score-delta score-pos discrete">+100</span>
-                                                <span class="score-reason discrete" colspan="3">Bra med poäng</span>
-                                            </li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <table id="scoring_items">
-                        </table>
+                        <div id="scoring">
+                            <p id="scoring_none" class="discrete">(No score has been recorded.)</p>
+                            <table style="display: none;">
+                                <tbody id="scoring_template">
+                                    <tr>
+                                        <th><span class="score-total score-pos">+70</span></th>
+                                        <th><span>Vårdtillfälle</span></th>
+                                        <td><span class="score-rubrik discrete">(TEMPLATE)</span></td>
+                                        <th><span class="score-date score-date-min">2017-02-01 03:14</span></th>
+                                        <th><span class="score-date score-date-max">2017-02-28 15:36</span></th>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5">
+                                            <ul class="score-list">
+                                                <li id="scoring_item_template">
+                                                    <span class="score-delta score-pos discrete">+100</span>
+                                                    <span class="score-reason discrete" colspan="3">Bra med poäng</span>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table id="scoring_items">
+                            </table>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <fieldset class="fieldset">
+                        <legend>Console log</legend>
+                        <div class="btn-group">
+                            <button id="consolelog_clear" class="input danger" type="button" onclick="clearContent('consolelog')">&times; Clear field</button>
+                            <button id="consolelog_select_all" class="input" type="button" onclick="focusAll('consolelog')">Select all</button>
+                            <button id="consolelog_select_end" class="input" type="button" onclick="focusEnd('consolelog')">Select end</button>
+                        </div>
+                        <pre id="consolelog" class="codefield mono limheight" contenteditable="true"></pre>
                     </fieldset>
                 </div>
             </div>

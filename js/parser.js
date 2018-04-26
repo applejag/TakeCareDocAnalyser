@@ -13,6 +13,7 @@
     var catch_checkbox = document.getElementById("parse_catch");
     var parse_time_min = document.getElementById("parse_time_min");
     var parse_time_max = document.getElementById("parse_time_max");
+    var consolelog = document.getElementById("consolelog");
     var timer = null;
     var readerFunctions = [];
 
@@ -106,31 +107,57 @@
         parser.isCrashed = false;
         setError();
 
-        if (catch_checkbox.checked) {
-            try {
-                var out = func(start);
-                if (out)
-                    parse_status.innerText = out;
-                else
-                    parse_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
+        var truelog = console.log;
+        var oldLog = {};
+        var logged = "";
 
-            } catch (e) {
-                parse_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
-                setError("Error while " + verb.toLowerCase() + "!", e);
+        function captureLogger(logger) {
+            if (oldLog[logger]) return;
+            oldLog[logger] = console[logger];
+            console[logger] = function() {
+                var str = Array.from(arguments).join(' ');
+                if (logged === "") logged = str;
+                else logged += "\n" + str;
+                oldLog[logger].apply(console, arguments);
+            };
+        }
+
+        try {
+            ['log', 'warn', 'error'].forEach(captureLogger);
+
+            if (catch_checkbox.checked) {
+                try {
+                    var out = func(start);
+                    if (out)
+                        parse_status.innerText = out;
+                    else
+                        parse_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
+
+                } catch (e) {
+                    parse_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
+                    setError("Error while " + verb.toLowerCase() + "!", e);
+                }
+            } else {
+                var success = false;
+                try {
+                    var out2 = func(start);
+                    if (out2)
+                        parse_status.innerText = out2;
+                    else
+                        parse_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
+                    success = true;
+                } finally {
+                   if (!success)
+                       parse_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
+                }
             }
-        } else {
-            var success = false;
-            try {
-                var out2 = func(start);
-                if (out2)
-                    parse_status.innerText = out2;
-                else
-                    parse_status.innerText = "("+verb+" successfully finished after "+(Date.now() - start)+"ms)";
-                success = true;
-            } finally {
-               if (!success)
-                   parse_status.innerText = "("+verb+" failed after "+(Date.now() - start)+"ms)";
+        } finally {
+            for (var logger in oldLog) {
+                if (oldLog.hasOwnProperty(logger)) {
+                    console[logger] = oldLog[logger];
+                }
             }
+            consolelog.innerText = logged;
         }
     }
 
@@ -562,9 +589,14 @@
         setError(null, null);
     });
 
-    var convertOutputToText = throttle(function() {
+    var convertSavedToText = throttle(function() {
         if (saved.children.length > 0)
             saved.innerHTML = saved.innerText;
+    }, 100);
+
+    var convertLogToText = throttle(function() {
+        if (consolelog.children.length > 0)
+            consolelog.innerHTML = consolelog.innerText;
     }, 100);
 
     window.addEventListener('load', function() {
@@ -573,9 +605,13 @@
         getTimespanMinMax();
     });
 
-    saved.addEventListener("DOMNodeInserted", convertOutputToText, false);
-    saved.addEventListener("DOMNodeRemoved", convertOutputToText, false);
-    saved.addEventListener("DOMCharacterDataModified", convertOutputToText, false);
+    saved.addEventListener("DOMNodeInserted", convertSavedToText, false);
+    saved.addEventListener("DOMNodeRemoved", convertSavedToText, false);
+    saved.addEventListener("DOMCharacterDataModified", convertSavedToText, false);
+
+    consolelog.addEventListener("DOMNodeInserted", convertLogToText, false);
+    consolelog.addEventListener("DOMNodeRemoved", convertLogToText, false);
+    consolelog.addEventListener("DOMCharacterDataModified", convertLogToText, false);
 
     // input.addEventListener("DOMNodeInserted", startParseTimer, false);
     // input.addEventListener("DOMNodeRemoved", startParseTimer, false);

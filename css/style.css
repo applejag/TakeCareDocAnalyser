@@ -9,10 +9,9 @@ html {
 
 .mono {
     font-family: monospace;
-    font-size: 80%;
 }
 
-#input, #saved {
+.limheight {
     max-height: 300px;
     min-height: 50px;
 }
@@ -390,7 +389,7 @@ input[invalid]+.validation:after {
     font-family: monospace;
     font-size: 125%;
     color: white;
-    width: 3em;
+    width: 4em;
     text-align: center;
 }
 

@@ -1,4 +1,4 @@
-
+﻿
 var allaFiltreradeReads = [];
 
 
@@ -15,6 +15,7 @@ function analyseData() {
     hittaOdlingarMikrobiologi();
     findInfInJournaltext();
     findDKoderInVtf();
+    findSjukdomarInVtfAndÖvk();
 
     analyseInfectionData();
     analyseÅtgärder();
