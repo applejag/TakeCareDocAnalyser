@@ -78,7 +78,7 @@
                             <button id="input_select_all" class="input" type="button" onclick="focusAll('input')">Select all</button>
                             <button id="input_select_end" class="input" type="button" onclick="focusEnd('input')">Select end</button>
                         </div>
-                        <div id="input" class="codefield" contenteditable="true"></div>
+                        <div id="input" class="codefield limheight" contenteditable="true"></div>
                     </fieldset>
                 </div>
                 <div class="col-6">
@@ -93,7 +93,7 @@
                             <button id="saved_select_all" class="input" type="button" onclick="focusAll('saved')">Select all</button>
                             <button id="saved_select_end" class="input" type="button" onclick="focusEnd('saved')">Select end</button>
                         </div>
-                        <pre id="saved" class="codefield mono" contenteditable="true"></pre>
+                        <pre id="saved" class="codefield mono limheight" contenteditable="true"></pre>
                     </fieldset>
                 </div>
             </div>
@@ -128,6 +128,19 @@
                         </table>
                         <table id="scoring_items">
                         </table>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <fieldset class="fieldset">
+                        <legend>Console log</legend>
+                        <div class="btn-group">
+                            <button id="consolelog_clear" class="input danger" type="button" onclick="clearContent('consolelog')">&times; Clear field</button>
+                            <button id="consolelog_select_all" class="input" type="button" onclick="focusAll('consolelog')">Select all</button>
+                            <button id="consolelog_select_end" class="input" type="button" onclick="focusEnd('consolelog')">Select end</button>
+                        </div>
+                        <pre id="consolelog" class="codefield mono limheight" contenteditable="true"></pre>
                     </fieldset>
                 </div>
             </div>

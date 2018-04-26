@@ -12,7 +12,7 @@ html {
     font-size: 80%;
 }
 
-#input, #saved {
+.limheight {
     max-height: 300px;
     min-height: 50px;
 }
