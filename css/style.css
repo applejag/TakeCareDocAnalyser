@@ -59,6 +59,7 @@ html {
     border-radius: 8px;
     padding: 0 8px;
     font-weight: bold;
+    background: white;
 }
 
 body > #container {
@@ -256,7 +257,7 @@ button.danger:active {
 button.close {
     float: right;
     font-size: 150%;
-    background: unset;
+    background: transparent;
     border: none;
     color: inherit;
     outline: none;
@@ -350,6 +351,10 @@ button.close:hover {
     width: 100%;
 }
 
+.form-control {
+    margin-left: 8px;
+}
+
 input:valid+.validation:after {
     content: '✓';
     padding-left: 5px;
@@ -408,4 +413,13 @@ input[invalid]+.validation:after {
 .discrete .score-neg, .score-neg.discrete {
     background: transparent;
     color: #533;
+}
+
+.wordwrap {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+pre.wordwrap {
+    white-space: pre-wrap;
 }

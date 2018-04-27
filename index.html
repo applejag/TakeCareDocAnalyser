@@ -48,10 +48,6 @@
                             <legend>Settings</legend>
                             <div class="form">
                                 <div class="form-group">
-                                    <label for="parse_catch">Catch exceptions?</label>
-                                    <input id="parse_catch" class="form-control" type="checkbox" name="parse_catch" checked />
-                                </div>
-                                <div class="form-group">
                                     <label for="parse_time_min">Timespan min</label>
                                     <input id="parse_time_min" class="form-control" type="date" name="parse_time_min" value="2017-02-01" required>
                                     <span class="validation"></span>
@@ -60,6 +56,14 @@
                                     <label for="parse_time_max">Timespan max</label>
                                     <input id="parse_time_max" class="form-control" type="date" name="parse_time_max" value="2017-02-28" required>
                                     <span class="validation"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="parse_setting_catch">Catch exceptions?</label>
+                                    <input id="parse_setting_catch" class="form-control" type="checkbox" name="parse_setting_catch" checked />
+                                </div>
+                                <div class="form-group">
+                                    <label for="parse_setting_json_indent">Export with indentation?</label>
+                                    <input id="parse_setting_json_indent" class="form-control" type="checkbox" name="parse_setting_json_indent" />
                                 </div>
                             </div>
                         </fieldset>
@@ -93,7 +97,7 @@
                             <button id="saved_select_all" class="input" type="button" onclick="focusAll('saved')">Select all</button>
                             <button id="saved_select_end" class="input" type="button" onclick="focusEnd('saved')">Select end</button>
                         </div>
-                        <pre id="saved" class="codefield mono limheight" contenteditable="true"></pre>
+                        <pre id="saved" class="codefield mono limheight wordwrap" contenteditable="true"></pre>
                     </fieldset>
                 </div>
             </div>
@@ -143,7 +147,7 @@
                             <button id="consolelog_select_all" class="input" type="button" onclick="focusAll('consolelog')">Select all</button>
                             <button id="consolelog_select_end" class="input" type="button" onclick="focusEnd('consolelog')">Select end</button>
                         </div>
-                        <pre id="consolelog" class="codefield mono limheight" contenteditable="true"></pre>
+                        <pre id="consolelog" class="codefield mono limheight wordwrap" contenteditable="true"></pre>
                     </fieldset>
                 </div>
             </div>

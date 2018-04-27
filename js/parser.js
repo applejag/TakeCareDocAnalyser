@@ -5,12 +5,15 @@
     parser.isParsed = false;
     parser.isCrashed = false;
     parser.isAnalysed = false;
+    parser.isExported = false;
+    parser.isImported = false;
     parser.lastParse = [];
 
     var input = document.getElementById("input");
     var saved = document.getElementById("saved");
     var parse_status = document.getElementById("parse_status");
-    var catch_checkbox = document.getElementById("parse_catch");
+    var setting_catch = document.getElementById("parse_setting_catch");
+    var setting_json_indent = document.getElementById("parse_setting_json_indent");
     var parse_time_min = document.getElementById("parse_time_min");
     var parse_time_max = document.getElementById("parse_time_max");
     var consolelog = document.getElementById("consolelog");
@@ -125,7 +128,7 @@
         try {
             ['log', 'warn', 'error'].forEach(captureLogger);
 
-            if (catch_checkbox.checked) {
+            if (setting_catch.checked) {
                 try {
                     var out = func(start);
                     if (out)
@@ -228,12 +231,19 @@
 
     parser.exportJSON = function() {
         execFunc("Export", function(start) {
-            saved.innerText = JSON.stringify(read, null, 4);
+            parser.isExported = false;
+            if (setting_json_indent.checked) {
+                saved.innerText = JSON.stringify(read, null, 4);
+            } else {
+                saved.innerText = JSON.stringify(read);
+            }
+            parser.isExported = true;
         });
     };
 
     parser.importJSON = function() {
         execFunc("Import", function(start) {
+            parser.isImported = false;
             var fieldCount = 0;
             var itemCount = 0;
 
@@ -245,6 +255,7 @@
 
             // Read json
             var data = JSON.parse(toParse, function (key, value) {
+                itemCount++;
                 if (key.search(/datum/i) !== -1 && isString(value)) {
                     return tryParseDate(value) || value;
                 }
@@ -274,7 +285,6 @@
 
                 read[dfield] = data[dfield];
                 fieldCount++;
-                if (data[dfield].length) itemCount += data[dfield].length;
             }
 
             // Clear omitted fields
@@ -290,8 +300,9 @@
             // Update timespan fields
             parse_time_min.value = formatDate(read.DatumMin);
             parse_time_max.value = formatDate(read.DatumMax);
+            parser.isImported = true;
 
-            return "(Imported "+fieldCount+" fields and a total of "+itemCount+" documents in "+(Date.now() - start)+" ms)";
+            return "(Imported "+fieldCount+" fields and a total of "+itemCount+" values in "+(Date.now() - start)+" ms)";
         });
     };
 
