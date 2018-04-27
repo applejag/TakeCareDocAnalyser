@@ -106,8 +106,9 @@
                     <fieldset class="fieldset">
                         <legend>Scoring</legend>
                         <div class="btn-group">
-                            <button id="scoring_refresh" class="input" type="button" onclick="parser.refreshScore()">Force refresh</button>
-                            <button id="scoring_select_all" class="input" type="button" onclick="focusAll('scoring_html')">Select all</button>
+                            <button id="scoring_html_clear" class="input danger" type="button" onclick="clearContent('scoring_html_items');scoring_html_none.style.display='none';">&times; Clear field</button>
+                            <button id="scoring_html_select_all" class="input" type="button" onclick="focusAll('scoring_html')">Select all</button>
+                            <button id="scoring_html_refresh" class="input" type="button" onclick="parser.refreshScoreHTML()">Force refresh</button>
                         </div>
                         <div id="scoring_html">
                             <p id="scoring_html_none" class="discrete">(No score has been recorded.)</p>
@@ -157,6 +158,7 @@
                             <button id="scoring_text_clear" class="input danger" type="button" onclick="clearContent('scoring_text')">&times; Clear field</button>
                             <button id="scoring_text_select_all" class="input" type="button" onclick="focusAll('scoring_text')">Select all</button>
                             <button id="scoring_text_select_end" class="input" type="button" onclick="focusEnd('scoring_text')">Select end</button>
+                            <button id="scoring_refresh" class="input" type="button" onclick="parser.refreshScoreText()">Force refresh</button>
                         </div>
                         <pre id="scoring_text" class="codefield mono limheight wordwrap" contenteditable="true"></pre>
                     </fieldset>

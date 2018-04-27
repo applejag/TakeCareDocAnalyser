@@ -171,7 +171,7 @@
 
     parser.refreshScoreText = function() {
         var prebox = document.getElementById("scoring_text");
-        prebox.innerText = "";
+
         var text = [];
 
         function format(val) {
@@ -180,12 +180,20 @@
             return val;
         }
 
-        function add() {
+        function concat(items) {
             var str = [];
-            for (var i = 0; i < arguments.length; i++) {
-                str.push(format(arguments[i]));
+            for (var i = 0; i < items.length; i++) {
+                str.push(format(items[i]));
             }
-            return text.push(str.join(' '));
+            return str.join(' ');
+        }
+
+        function add() {
+            text.push(concat(arguments));
+        }
+
+        function addIndented() {
+            text.push('\t'+concat(arguments));
         }
 
         for (var ri = 0; ri < allaFiltreradeReads.length; ri++) {
@@ -205,12 +213,13 @@
             for (var si = 0; si < fread.ScoringHistory.length; si++) {
                 var hist = fread.ScoringHistory[si];
 
-                add (
-                    "\t",
+                addIndented (
                     hist.delta,
                     hist.reason
                 );
             }
+
+            add();
         }
 
         prebox.innerText = text.join('\n');
