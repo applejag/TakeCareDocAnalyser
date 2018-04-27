@@ -414,3 +414,12 @@ input[invalid]+.validation:after {
     background: transparent;
     color: #533;
 }
+
+.wordwrap {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+pre.wordwrap {
+    white-space: pre-wrap;
+}

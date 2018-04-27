@@ -10,7 +10,8 @@
     var input = document.getElementById("input");
     var saved = document.getElementById("saved");
     var parse_status = document.getElementById("parse_status");
-    var catch_checkbox = document.getElementById("parse_catch");
+    var setting_catch = document.getElementById("parse_setting_catch");
+    var setting_json_indent = document.getElementById("parse_setting_json_indent");
     var parse_time_min = document.getElementById("parse_time_min");
     var parse_time_max = document.getElementById("parse_time_max");
     var consolelog = document.getElementById("consolelog");
@@ -125,7 +126,7 @@
         try {
             ['log', 'warn', 'error'].forEach(captureLogger);
 
-            if (catch_checkbox.checked) {
+            if (setting_catch.checked) {
                 try {
                     var out = func(start);
                     if (out)
@@ -228,7 +229,11 @@
 
     parser.exportJSON = function() {
         execFunc("Export", function(start) {
-            saved.innerText = JSON.stringify(read, null, 4);
+            if (setting_json_indent.checked) {
+                saved.innerText = JSON.stringify(read, null, 4);
+            } else {
+                saved.innerText = JSON.stringify(read);
+            }
         });
     };
 
