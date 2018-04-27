@@ -1,29 +1,29 @@
-
+﻿
 var allaFiltreradeReads = [];
 
 
 function analyseData() {
     console.log("[!] PATIANT DATA GET IN LINE FOR INSPECTION\n[!] THIS IS YOUR EVALUATION DAY");
     sorteraVTF();
-    analyseÅtgärder();
-    analyseInfectionData();
-    //checkLongestVårdtillfälle();
-    findSjukdomarInVtfAndÖvk();
-    printData();
-    for (var i = 0; i < allaFiltreradeReads.length; i++) {
-        addScore(i, 10, "Testing " + i);
-        console.log(allaFiltreradeReads[i].Score + " " + allaFiltreradeReads[i].Vårdtillfälle.Inskrivningsdatum.toString().substring(0, 15));
-    }
 
-}
-
-function analyseÅtgärder(){
     hittaInfarter();
     hittaDrän();
     hittaKirurgi();
     hittaRespirator();
-}
+    findFeberMätvärden();
+    hittaKemSvar();
+    hittaOdlingarMikrobiologi();
+    findInfInJournaltext();
+    findDKoderInVtf();
+    findSjukdomarInVtfAndÖvk();
 
+    analyseInfectionData();
+    analyseÅtgärder();
+    //checkLongestVårdtillfälle();
+
+    printData();
+
+}
 
 
 function checkLongestVårdtillfälle() {
@@ -153,5 +153,10 @@ function printData(){
             console.log(allaFiltreradeReads[v].hittadRespirator[l].datum.toString().substring(0, 15));
         }
         console.log("");
+
+        for (var i = 0; i < allaFiltreradeReads[v].ScoringHistory.length; i++) {
+            console.log(allaFiltreradeReads[v].ScoringHistory[i].delta + " : " + allaFiltreradeReads[v].ScoringHistory[i].reason);
+        }
+        console.log("= " + allaFiltreradeReads[v].Score);
     }
 }
