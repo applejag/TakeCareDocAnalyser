@@ -5,6 +5,8 @@
     parser.isParsed = false;
     parser.isCrashed = false;
     parser.isAnalysed = false;
+    parser.isExported = false;
+    parser.isImported = false;
     parser.lastParse = [];
 
     var input = document.getElementById("input");
@@ -229,16 +231,19 @@
 
     parser.exportJSON = function() {
         execFunc("Export", function(start) {
+            parser.isExported = false;
             if (setting_json_indent.checked) {
                 saved.innerText = JSON.stringify(read, null, 4);
             } else {
                 saved.innerText = JSON.stringify(read);
             }
+            parser.isExported = true;
         });
     };
 
     parser.importJSON = function() {
         execFunc("Import", function(start) {
+            parser.isImported = false;
             var fieldCount = 0;
             var itemCount = 0;
 
@@ -295,6 +300,7 @@
             // Update timespan fields
             parse_time_min.value = formatDate(read.DatumMin);
             parse_time_max.value = formatDate(read.DatumMax);
+            parser.isImported = true;
 
             return "(Imported "+fieldCount+" fields and a total of "+itemCount+" values in "+(Date.now() - start)+" ms)";
         });
