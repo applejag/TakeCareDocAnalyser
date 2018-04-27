@@ -142,11 +142,11 @@ function findSjukdomarInVtfAndÖvk() {
 
             if (funnaICD10.length > 0) {
                 var koder = funnaICD10.mapField('Värde').join(', ');
-                addScore(ri, Math.irandomRange(10,999), 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
+                addScore(ri, 1, 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
             }
             if (funnaEpikris.length > 0) {
                 var texter = funnaEpikris.mapField('Värde').join('", "');
-                addScore(ri, Math.irandomRange(2,666), 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
+                addScore(ri, 1, 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
             }
         }
     }

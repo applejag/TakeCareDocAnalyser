@@ -1,8 +1,12 @@
 var infarter = [/(?:^|[\s\\/\-_&.,:;])KAD(?:$|[\s\\/\-_&.,:;])/i, /Urinavledning/i, /CVK/i, /Picc/i, /SVP/i, /CDK/i, /Venport/i, /(Suprapubiskateter|sp-kateter)/i]; // KAD = urinkateter
 
-var intressantaDKoder = "(A|B|T814|T802|T835|T880|T802|T814|T826|T835|T836|T814|T818|R572|R651|I39|N0[0-5]|N1[0-2]|N30|N330|N34|",
+//Diagnoskoder för olika infektioner
+var intressantaDKoder = ["(A|B|T814|T802|T835|T880|T802|T814|T826|T835|T836|T814|T818|R572|R651|I39|N0[0-5]|N1[0-2]|N30|N330|N34|",
             "N35|N390|N41|O862|O863|O98|Z22|E06|L0[0-5]|L08|K12|K102|K112|K113|K130|J0[0-6]|J09|J1[0-8]|J2[0-2]|",
-            "J32|J37|J69|G0[1-8]|G61|M0[0-3]|M0[5-9]|M1[0-4]|M3[0-5]|M45|M46|M60|M63|M86|H01|H10|H16|H20|H30|H46|D709C)"]
+            "J32|J37|J69|G0[1-8]|G61|M0[0-3]|M0[5-9]|M1[0-4]|M3[0-5]|M45|M46|M60|M63|M86|H01|H10|H16|H20|H30|H46|D709C)"];
+
+//Diagnoskoder för olika VRI:er
+var VRIkoder = /T880|T802|T814|T826|T835|T836|T814|T818|A047/i;
 
 function hittaInfDebut(index){
     if(allaFiltreradeReads[index].hittadFeber.length > 0)
@@ -14,6 +18,30 @@ function hittaInfDebut(index){
 
 
     return 0;
+}
+
+function hittaMedicinering(){
+    var ordinationer = read.Läkemedelsordinationer;
+    var hittadRiskMedicin = [];
+    var treMånaderInnanFeb = new Date(2016, 11, 1);
+
+    for (var i = 0; i < ordinationer.length; i++) {
+        for (var j = 0; j < ordinationer[i].Läkemedel.length; j++) {
+            läkemedel = ordinationer[i].Läkemedel[j];
+            var tmp = ATC.findATC(läkemedel);
+            if(tmp !== null){
+                if(ordinationer[i].Utsättningsdatum > treMånaderInnanFeb) {
+                    var läkemedelData = {läkemedel: läkemedel, inDatum: ordinationer[i].Datum, utDatum: ordinationer[i].Utsättningsdatum};
+                    hittadRiskMedicin.push(läkemedelData);
+                }
+            }
+        }
+    }
+
+    for(var v = 0; v < allaFiltreradeReads.length; v++){
+        allaFiltreradeReads[v].hittadRiskMedicin = hittadRiskMedicin;
+    }
+
 }
 
 function findDKoderInVtf() {
@@ -179,6 +207,10 @@ function compareKoder(kodLista, tillfälleTyp, datumet, index, chosenSearchList,
         if (sökListor[chosenSearchList].test(kodLista[s])) {
             var koddata = {kod: kodLista[s], tillfälle: tillfälleTyp, datum: datumet};
             allaFiltreradeReads[index][pushHere].push(koddata);
+
+            if(VRIkoder.test(koddata.kod)){
+                addScore(index, 100, "Diagnoskod för VRI funnen!");
+            }
         }
     }
 }
