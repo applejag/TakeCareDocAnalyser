@@ -17,8 +17,14 @@ function analyseInfectionData() {
         }
 
         if(allaFiltreradeReads[i].hittadeDKoder.length > 0) {
-            harInf = true;
-            addScore(i, 50, "Diagnoskoder för infekion funna för vårdtillfället: " + allaFiltreradeReads[i].hittadeDKoder.join(", "));
+            for(var k = 0; k < allaFiltreradeReads[i].hittadeDKoder.length; k++){
+                var tmpKoder = [];
+                if(allaFiltreradeReads[i].hittadeDKoder[k].tillfälle == "Vårdtillfälle"){
+                    harInf = true;
+                    tmpKoder.push(allaFiltreradeReads[i].hittadeDKoder[k].kod);
+                }
+            }
+            addScore(i, 50, "Diagnoskoder för infektion funna för vårdtillfället: " + tmpKoder.join(", "));
         }
         if(allaFiltreradeReads[i].hittadFeber.length > 0 && !harInf)
             addScore(i, 8, "Feber under vårdtiden");
@@ -74,16 +80,15 @@ function infITidEfterInskrivning(index){
 
     infDebut = allaFiltreradeReads[index].InfDebut;
     if(infDebut - allaFiltreradeReads[index].Vårdtillfälle.Inskrivningsdatum > 48*60*60*1000 && infDebut < allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum){
-        addScore(index, 30, "Infektion dök upp >48h efter inskrivning");
+        addScore(index, 20, "Infektion dök upp >48h efter inskrivning");
     } else {
         if(index == 0 && finnsÅtgärderInnanFörstaVtf(index)){
-            addScore(index, 30, "Inskriven för infektion efter tidigare kontakt med vård");
+            addScore(index, 20, "Inskriven för infektion efter tidigare kontakt med vård");
         }
         else{
             addScore(index, -30, "Infektion dök upp inom 48h efter inskrivning");
         }
     }
-    return bonusPoints;
 }
 
 

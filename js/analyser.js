@@ -16,9 +16,11 @@ function analyseData() {
     findInfInJournaltext();
     findDKoderInVtf();
     findSjukdomarInVtfAndÖvk();
+    hittaMedicinering();
 
     analyseInfectionData();
     analyseÅtgärder();
+    analyseMedicinering();
     //checkLongestVårdtillfälle();
 
     printData();
@@ -158,5 +160,7 @@ function printData(){
             console.log(allaFiltreradeReads[v].ScoringHistory[i].delta + " : " + allaFiltreradeReads[v].ScoringHistory[i].reason);
         }
         console.log("= " + allaFiltreradeReads[v].Score);
+        if(allaFiltreradeReads[v].Score >= 80)
+            console.log("Misstänkt VRI!");
     }
 }
