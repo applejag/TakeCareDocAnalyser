@@ -17,8 +17,8 @@ function analyseInfectionData() {
         }
 
         if(allaFiltreradeReads[i].hittadeDKoder.length > 0) {
+            var tmpKoder = [];
             for(var k = 0; k < allaFiltreradeReads[i].hittadeDKoder.length; k++){
-                var tmpKoder = [];
                 if(allaFiltreradeReads[i].hittadeDKoder[k].tillfälle == "Vårdtillfälle"){
                     harInf = true;
                     tmpKoder.push(allaFiltreradeReads[i].hittadeDKoder[k].kod);
