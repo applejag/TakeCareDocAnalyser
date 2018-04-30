@@ -13,5 +13,12 @@ function analyseMedicinering() {
 * Kollar även om Clostridium, difficile påvisats i samband med kur => oundviklig VRI
 */
 function antibiotikaAnalys() {
-    
+
+}
+
+/*
+* Kollar igenom tidigare vårdtillfällen efter cytostatikatillförsel
+*/
+function hittaCytostatika(){
+
 }

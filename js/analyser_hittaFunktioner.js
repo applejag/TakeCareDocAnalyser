@@ -1,4 +1,6 @@
-var infarter = [/(?:^|[\s\\/\-_&.,:;])KAD(?:$|[\s\\/\-_&.,:;])/i, /Urinavledning/i, /CVK/i, /Picc/i, /SVP/i, /CDK/i, /Venport/i, /(Suprapubiskateter|sp-kateter)/i]; // KAD = urinkateter
+var infarter = [/(?:^|[\s\\/\-_&.,:;])KAD(?:$|[\s\\/\-_&.,:;])/i, /Urinavledning/i, /CVK/i, /Picc/i, /SVP/i, /CDK/i,
+                /Venport/i, /(Suprapubiskateter|sp-kateter)/i, /nefrostomi/i, /cystofix/i, /j-stent/i, /pyelostomi/i,
+                /timankateter/i, /Hemodialyskateter/i, /cystostomi/i]; // KAD = urinkateter
 
 //Diagnoskoder för olika infektioner
 var intressantaDKoder = ["(A|B|T814|T802|T835|T880|T802|T814|T826|T835|T836|T814|T818|R572|R651|I39|N0[0-5]|N1[0-2]|N30|N330|N34|",
@@ -8,6 +10,9 @@ var intressantaDKoder = ["(A|B|T814|T802|T835|T880|T802|T814|T826|T835|T836|T814
 //Diagnoskoder för olika VRI:er
 var VRIkoder = /T880|T802|T814|T826|T835|T836|T814|T818|A047/i;
 
+/**
+*
+*/
 function hittaInfDebut(index){
     if(allaFiltreradeReads[index].hittadFeber.length > 0)
         return allaFiltreradeReads[index].hittadFeber[allaFiltreradeReads[index].hittadFeber.length - 1].datum;
@@ -20,6 +25,9 @@ function hittaInfDebut(index){
     return 0;
 }
 
+/**
+*
+*/
 function hittaMedicinering(){
     var ordinationer = read.Läkemedelsordinationer;
     var hittadRiskMedicin = [];
@@ -44,6 +52,9 @@ function hittaMedicinering(){
 
 }
 
+/**
+* Letar igenom öppna vårdkontakter och vårdtillfälle efter intressanta diagnoskoder. Tar hjälp av funktionen compareKoder
+*/
 function findDKoderInVtf() {
 
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
@@ -77,6 +88,10 @@ function findFeberMätvärden() {
     }
 }
 
+
+/**
+*
+*/
 function hittaOdlingarMikrobiologi() {
     // Solla ut negativa resultat
     var negatives = /(ej|inte|ingen|inga)\s+(positiv|fynd|påvisa|funne|växt)|\bNegativ|flora/i;
@@ -104,11 +119,14 @@ function hittaOdlingarMikrobiologi() {
 }
 
 
+/**
+* Letar i journaltextens fritext efter tecken på infektion. Resultat sparas i listan .infekteradeTexter
+*/
 function findInfInJournaltext() {
 
     var negativInf = /(ej|inte|ingen|inga tecken på|inga kända)\s+(infektion|infektionstecken|sepsis|infektera)|infektionsklinik|desinfekt/i;
     //NANDA 00004 - risk för infektion
-    var positivInf = /(infektion|NANDA 00004|sepsis|infektera)/i;
+    var positivInf = /(infektion|NANDA 00004|sepsis|infektera|infektionstecken)/i;
 
     for (var v = 0; v < allaFiltreradeReads.length; v++) {
         var journaltexter = allaFiltreradeReads[v].Journaltexter;
@@ -125,6 +143,9 @@ function findInfInJournaltext() {
     }
 }
 
+/**
+* Letar igenom kemsvar efter onormala värden på CRP och LPK. Typ värde och datum sparas i listan .hittadeKemSvar
+*/
 function hittaKemSvar() {
 
     for (var v = 0; v < allaFiltreradeReads.length; v++) {
@@ -150,6 +171,9 @@ function hittaKemSvar() {
     }
 }
 
+/**
+* Letar igenom journaltext efter tecken på andningsstöd. Datum sparas i listan .hittadRespirator
+*/
 function hittaRespirator() {
     var ventilationSökord = /andningsstöd|respirator\b|respiratorstöd|intubera|tracheostomi|ventilatorstöd/i;
 
@@ -178,6 +202,9 @@ function hittaRespirator() {
     }
 }
 
+/**
+* Letar igenom öppna vårdkontakter och vårdtillfälle efter intressanta åtgärdskoder. Tar hjälp av funktionen compareKoder
+*/
 function hittaKirurgi() {
 
     var åtgärdskoder = [];
@@ -195,13 +222,21 @@ function hittaKirurgi() {
 }
 
 
-
+/**
+* Letar igenom en tillhandahållen kodlista efter, på förhand definierade, intressanta koder
+* Om en diagnoskod för VRI hittas kommer även 100 poäng läggas till för aktuellt vårdtillfälle
+*
+* @param {List} kodLista en lista med koder som ska sökas igenom
+* @param {String} tillfälleTyp en string som anger om det är öppenvård eller vårdtillfället
+* @param {Date} datumet datum som koderna registrerats i Take Care
+* @param {Integer} index Vilket objekt i listan allaFiltreradeReads som är aktuellt
+* @param {Integer} chosenSearchList Anger vilken söklista som ska användas, index i listan sökListor
+* @param {String} pushHere Anger i vilken lista i det aktuella allaFiltreradeReads-objektet som resultatet ska sparas (hittadeKirurgKoder eller hittadeDKoder)
+*/
 function compareKoder(kodLista, tillfälleTyp, datumet, index, chosenSearchList, pushHere){
     var kirurgkoder = /^\D{3,}/;
     var regexDKoder = new RegExp(intressantaDKoder.join(''), "i");
     var sökListor = [kirurgkoder, regexDKoder];
-    //var kirurgKoder1 = /^(H|B|J|L|P|E|M|N|F|K|C|Y|T|U|GB|GC|GE|GW|XA|XC|XF|XG|XJ|XK|XL|XN|XP|XX|YC|YF|YG|YJ|YK|YN|YP|YQ|YW)/;
-    //var kirurgKoder2 = /^(A|Q|P|D)+\D{2,}|^(GA|GD)+\D/;
 
     for (var s = 0; s < kodLista.length; s++) {
         if (sökListor[chosenSearchList].test(kodLista[s])) {
@@ -216,6 +251,9 @@ function compareKoder(kodLista, tillfälleTyp, datumet, index, chosenSearchList,
 }
 
 
+/**
+* Söker efter dränage i journaltextens fritext. Ett objekt med in- samt utdatum skapas sedan och placeras i listan .hittadeDrän
+*/
 function hittaDrän() {
     var inDatum = new Date();
     var utDatum = new Date();
@@ -245,13 +283,21 @@ function hittaDrän() {
 }
 
 
-function hittaInfarter() {
+/**
+* Söker efter infarter i journaltextens fritext. Om en matchning hittas kollas det även att inget
+* negerande ord förekommer tidigare i meningen. Alla olika typer av infarter letas efter en åt gången
+* och ett objekt med infartstyp och in- samt utdatum skapas sedan och placeras i listan .hittadeInfarter
+*/
+
+function hittaInfarter() { // NÅGOT ATT KANSKE LÄGGA TILL: Kunna märka om infart tas ut och sedan sätts in igen
     var inDatum = new Date();
     var utDatum = new Date();
     var matches = 0;
     var match = [];
     var negatives = /(vägrar|inte|ej|förnekar|ingen)/i;
-    var infartStrings = ["KAD", "Urinavledning", "CVK", "Picc", "SVP", "CDK", "Venport", "Suprapubiskateter"];
+    var infartStrings = ["KAD", "Urinavledning", "CVK", "Picc", "SVP", "CDK", "Venport", "Suprapubiskateter",
+                            "Nefrostomi", "Cystofix", "J-stent", "Pyelostomi", "Timankateter", "Hemodialyskateter",
+                            "Cystostomi"];
 
     for (var v = 0; v < allaFiltreradeReads.length; v++) {
         var journaltexter = allaFiltreradeReads[v].Journaltexter;
