@@ -1,6 +1,8 @@
 ﻿
+/**
+ * @type {FiltreradRead[]}
+ */
 var allaFiltreradeReads = [];
-
 
 function analyseData() {
     console.log("[!] PATIANT DATA GET IN LINE FOR INSPECTION\n[!] THIS IS YOUR EVALUATION DAY");

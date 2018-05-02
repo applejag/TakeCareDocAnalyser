@@ -36,7 +36,7 @@ function hittaMedicinering(){
     for (var i = 0; i < ordinationer.length; i++) {
         for (var j = 0; j < ordinationer[i].Läkemedel.length; j++) {
             läkemedel = ordinationer[i].Läkemedel[j];
-            var tmp = ATC.findATC(läkemedel);
+            var tmp = findATC(läkemedel);
             if(tmp !== null){
                 if(ordinationer[i].Utsättningsdatum > treMånaderInnanFeb) {
                     var läkemedelData = {läkemedel: läkemedel, inDatum: ordinationer[i].Datum, utDatum: ordinationer[i].Utsättningsdatum};

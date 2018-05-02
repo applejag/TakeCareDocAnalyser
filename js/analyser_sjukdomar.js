@@ -1,34 +1,26 @@
 
-/*
+/**
+ * @typedef {Object} HittatVärde
+ * @prop {String} Värde Källan på det funna värdet.
+ * @prop {String} Dokument Namn på det dokument typ som fann värdet.
+ * @prop {Date} Datum Datum på det dokument som fann värdet.
+ */
 
-# Hämtar från `allaFiltreradeReads[n].Vårdtillfälle`, `allaFiltreradeReads[n].ÖppnaVårdkontakter`
-# och `allaFiltreradeReads[n].Journaltexter`
-# Sparar resultat i `allaFiltreradeReads[n]`
-findSjukdomarInVtfAndÖvk();
+/**
+ * @typedef {Object} HittatSjukdomsResultat
+ * @prop {HittatVärde[]} Njursjukdomar Lista på hittade värden som tyder på njursjukdomar.
+ * @prop {HittatVärde[]} Diabetes Lista på hittade värden som tyder på diabetes.
+ * @prop {HittatVärde[]} Lungsjukdomar Lista på hittade värden som tyder på lungsjukdomar.
+ * @prop {HittatVärde[]} Cancer Lista på hittade värden som tyder på cancer.
+ * @prop {HittatVärde[]} KardiovaskuläraSjukdomar Lista på hittade värden som tyder på kardiovaskulära sjukdomar.
+ */
 
-allaFiltreradeReads[0..n]: {
-    /..other data../
-
-    hittadeSjukdomarICD10[0..n]: {hittad sjukdom},
-    hittadeSjukdomarEpikris[0..n]: {hittad sjukdom},
-    hittadeSjukdomarKVÅ[0..n]: {hittad sjukdom}
-}
-
-{hittad sjukdom}: {
-    ['kategori'][0..n]: {
-        Värde: "" String,
-        Dokument: "" String,
-        Datum: Date
-    }
-}
-
-kategorier:
-    'Njursjukdomar'
-    'Diabetes'
-    'Lungsjukdomar'
-    'Cancer'
-    'KardiovaskuläraSjukdomar'
-*/
+/**
+ * @typedef {Object} FiltreradRead
+ * @prop {HittatSjukdomsResultat} hittadeSjukdomarICD10 Listor med sjukdomsresultat baserat på ICD-10 diagnoskoder.
+ * @prop {HittatSjukdomsResultat} hittadeSjukdomarEpikris Listor med sjukdomsresultat baserat på journaltext från epikriser.
+ * @prop {HittatSjukdomsResultat} hittadeSjukdomarKVÅ Listor med sjukdomsresultat baserat på KVÅ koder (Åtgärdskoder).
+ */
 
 function _d() {
     var _ = Array.from(arguments).mapField('source');
@@ -94,8 +86,19 @@ var sjukdomsRegExp = {
     }
 };
 
+/**
+ * Hämtar från `allaFiltreradeReads[n].Vårdtillfälle`, `allaFiltreradeReads[n].ÖppnaVårdkontakter`
+ * och `allaFiltreradeReads[n].Journaltexter`
+ * Sparar resultat i `allaFiltreradeReads[n]`
+ */
 function findSjukdomarInVtfAndÖvk() {
-
+    /**
+     * @param {Array<{}>} list List of results
+     * @param {RegExp} regex RegExp to find the match for the results list
+     * @param {Array<String>} texts List of strings to use the regex on
+     * @param {String} dok Document source name
+     * @param {Date} datum Date of document
+     */
     function addResultToList(list, regex, texts, dok, datum) {
         for (var i = 0; i < texts.length; i++) {
             var result = regex.exec(texts[i]);

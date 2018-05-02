@@ -1,91 +1,110 @@
-/* jshint ignore:start */
 
-var read = {
-    Vårdtillfällen[0..n]: {
-        Rubrik: "" String,
-        Inskrivningsdatum: Date,
-        Utskrivningsdatum: Date,
-        Diagnoser[0..n]: "" String
-        Åtgärder[0..n]: "" String
-    }
+/**
+ * @typedef {Object} ReadParsedDocuments
+ * @prop {ParsedVårdtillfälle[]} Vårdtillfällen
+ * @prop {ParsedÖppenVårdkontakt[]} ÖppenVårdkontakter
+ * @prop {ParsedMätvärde[]} Mätvärden
+ * @prop {ParsedJournaltext[]} Journaltexter
+ * @prop {ParsedMikrobiologiSvar[]} MikrobiologiSvar
+ * @prop {ParsedRöntgenSvar[]} RöntgenSvar
+ * @prop {ParsedKemlabSvar[]} KemlabSvar
+ * @prop {ParsedMultidisciplinärtSvar[]} MultidisciplinäraSvar
+ * @prop {ParsedLäkemedelsordination[]} Läkemedelsordinationer
+ * 
+ * @prop {Number[]} ParsedDocuments
+ * @prop {Date} DatumMin
+ * @prop {Date} DatumMax
+ */
 
-    ÖppnaVårdkontakter[0..n]: {
-        Rubrik: "" String,
-        Datum: Date,
-        Diagnoser[0..n]: "" String
-        Åtgärder[0..n]: "" String
-    }
+/**
+ * @typedef {Object} ParsedVårdtillfälle
+ * @prop {String} Rubrik
+ * @prop {Date} Inskrivningsdatum 
+ * @prop {Date} Utskrivningsdatum 
+ * @prop {String[]} Diagnoser
+ * @prop {String[]} Åtgärder 
+ */
 
-    Mätvärden[0..n]: {
-        Rubrik: "" String,
-        Datum: Date,
-        RegistreradAv: "" String,
-        Värden: {
-            ["värdenamn"]: String|Number
-        }
-    }
+/**
+ * @typedef {Object} ParsedÖppenVårdkontakt
+ * @prop {String} Rubrik
+ * @prop {Date} Datum
+ * @prop {String[]} Diagnoser
+ * @prop {String[]} Åtgärder 
+ */
 
-    Journaltexter[0..n]: {
-        Rubrik: "" String,
-        Datum: Date,
-        Signeringsansvarig: "" String,
-        Mall: "" String,
-        Fritext: "" String
-    }
+/**
+ * @typedef {Object} ParsedMätvärde
+ * @prop {String} Rubrik
+ * @prop {Date} Datum
+ * @prop {String} RegistreradAv
+ * @prop {{x: string | number}} Värden
+ */
 
-    MikrobiologiSvar[0..n]: {
-        Rubrik: "" String,
-        Datum: Date,
-        Remittent: "" String,
-        Undersökning: "" String,
-        Provmaterial: "" String,
-        Svar: "" String
-    },
+/**
+ * @typedef {Object} ParsedJournaltext
+ * @prop {String} Rubrik
+ * @prop {Date} Datum
+ * @prop {String} Signeringsansvarig
+ * @prop {String} Mall
+ * @prop {String} Fritext
+ */
 
-    RöntgenSvar[0..n]: {
-        Rubrik: "" String,
-        Datum: Date,
-        Remittent: "" String,
-        Beställning: "" String,
-        ÖnskadUndersökning: "" String,
-        Frågeställning: "" String,
-        Svar: "" String,
-        Utlåtande: "" String
-    },
+/**
+ * @typedef {Object} ParsedMikrobiologiSvar
+ * @prop {String} Rubrik
+ * @prop {Date} Datum
+ * @prop {String} Remittent
+ * @prop {String} Undersökning
+ * @prop {String} Provmaterial
+ * @prop {String} Svar
+ */
 
-    KemlabSvar[0..n] {
-        Rubrik: "" String,
-        Datum: Date,
-        Sjukhus: "" String,
-        Remittent: "" String,
-        UtanförNågotIntervall: true|false,
-        Värden[1..n]: {
-            Analysnamn: "" String,
-            Resultat: Number|String,
-            UtanförIntervall: true|false,
-            ReferensLägre: Number|null,
-            ReferensÖvre: Number|null,
-        },
-    },
+/**
+ * @typedef {Object} ParsedRöntgenSvar
+ * @prop {String} Rubrik
+ * @prop {Date} Datum
+ * @prop {String} Remittent
+ * @prop {String} Beställning
+ * @prop {String} ÖnskadUndersökning
+ * @prop {String} Frågeställning
+ * @prop {String} Svar
+ * @prop {String} Utlåtande
+ */
 
-    MultidisciplinäraSvar[0..n] {
-        Rubrik: "" String,
-        Datum: Date,
-        Remittent: "" String,
-        UtanförNågotIntervall: true|false,
-        Värden[1..n]: {
-            Analysnamn: "" String,
-            Resultat: Number|String,
-            UtanförIntervall: true|false,
-            ReferensLägre: Number|null,
-            ReferensÖvre: Number|null,
-        },
-    },
+/**
+ * @typedef {Object} ParsedKemlabSvar
+ * @prop {String} Rubrik
+ * @prop {Date} Datum
+ * @prop {String} Sjukhus
+ * @prop {String} Remittent
+ * @prop {Boolean} UtanförNågotIntervall
+ * @prop {SvarVärde} Värden
+ */
 
-    Läkemedelsordinationer[0..n]: {
-        Rubrik: "" String,
-        Datum: Date,
-        Utsättningsdatum: Date,
-        Läkemedel[1..n]: "" String
-    }
-};
+/**
+ * @typedef {Object} ParsedMultidisciplinärtSvar
+ * @prop {String} Rubrik
+ * @prop {Date} Datum
+ * @prop {String} Remittent
+ * @prop {Boolean} UtanförNågotIntervall
+ * @prop {SvarVärde} Värden
+ */
+
+/**
+ * @typedef {Object} SvarVärde
+ * @prop {String} Analysnamn
+ * @prop {Number|String} Resultat
+ * @prop {Boolean} UtanförIntervall
+ * @prop {Number|null} ReferensLägre
+ * @prop {Number|null} ReferensÖvre
+ */
+
+/**
+ * @typedef {Object} ParsedLäkemedelsordination
+ * @prop {String} Rubrik
+ * @prop {Date} Datum
+ * @prop {Date} Utsättningsdatum
+ * @prop {String[]} Läkemedel
+ */
+
