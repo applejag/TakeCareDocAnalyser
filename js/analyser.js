@@ -29,7 +29,7 @@ function analyseData() {
     printData();
 
 }
-
+ 
 
 function checkLongestVårdtillfälle() {
     // Minst 1 tillfälle

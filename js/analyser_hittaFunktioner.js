@@ -26,7 +26,7 @@ function hittaInfDebut(index){
 }
 
 /**
-*
+* Letar igenom läkemedelsordinationer efter intressanta läkemedel
 */
 function hittaMedicinering(){
     var ordinationer = read.Läkemedelsordinationer;
@@ -55,7 +55,7 @@ function hittaMedicinering(){
 }
 
 /**
-*
+* Letar efter cytostatikatillförsel i vårdtillfällens åtgärdskoder
 */
 function hittaCytostatika(){
     var cytostatikaTillförsel = /DT107|DT108|DT112|DT116|DT135/i;
