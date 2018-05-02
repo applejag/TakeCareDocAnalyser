@@ -1,4 +1,4 @@
-var infarter = [/(?:^|[\s\\/\-_&.,:;])KAD(?:$|[\s\\/\-_&.,:;])/i, /Urinavledning/i, /CVK/i, /Picc/i, /SVP/i, /CDK/i, /Venport/i, /(Suprapubiskateter|sp-kateter)/i]; // KAD = urinkateter
+var infarter = [/(?:^|[\s\\/\-_&.,:;])KAD(?:$|[\s\\/\-_&.,:;])/i, /Urinavledning/i, /CVK/i, /Picc/i, /SVP/i, /CDK|dialyskateter/i, /Venport/i, /(Suprapubiskateter|sp-kateter)/i]; // KAD = urinkateter
 
 //Diagnoskoder för olika infektioner
 var intressantaDKoder = ["(A|B|T814|T802|T835|T880|T802|T814|T826|T835|T836|T814|T818|R572|R651|I39|N0[0-5]|N1[0-2]|N30|N330|N34|",
