@@ -19,6 +19,7 @@ function analyseData() {
     findDKoderInVtf();
     findSjukdomarInVtfAndÖvk();
     hittaMedicinering();
+    hittaCytostatika();
 
     analyseInfectionData();
     analyseÅtgärder();
@@ -82,7 +83,7 @@ function sorteraVTF() {
         var tillfälle = read.Vårdtillfällen[ti];
         var yngre = read.Vårdtillfällen[ti+1];
 
-        if(tillfälle.Inskrivningsdatum < förstaMars || tillfälle.Utskrivningsdatum > förstaFebruari){
+        if(tillfälle.Inskrivningsdatum < förstaMars && tillfälle.Utskrivningsdatum > förstaFebruari){
             // new read obj per tillfälle
             var filtreradRead = {
                 Vårdtillfälle: tillfälle,

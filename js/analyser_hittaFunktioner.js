@@ -38,7 +38,7 @@ function hittaMedicinering(){
             läkemedel = ordinationer[i].Läkemedel[j];
             var tmp = findATC(läkemedel);
             if(tmp !== null){
-                if(ordinationer[i].Utsättningsdatum > treMånaderInnanFeb) {
+                if(ordinationer[i].Utsättningsdatum > treMånaderInnanFeb) { // ELLER UTSÄTTNIGSDADTUM INTE FINNS!!
                     var läkemedelData = {läkemedel: läkemedel, inDatum: ordinationer[i].Datum, utDatum: ordinationer[i].Utsättningsdatum};
                     hittadRiskMedicin.push(läkemedelData);
                 }
@@ -47,9 +47,37 @@ function hittaMedicinering(){
     }
 
     for(var v = 0; v < allaFiltreradeReads.length; v++){
-        allaFiltreradeReads[v].hittadRiskMedicin = hittadRiskMedicin;
+        for (var k = 0; k < hittadRiskMedicin.length; k++) {
+            allaFiltreradeReads[v].hittadRiskMedicin.push(hittadRiskMedicin[k]);
+        }
     }
 
+}
+
+/**
+*
+*/
+function hittaCytostatika(){
+    var cytostatikaTillförsel = /DT107|DT108|DT112|DT116|DT135/i;
+    var resultat = [];
+    var treMånaderInnanFeb = new Date(2016, 11, 1);
+
+
+    for (var i = 0; i < read.Vårdtillfällen.length; i++) {
+        var tillfälle = read.Vårdtillfällen[i];
+
+        for (var k = 0; k < tillfälle.Åtgärder.length; k++) {
+            if (cytostatikaTillförsel.test(tillfälle.Åtgärder[k]) && tillfälle.Utskrivningsdatum > treMånaderInnanFeb) {
+                var läkemedelData = {läkemedel: Cytostatika, inDatum: tillfälle.Inskrivningsdatum, utDatum: tillfälle.Utskrivningsdatum};
+                resultat.push(läkemedelData);
+            }
+        }
+    }
+    for(var v = 0; v < allaFiltreradeReads.length; v++){
+        for (var j = 0; j < resultat.length; j++) {
+            allaFiltreradeReads[v].hittadRiskMedicin.push(resultat[j]);
+        }
+    }
 }
 
 /**

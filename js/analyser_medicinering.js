@@ -19,6 +19,3 @@ function antibiotikaAnalys() {
 /*
 * Kollar igenom tidigare vårdtillfällen efter cytostatikatillförsel
 */
-function hittaCytostatika(){
-
-}
