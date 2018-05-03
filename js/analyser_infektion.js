@@ -1,6 +1,8 @@
 
-// Ska kolla utifrån resultat från epikrisen, feber, mikrobiologi svar
-// och kemlab svar om patienten har infektion.
+/**
+* Ska kolla utifrån resultat från epikrisen, feber, mikrobiologi svar
+* och kemlab svar om patienten har infektion.
+*/
 function analyseInfectionData() {
 
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
@@ -53,7 +55,10 @@ function analyseInfectionData() {
 
 }
 
-// Kolla om patienten tagit kontakt med vården efter utskrivning
+/**
+* Kolla om patienten tagit kontakt med vården efter utskrivning
+* @param {Integer} index Anger vilket vårdtillfälle i listan allaFiltreradeReads som ska behandlas
+*/
 function hittasInfEfterUtskrivning(index){
     var utDatum = allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum;
     var journaltexter = allaFiltreradeReads[index].infekteradeTexter;
@@ -74,8 +79,11 @@ function hittasInfEfterUtskrivning(index){
 }
 
 
-// Kollar om fevern upptstått efter Inskrivningsdatum
-// Tar i nuläget inte hänsyn till om multipla febrar förekommit under vårdtiden
+/**
+* Kollar vilken tid efter inskrivningsdatum som febern uppstått, om >48h ge poäng annars dra av om det inte finns åtgärder gjorda innan
+* Tar i nuläget inte hänsyn till om multipla febrar förekommit under vårdtiden
+*  @param {Integer} index Anger vilket vårdtillfälle i listan allaFiltreradeReads som ska behandlas
+*/
 function infITidEfterInskrivning(index){
 
     infDebut = allaFiltreradeReads[index].InfDebut;
@@ -91,7 +99,11 @@ function infITidEfterInskrivning(index){
     }
 }
 
-
+/**
+* Kollar om det finns åtgärder gjorda innan inskrivning
+* @param {Integer} index Anger vilket vårdtillfälle i listan allaFiltreradeReads som ska behandlas
+* @return {Boolean} True|False True om åtgärd annars false
+*/
 function finnsÅtgärderInnanFörstaVtf(index){
     var vtf = allaFiltreradeReads[index];
 
@@ -116,7 +128,7 @@ function finnsÅtgärderInnanFörstaVtf(index){
 }
 
 
-/*
+/**
 * Undersöker om datum för feber, odlingar och crp stämmer överens och ger bonuspoäng därefter
 * +10 poäng om kemsvar < 24h efter feber, +10 om odling < 5 dygn efter feber
 * Om ingen feber finns jämförs kemsvar och odling, +10 om odling < 4 dygn efter kemsvar

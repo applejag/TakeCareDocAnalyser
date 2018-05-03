@@ -1,6 +1,10 @@
 
 var antibiotika = [];
 
+
+/**
+* Kollar om det hittats medicinering klassat som riskfaktor
+*/
 function analyseMedicinering() {
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
         if(allaFiltreradeReads[i].hittadRiskMedicin.length > 0)
@@ -8,17 +12,10 @@ function analyseMedicinering() {
     }
 }
 
-/*
+/**
 * Kollar om antibiotia ordinerats efter en åtgärd vilket skulle tyda på infektion
 * Kollar även om Clostridium, difficile påvisats i samband med kur => oundviklig VRI
 */
 function antibiotikaAnalys() {
-
-}
-
-/*
-* Kollar igenom tidigare vårdtillfällen efter cytostatikatillförsel
-*/
-function hittaCytostatika(){
 
 }
