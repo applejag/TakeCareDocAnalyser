@@ -250,7 +250,7 @@ function hittaInfarter() {
     var utDatum = new Date();
     var matches = 0;
     var match = [];
-    var negatives = /(vägrar|inte|ej|förnekar|ingen)/i;
+    var negatives = /(vägrar|inte|ej|förnekar|ingen)/i; // risk för
     var infartStrings = ["KAD", "Urinavledning", "CVK", "Picc", "SVP", "CDK", "Venport", "Suprapubiskateter"];
 
     for (var v = 0; v < allaFiltreradeReads.length; v++) {

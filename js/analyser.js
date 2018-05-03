@@ -152,7 +152,7 @@ function printData(){
         console.log("");
         console.log("Hittat andningsstöd:");
         for (var l = 0; l < allaFiltreradeReads[v].hittadRespirator.length; l++) {
-            console.log(allaFiltreradeReads[v].hittadRespirator[l].datum.toString().substring(0, 15));
+            console.log(allaFiltreradeReads[v].hittadRespirator[l].toString().substring(0, 15));
         }
         console.log("");
 
