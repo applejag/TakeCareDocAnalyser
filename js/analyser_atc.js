@@ -13,7 +13,7 @@
 function findATC(läkemedel) {
     var best = findATCMatches(läkemedel)[0];
     return best ? best.ATC : null;
-};
+}
 
 /**
  * @param {String} läkemedel
@@ -21,7 +21,7 @@ function findATC(läkemedel) {
 */
 function findATCs(läkemedel) {
     return findATCMatches(läkemedel).mapField("ATC");
-};
+}
 
 /**
  * @param {String} läkemedel
@@ -62,7 +62,7 @@ function findATCMatches(läkemedel) {
     });
 
     return matches;
-};
+}
 
 /**
  * Mediciner och dess ATC koder

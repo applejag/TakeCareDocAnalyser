@@ -29,7 +29,7 @@ function analyseData() {
     printData();
 
 }
- 
+
 
 function checkLongestVårdtillfälle() {
     // Minst 1 tillfälle
@@ -67,9 +67,6 @@ function checkLongestVårdtillfälle() {
 */
 
 function sorteraVTF() {
-
-    var förstaMars = new Date(2017, 3, 1, 0);
-    var förstaFebruari = new Date(2017, 2, 1, 0);
     var VTFnummer = 0;
     var blacklist = ["Vårdtillfällen", "ParsedDocuments", "DatumMin", "DatumMax"];
     allaFiltreradeReads = [];
@@ -83,7 +80,7 @@ function sorteraVTF() {
         var tillfälle = read.Vårdtillfällen[ti];
         var yngre = read.Vårdtillfällen[ti+1];
 
-        if(tillfälle.Inskrivningsdatum < förstaMars && tillfälle.Utskrivningsdatum > förstaFebruari){
+        if(tillfälle.Inskrivningsdatum < read.DatumMax && tillfälle.Utskrivningsdatum > read.DatumMin){
             // new read obj per tillfälle
             var filtreradRead = {
                 Vårdtillfälle: tillfälle,
@@ -108,7 +105,7 @@ function sorteraVTF() {
                     if (dok.Datum < tillfälle.Inskrivningsdatum && VTFnummer !== 0)
                         continue;
                     // Skippa om det "tillhör" yngre
-                    if (yngre && dok.Datum >= yngre.Inskrivningsdatum && yngre.Inskrivningsdatum < förstaMars)
+                    if (yngre && dok.Datum >= yngre.Inskrivningsdatum && yngre.Inskrivningsdatum < read.DatumMax)
                         continue;
 
                     filtreradRead[dokTyp].push(dok);
