@@ -118,6 +118,42 @@ function sorteraVTF() {
 
     }
 }
+/**
+* Ibland skrivs patienter in oplanerat och hamnar inte i Vårdtillfällen
+*/
+function hittaOplaneradInskrivning(){
+    var kanskeNyaVTF = [];
+    var nyttVTF = false;
+    var ettDygn = 1*24*60*60*1000; // i ms
+
+    for (var i = 0; i < read.ÖppenVårdkontakter.length; i++) {
+        var övk = read.ÖppenVårdkontakter[i];
+        for (var j = 0; j < övk.Åtgärder.length; j++) {
+            if(övk.Åtgärder[j] = "XS100"){
+                kanskeNyaVTF.push(övk.Datum);
+            }
+        }
+    }
+
+    for (var k = 0; k < kanskeNyaVTF.length; k++) {
+        for (var l = 0; l < read.Vårdtillfällen.length; l++) {
+            vtf = read.Vårdtillfällen[l];
+
+            if((vtf.Inskrivningsdatum - kanskeNyaVTF[k]) < ettDygn){
+                nyttVTF = false;
+                break;
+            }
+            nyttVTF = true;
+        }
+        read.Vårdtillfällen.push({
+            Rubrik: doc.head.data2,
+            Inskrivningsdatum: parseDate(tab.Inskrivningsdatum.text),
+            Utskrivningsdatum: parseDate(tab.Utskrivningsdatum.text),
+            Diagnoser: findTableFirstColumn(doc.tables, "Diagnoser", true) || [],
+            Åtgärder: findTableFirstColumn(doc.tables, "Åtgärder", true) || []
+        });
+    }
+}
 
 /**
 * Utskrift av analysens resultat
