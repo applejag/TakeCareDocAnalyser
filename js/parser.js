@@ -165,10 +165,71 @@
     }
 
     parser.refreshScore = function() {
-        var container = document.getElementById("scoring_items");
-        var none = document.getElementById("scoring_none");
-        var template = document.getElementById("scoring_template");
-        var item_template = document.getElementById("scoring_item_template");
+        parser.refreshScoreHTML();
+        parser.refreshScoreText();
+    };
+
+    parser.refreshScoreText = function() {
+        var prebox = document.getElementById("scoring_text");
+
+        var text = [];
+
+        function format(val) {
+            if (val instanceof Date) return formatDateTime(val);
+            if (isNumber(val)) return val >= 0 ? "+" + val : val.toString();
+            return val;
+        }
+
+        function concat(items) {
+            var str = [];
+            for (var i = 0; i < items.length; i++) {
+                str.push(format(items[i]));
+            }
+            return str.join(' ');
+        }
+
+        function add() {
+            text.push(concat(arguments));
+        }
+
+        function addIndented() {
+            text.push('\t'+concat(arguments));
+        }
+
+        for (var ri = 0; ri < allaFiltreradeReads.length; ri++) {
+            var fread = allaFiltreradeReads[ri];
+
+            add (
+                "[",
+                fread.Score,
+                "]",
+                "Vårdtillfälle",
+                "("+fread.Vårdtillfälle.Rubrik+")",
+                fread.Vårdtillfälle.Inskrivningsdatum,
+                "→",
+                fread.Vårdtillfälle.Utskrivningsdatum
+            );
+
+            for (var si = 0; si < fread.ScoringHistory.length; si++) {
+                var hist = fread.ScoringHistory[si];
+
+                addIndented (
+                    hist.delta,
+                    hist.reason
+                );
+            }
+
+            add();
+        }
+
+        prebox.innerText = text.join('\n');
+    };
+
+    parser.refreshScoreHTML = function() {
+        var container = document.getElementById("scoring_html_items");
+        var none = document.getElementById("scoring_html_none");
+        var template = document.getElementById("scoring_html_template");
+        var item_template = document.getElementById("scoring_html_item_template");
         container.innerHTML = "";
 
         if (allaFiltreradeReads.length === 0) {

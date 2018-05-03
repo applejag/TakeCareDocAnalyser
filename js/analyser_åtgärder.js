@@ -7,7 +7,6 @@ var dränInf = /(hud|lokal)\s*(infektion|irritation|inflammation)|abscess/i;
 var kirurgiInf = /sår+(infektion|inflammation)/i;
 var respInf = /(lung|inflammtion i|luftvägs)\s*(inflammation|infektion|lunga|luftvägar|lungor)|bronkit|pneumoni/i;
 
-
 function analyseÅtgärder(){
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
         if(allaFiltreradeReads[i].hittadeInfarter.length > 0){

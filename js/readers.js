@@ -47,6 +47,9 @@ tree: {
 
 */
 
+/**
+ * @type {ReadParsedDocuments}
+ */
 var read = {
     Vårdtillfällen: [],
     ÖppnaVårdkontakter: [],
@@ -63,6 +66,9 @@ var read = {
     DatumMax: Date.parse("2017-02-28")
 };
 
+/**
+ * @type {ReadParsedDocuments}
+ */
 var read_default = read.cloneDeep();
 
 // parser.addReader = function(category, func(parsed))

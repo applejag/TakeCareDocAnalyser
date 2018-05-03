@@ -1,26 +1,26 @@
 
-/*
+/**
+ * @typedef {Object} HittatVärde
+ * @prop {String} Värde Källan på det funna värdet.
+ * @prop {String} Dokument Namn på det dokument typ som fann värdet.
+ * @prop {Date} Datum Datum på det dokument som fann värdet.
+ */
 
-# Hämtar från `allaFiltreradeReads[n].Vårdtillfälle`, `allaFiltreradeReads[n].ÖppnaVårdkontakter`
-# och `allaFiltreradeReads[n].Journaltexter`
-# Sparar resultat i `allaFiltreradeReads[n]`
-findSjukdomarInVtfAndÖvk();
+/**
+ * @typedef {Object} HittatSjukdomsResultat
+ * @prop {HittatVärde[]} Njursjukdomar Lista på hittade värden som tyder på njursjukdomar.
+ * @prop {HittatVärde[]} Diabetes Lista på hittade värden som tyder på diabetes.
+ * @prop {HittatVärde[]} Lungsjukdomar Lista på hittade värden som tyder på lungsjukdomar.
+ * @prop {HittatVärde[]} Cancer Lista på hittade värden som tyder på cancer.
+ * @prop {HittatVärde[]} KardiovaskuläraSjukdomar Lista på hittade värden som tyder på kardiovaskulära sjukdomar.
+ */
 
-allaFiltreradeReads[0..n]: {
-    /..other data../
-
-    hittadeSjukdomarICD10[0..n]: {hittad sjukdom},
-    hittadeSjukdomarEpikris[0..n]: {hittad sjukdom}
-}
-
-{hittad sjukdom}: {
-    ['kategori'][0..n]: {
-        Värde: "" String,
-        Dokument: "" String,
-        Datum: Date
-    }
-}
-*/
+/**
+ * @typedef {Object} FiltreradRead
+ * @prop {HittatSjukdomsResultat} hittadeSjukdomarICD10 Listor med sjukdomsresultat baserat på ICD-10 diagnoskoder.
+ * @prop {HittatSjukdomsResultat} hittadeSjukdomarEpikris Listor med sjukdomsresultat baserat på journaltext från epikriser.
+ * @prop {HittatSjukdomsResultat} hittadeSjukdomarKVÅ Listor med sjukdomsresultat baserat på KVÅ koder (Åtgärdskoder).
+ */
 
 function _d() {
     var _ = Array.from(arguments).mapField('source');
@@ -57,7 +57,13 @@ var sjukdomsRegExp = {
             /(?:C[0-8][0-9]|C9[0-7])/, // C00-C97
             /D0[0-9]/, // D00-D09
             /(?:D3[7-9]|D4[0-8])/, // D37-D48
+            /Z511/, // Z51.1
             /Z85/ // Z85
+        ),
+        kvå: _d(
+            /V[A-C]/, // VA, VB, VC
+            /V[E-H]/, // VE, VF, VG, VH
+            /V[L-N]/ // VL, VM, VN
         )
     },
     KardiovaskuläraSjukdomar: {
@@ -80,8 +86,19 @@ var sjukdomsRegExp = {
     }
 };
 
+/**
+ * Hämtar från `allaFiltreradeReads[n].Vårdtillfälle`, `allaFiltreradeReads[n].ÖppnaVårdkontakter`
+ * och `allaFiltreradeReads[n].Journaltexter`
+ * Sparar resultat i `allaFiltreradeReads[n]`
+ */
 function findSjukdomarInVtfAndÖvk() {
-
+    /**
+     * @param {Array<{}>} list List of results
+     * @param {RegExp} regex RegExp to find the match for the results list
+     * @param {Array<String>} texts List of strings to use the regex on
+     * @param {String} dok Document source name
+     * @param {Date} datum Date of document
+     */
     function addResultToList(list, regex, texts, dok, datum) {
         for (var i = 0; i < texts.length; i++) {
             var result = regex.exec(texts[i]);
@@ -102,17 +119,18 @@ function findSjukdomarInVtfAndÖvk() {
         var fread = allaFiltreradeReads[ri];
         fread.hittadeSjukdomarICD10 = {};
         fread.hittadeSjukdomarEpikris = {};
+        fread.hittadeSjukdomarKVÅ = {};
 
         // För varje sjukdomskategori...
         for (var sjukdom in sjukdomsRegExp) {
             if (!sjukdomsRegExp.hasOwnProperty(sjukdom)) continue;
 
-            var funnaICD10 = [];
-            var funnaEpikris = [];
 
+            var funnaICD10 = [];
+            fread.hittadeSjukdomarICD10[sjukdom] = funnaICD10;
             var icd10 = sjukdomsRegExp[sjukdom].icd10;
             if (icd10) {
-                // Leta efter koder
+                // Leta i vårdtillfället
                 var vtf = fread.Vårdtillfälle;
                 addResultToList(funnaICD10, icd10, vtf.Diagnoser, 'Vårdtillfälle', vtf.Inskrivningsdatum);
 
@@ -122,8 +140,14 @@ function findSjukdomarInVtfAndÖvk() {
                     var övk = fread.ÖppnaVårdkontakter[öi];
                     addResultToList(funnaICD10, icd10, övk.Diagnoser, 'Öppen vårdkontakt', övk.Datum);
                 }
+                if (funnaICD10.length > 0) {
+                    var koder = funnaICD10.mapField('Värde').join(', ');
+                    addScore(ri, 1, 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
+                }
             }
 
+            var funnaEpikris = [];
+            fread.hittadeSjukdomarEpikris[sjukdom] = funnaEpikris;
             var epikris = sjukdomsRegExp[sjukdom].epikris;
             if (epikris) {
                 // För varje journal...
@@ -134,20 +158,32 @@ function findSjukdomarInVtfAndÖvk() {
                     // Leta resultat
                     addResultToList(funnaEpikris, epikris, j.Fritext.splitSentences(), 'Epikris', j.Datum);
                 }
+                if (funnaEpikris.length > 0) {
+                    var texter = funnaEpikris.mapField('Värde').join('", "');
+                    addScore(ri, 1, 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
+                }
             }
 
-            // Spara sjukdomens matachade diagnoser
-            fread.hittadeSjukdomarICD10[sjukdom] = funnaICD10;
-            fread.hittadeSjukdomarEpikris[sjukdom] = funnaEpikris;
+            var funnaKVÅ = [];
+            fread.hittadeSjukdomarKVÅ[sjukdom] = funnaKVÅ;
+            var kvå = sjukdomsRegExp[sjukdom].kvå;
+            if (kvå) {
+                // Leta i vårdtillfället
+                var vtf2 = fread.Vårdtillfälle;
+                addResultToList(funnaKVÅ, kvå, vtf2.Åtgärder, 'Vårdtillfälle', vtf2.Inskrivningsdatum);
 
-            if (funnaICD10.length > 0) {
-                var koder = funnaICD10.mapField('Värde').join(', ');
-                addScore(ri, 1, 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
+                // För varje Öppen vårdkontakt...
+                for (var öi2 = 0; öi2 < fread.ÖppnaVårdkontakter.length; öi2++) {
+                    // Leta efter koder
+                    var övk2 = fread.ÖppnaVårdkontakter[öi2];
+                    addResultToList(funnaKVÅ, kvå, övk2.Åtgärder, 'Öppen vårdkontakt', övk2.Datum);
+                }
+                if (funnaKVÅ.length > 0) {
+                    var koder2 = funnaKVÅ.mapField('Värde').join(', ');
+                    addScore(ri, 1, 'Hittade '+funnaKVÅ.length+'st KVÅ koder för ' + sjukdom+': '+koder2);
+                }
             }
-            if (funnaEpikris.length > 0) {
-                var texter = funnaEpikris.mapField('Värde').join('", "');
-                addScore(ri, 1, 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
-            }
+
         }
     }
 }

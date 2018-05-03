@@ -1,6 +1,8 @@
 ﻿
+/**
+ * @type {FiltreradRead[]}
+ */
 var allaFiltreradeReads = [];
-
 
 function analyseData() {
     console.log("[!] PATIANT DATA GET IN LINE FOR INSPECTION\n[!] THIS IS YOUR EVALUATION DAY");
@@ -56,8 +58,18 @@ function checkLongestVårdtillfälle() {
 }
 
 
+/**
+* Sorterar alla dokument och parar ihop dem tillsammans med ett vårdtillfälle i ett objekt
+* Alla dessa objekt placeras i en lista.
+* Dokumenten sorteras så att alla dokument f.o.m. ett inskr. datum till det följande inskr. datumet
+* tillhör det tidigare vårdtillfället. Det äldsta vårdtillfället tilldelas även de dokument som daterats tidigare än det.
+*/
+
 function sorteraVTF() {
 
+    var förstaMars = new Date(2017, 3, 1, 0);
+    var förstaFebruari = new Date(2017, 2, 1, 0);
+    var VTFnummer = 0;
     var blacklist = ["Vårdtillfällen", "ParsedDocuments", "DatumMin", "DatumMax"];
     allaFiltreradeReads = [];
 
@@ -70,41 +82,46 @@ function sorteraVTF() {
         var tillfälle = read.Vårdtillfällen[ti];
         var yngre = read.Vårdtillfällen[ti+1];
 
-        // new read obj per tillfälle
-        var filtreradRead = {
-            Vårdtillfälle: tillfälle,
-            ScoringHistory: [],
-            Score: 0
-        };
-        allaFiltreradeReads.push(filtreradRead);
+        if(tillfälle.Inskrivningsdatum < förstaMars && tillfälle.Utskrivningsdatum > förstaFebruari){
+            // new read obj per tillfälle
+            var filtreradRead = {
+                Vårdtillfälle: tillfälle,
+                ScoringHistory: [],
+                Score: 0
+            };
+            allaFiltreradeReads.push(filtreradRead);
 
-        // Loopa dokument typer, ex: Mätvärden, RöntgenSvar, etc
-        for (var dokTyp in read) {
-            if (!read.hasOwnProperty(dokTyp))
-                continue;
-            if (blacklist.indexOf(dokTyp) !== -1)
-                continue;
-
-            filtreradRead[dokTyp] = [];
-
-            var origDokLista = read[dokTyp];
-            for (var di = 0; di < origDokLista.length; di++) {
-                var dok = origDokLista[di];
-                // Skippa om för tidig, om inte är första tillfället
-                if (dok.Datum < tillfälle.Inskrivningsdatum && ti !== 0)
+            // Loopa dokument typer, ex: Mätvärden, RöntgenSvar, etc
+            for (var dokTyp in read) {
+                if (!read.hasOwnProperty(dokTyp))
                     continue;
-                // Skippa om det "tillhör" yngre
-                if (yngre && dok.Datum >= yngre.Inskrivningsdatum)
+                if (blacklist.indexOf(dokTyp) !== -1)
                     continue;
 
-                filtreradRead[dokTyp].push(dok);
+                filtreradRead[dokTyp] = [];
+
+                var origDokLista = read[dokTyp];
+                for (var di = 0; di < origDokLista.length; di++) {
+                    var dok = origDokLista[di];
+                    // Skippa om för tidig, om inte är första tillfället
+                    if (dok.Datum < tillfälle.Inskrivningsdatum && VTFnummer !== 0)
+                        continue;
+                    // Skippa om det "tillhör" yngre
+                    if (yngre && dok.Datum >= yngre.Inskrivningsdatum && yngre.Inskrivningsdatum < förstaMars)
+                        continue;
+
+                    filtreradRead[dokTyp].push(dok);
+                    VTFnummer++;
+                }
             }
         }
 
     }
 }
 
-
+/**
+* Utskrift av analysens resultat
+*/
 
 function printData(){
     for (var v = 0; v < allaFiltreradeReads.length; v++) {
