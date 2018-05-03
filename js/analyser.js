@@ -19,6 +19,7 @@ function analyseData() {
     findDKoderInVtf();
     findSjukdomarInVtfAndÖvk();
     hittaMedicinering();
+    hittaCytostatika();
 
     analyseInfectionData();
     analyseÅtgärder();
@@ -28,7 +29,7 @@ function analyseData() {
     printData();
 
 }
-
+ 
 
 function checkLongestVårdtillfälle() {
     // Minst 1 tillfälle
