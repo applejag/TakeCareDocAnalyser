@@ -47,6 +47,7 @@ function hittaMedicinering(){
     }
 
     for(var v = 0; v < allaFiltreradeReads.length; v++){
+        allaFiltreradeReads[v].hittadRiskMedicin = [];
         for (var k = 0; k < hittadRiskMedicin.length; k++) {
             allaFiltreradeReads[v].hittadRiskMedicin.push(hittadRiskMedicin[k]);
         }
