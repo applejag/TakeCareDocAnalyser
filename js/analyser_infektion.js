@@ -1,6 +1,5 @@
 //Diagnoskoder för olika VRI:er
 var VRIkoder = /T880|T802|T814|T826|T835|T836|T814|T818|A047/i;
-var infektionEfterVtf = null;
 
 /**
 * Ska kolla utifrån resultat från epikrisen, feber, mikrobiologi svar
@@ -92,10 +91,10 @@ function hittasInfEfterUtskrivning(index){
 
     for (var i = 0; i < journaltexter.length; i++) {
         if(journaltexter[i].Datum > utDatum){
-            addScore(index, 12, "Journaltext som tyder på infektion efter utskrivning");
-            onlyScoreForFirstFinding = false;
-            infektionEfterVtf = journaltexter[i].Datum;
-            break;
+            if(onlyScoreForFirstFinding){
+                addScore(index, 12, "Journaltext som tyder på infektion efter utskrivning");
+                onlyScoreForFirstFinding = false;
+            }
         }
     }
 }

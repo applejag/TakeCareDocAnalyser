@@ -80,10 +80,10 @@ function hittaInfektionÅtgärdSamband(sökDKoder, sökord, index, åtgärdDatum
     if(fannSambandUnderVtfKod){
         addScore(index, 5, "Diagnoskod tyder på infektion i samband med " + åtgärd);
     } else {
-        if(fannSambandUnderVtfKodText)
+        if(fannSambandUnderVtfText)
             addScore(index, 6, "Journaltext tyder på infektion i samband med " + åtgärd);
     }
-    
+
     if(fannSambandEfterVtfKod){
         addScore(index, 4, "Diagnoskod tyder samband mellan " + åtgärd + " och infektion efter utskrivning");
     } else {

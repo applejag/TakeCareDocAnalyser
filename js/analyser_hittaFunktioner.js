@@ -14,12 +14,16 @@ var VRIkoder = /T880|T802|T814|T826|T835|T836|T814|T818|A047/i;
 *
 */
 function hittaInfDebut(index){
-    if(allaFiltreradeReads[index].hittadFeber.length > 0)
-        return allaFiltreradeReads[index].hittadFeber[allaFiltreradeReads[index].hittadFeber.length - 1].datum;
-    if(allaFiltreradeReads[index].hittadeKemSvar.length > 0)
-        return allaFiltreradeReads[index].hittadeKemSvar[allaFiltreradeReads[index].hittadeKemSvar.length - 1].datum;
-    if(allaFiltreradeReads[index].hittadeOdlingar.length > 0)
-        return allaFiltreradeReads[index].hittadeOdlingar[allaFiltreradeReads[index].hittadeOdlingar.length - 1].datum;
+    var feber = allaFiltreradeReads[index].hittadFeber;
+    var kemSvar = allaFiltreradeReads[index].hittadeKemSvar;
+    var odlingar = allaFiltreradeReads[index].hittadeOdlingar;
+
+    if(feber.length > 0) // FIXA DATUMEN!!
+        return feber[feber.length - 1].datum;
+    if(kemSvar.length > 0)
+        return kemSvar[kemSvar.length - 1].datum;
+    if(odlingar.length > 0)
+        return odlingar[odlingar.length - 1].datum;
 
 
     return 0;
@@ -69,7 +73,7 @@ function hittaCytostatika(){
 
         for (var k = 0; k < tillfälle.Åtgärder.length; k++) {
             if (cytostatikaTillförsel.test(tillfälle.Åtgärder[k]) && tillfälle.Utskrivningsdatum > treMånaderInnanFeb) {
-                var läkemedelData = {läkemedel: Cytostatika, inDatum: tillfälle.Inskrivningsdatum, utDatum: tillfälle.Utskrivningsdatum};
+                var läkemedelData = {läkemedel: "Cytostatika", inDatum: tillfälle.Inskrivningsdatum, utDatum: tillfälle.Utskrivningsdatum};
                 resultat.push(läkemedelData);
             }
         }
