@@ -66,13 +66,13 @@ function hittasInfEfterUtskrivning(index){
 
     for (var i = 0; i < journaltexter.length; i++) {
         if(journaltexter[i].Datum > utDatum){
-            addScore(index, 20, "Journaltexter som tyder på infektion efter utskrivning");
+            addScore(index, 15, "Journaltexter som tyder på infektion efter utskrivning");
             break;
         }
     }
     for (var j = 0; j < dkoder.length; j++) {
         if(dkoder[j].datum > utDatum){
-            addScore(index, 20, "Diagnoskoder för infektion funna efter utskrivning");
+            addScore(index, 15, "Diagnoskoder för infektion funna efter utskrivning");
             break;
         }
     }
@@ -91,7 +91,7 @@ function infITidEfterInskrivning(index){
         addScore(index, 20, "Infektion dök upp >48h efter inskrivning");
     } else {
         if(index == 0 && finnsÅtgärderInnanFörstaVtf(index)){
-            addScore(index, 20, "Inskriven för infektion efter tidigare kontakt med vård");
+            addScore(index, 15, "Inskriven för infektion efter tidigare kontakt med vård");
         }
         else{
             addScore(index, -30, "Infektion dök upp inom 48h efter inskrivning");
@@ -139,6 +139,7 @@ function checkIfDatesMatch(index){
     var odlingLista = allaFiltreradeReads[index].hittadeOdlingar; // 3-5 dygn
     var kemLista = allaFiltreradeReads[index].hittadeKemSvar; // 1-4 h
     var feberDebut, kemDebut, odlingDebut;
+    
     if(feberLista.length > 0){
         feberDebut = feberLista[feberLista.length - 1].datum;
     } else {

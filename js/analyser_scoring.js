@@ -37,3 +37,48 @@ function addScore(vtf_index, delta_score, reason_comment) {
 
     return vtf_object.Score;
 }
+
+/*
+* scoreObjekt = {scoreKod: ,
+*               score: ,
+*               orsak: }
+*/
+
+var scoreKoder = [{scoreKod: , orsak: }];
+
+
+/*
+ING     (Ingreppskoder)
+01    14, "Har haft infart(er) under vårdtillfället"); 
+02    10, "Har haft dränage under vårdtillfället");  
+03    14, "Kirurgiskt ingrepp under vårdtillfället");
+04    5, "Har fått andningsstöd under vårdtillfället");
+05    25, "Journaltext och diagnoskoder tyder på infektion i samband med " + åtgärd);
+06    15, "Diagnoskoder tyder på infektion i samband med " + åtgärd);      
+07    10, "Journaltext tyder på infektion i samband med " + åtgärd);
+
+INF     (Infektionskoder)
+01    8, "Feber under vårdtiden");       
+02    8, "Hittade odlingar");
+03    8, "Högt CRP");
+04    8, "LPK utanför intervall");      
+05    15, "Journaltexter som tyder på infektion efter utskrivning");               
+06    20, "Infektion dök upp >48h efter inskrivning"); 
+07    15, "Inskriven för infektion efter tidigare kontakt med vård");  
+08    -30, "Infektion dök upp inom 48h efter inskrivning");
+09    9, "Odling funnen samtidigt som feber");   
+10    9, "Onormalt CRP eller LPK funnet samtidigt som feber");      
+11    9, "Ingen feber men odling funnen samtidigt som onormalt CRP eller LPK");
+12    15, "Diagnoskoder för infektion funna efter utskrivning");
+13    100, "Diagnoskod för VRI funnen!");
+14    50, "Diagnoskoder för infektion funna för vårdtillfället: " + tmpKoder.join(", "));
+
+MED     (Medicineringskoder)
+01    1, "Har ordinerats cytostatika, steroider, immunhämmande läkemedel eller antibiotika <90 dagar innan vårdtillfället");
+
+SJU     (Sjukdomskoder)
+01    1, 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
+02    1, 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
+03    1, 'Hittade '+funnaKVÅ.length+'st KVÅ koder för ' + sjukdom+': '+koder2);
+
+*/

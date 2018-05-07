@@ -11,7 +11,7 @@ function analyseÅtgärder(){
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
         if(allaFiltreradeReads[i].hittadeInfarter.length > 0){
             var infarter = allaFiltreradeReads[i].hittadeInfarter;
-            addScore(i, 14, "Har haft infart(er) under vårdtillfället");
+            addScore(i, 14, "Har haft infart(er) under vårdtillfället"); 
             if(allaFiltreradeReads[i].hasInfection)
                 hittaInfektionÅtgärdSamband(infartDkoder, infartInf, i, infarter[infarter.length - 1].inDatum, "en infart");
         }
