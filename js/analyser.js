@@ -70,6 +70,8 @@ function sorteraVTF() {
     var VTFnummer = 0;
     var blacklist = ["Vårdtillfällen", "ParsedDocuments", "DatumMin", "DatumMax"];
     allaFiltreradeReads = [];
+    var dateMin = new Date(2010, 0, 1);
+    var dateMax = new Date(2018, 3, 1);
 
     // Äldst först
     read.Vårdtillfällen.sort(function(a,b) {
@@ -80,7 +82,7 @@ function sorteraVTF() {
         var tillfälle = read.Vårdtillfällen[ti];
         var yngre = read.Vårdtillfällen[ti+1];
 
-        if(tillfälle.Inskrivningsdatum < read.DatumMax && tillfälle.Utskrivningsdatum > read.DatumMin){
+        if(tillfälle.Inskrivningsdatum < dateMax && tillfälle.Utskrivningsdatum > dateMin){
             // new read obj per tillfälle
             var filtreradRead = {
                 Vårdtillfälle: tillfälle,
@@ -127,7 +129,7 @@ function hittaOplaneradInskrivning(){
     for (var i = 0; i < read.ÖppenVårdkontakter.length; i++) {
         var övk = read.ÖppenVårdkontakter[i];
         for (var j = 0; j < övk.Åtgärder.length; j++) {
-            if(övk.Åtgärder[j] = "XS100"){
+            if(övk.Åtgärder[j] == "XS100"){
                 kanskeNyaVTF.push(övk.Datum);
             }
         }
@@ -208,7 +210,7 @@ function printData(){
         console.log("");
 
         for (var i = 0; i < allaFiltreradeReads[v].ScoringHistory.length; i++) {
-            console.log(allaFiltreradeReads[v].ScoringHistory[i].delta + " : " + allaFiltreradeReads[v].ScoringHistory[i].reason);
+            console.log(allaFiltreradeReads[v].ScoringHistory[i].score + " : " + allaFiltreradeReads[v].ScoringHistory[i].orsak);
         }
         console.log("= " + allaFiltreradeReads[v].Score);
         if(allaFiltreradeReads[v].Score >= 80)

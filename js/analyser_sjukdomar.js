@@ -142,9 +142,10 @@ function findSjukdomarInVtfAndÖvk() {
                 }
                 if (funnaICD10.length > 0) {
                     var koder = funnaICD10.mapField('Värde').join(', ');
-                    addScore(ri, 1, 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
+                    addScore(ri, 22, 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
                 }
             }
+            
 
             var funnaEpikris = [];
             fread.hittadeSjukdomarEpikris[sjukdom] = funnaEpikris;
@@ -160,7 +161,7 @@ function findSjukdomarInVtfAndÖvk() {
                 }
                 if (funnaEpikris.length > 0) {
                     var texter = funnaEpikris.mapField('Värde').join('", "');
-                    addScore(ri, 1, 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
+                    addScore(ri, 23, 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
                 }
             }
 
@@ -180,7 +181,7 @@ function findSjukdomarInVtfAndÖvk() {
                 }
                 if (funnaKVÅ.length > 0) {
                     var koder2 = funnaKVÅ.mapField('Värde').join(', ');
-                    addScore(ri, 1, 'Hittade '+funnaKVÅ.length+'st KVÅ koder för ' + sjukdom+': '+koder2);
+                    addScore(ri, 24, 'Hittade '+funnaKVÅ.length+'st KVÅ koder för ' + sjukdom+': '+koder2);
                 }
             }
 

@@ -214,8 +214,9 @@
                 var hist = fread.ScoringHistory[si];
 
                 addIndented (
-                    hist.delta,
-                    hist.reason
+                    hist.score,
+                    hist.orsak,
+                    hist.scoreKod
                 );
             }
 
@@ -283,8 +284,9 @@
                 var hist = fread.ScoringHistory[si];
 
                 var item = item_template.cloneDeep();
-                foreachElementByClass(item, 'score-delta', _setScore(hist.delta));
-                foreachElementByClass(item, 'score-reason', _setText(hist.reason));
+                foreachElementByClass(item, 'score-delta', _setScore(hist.score));
+                foreachElementByClass(item, 'score-reason', _setText(hist.orsak));
+                foreachElementByClass(item, 'score-code', _setText(hist.scoreKod));
                 item_container.appendChild(item);
             }
         }

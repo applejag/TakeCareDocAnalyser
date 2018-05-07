@@ -11,65 +11,85 @@ function analyseÅtgärder(){
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
         if(allaFiltreradeReads[i].hittadeInfarter.length > 0){
             var infarter = allaFiltreradeReads[i].hittadeInfarter;
-            addScore(i, 14, "Har haft infart(er) under vårdtillfället"); 
+            addScore(i, 0, "Har haft infart(er) under vårdtillfället");
             if(allaFiltreradeReads[i].hasInfection)
                 hittaInfektionÅtgärdSamband(infartDkoder, infartInf, i, infarter[infarter.length - 1].inDatum, "en infart");
         }
 
         if(allaFiltreradeReads[i].hittadeDrän.length > 0){
             var drän = allaFiltreradeReads[i].hittadeDrän;
-            addScore(i, 10, "Har haft dränage under vårdtillfället");
+            addScore(i, 1, "Har haft dränage under vårdtillfället");
             if(allaFiltreradeReads[i].hasInfection)
                 hittaInfektionÅtgärdSamband(dränDkoder, dränInf, i, drän[drän.length - 1].inDatum, "dränage");
         }
 
         if(allaFiltreradeReads[i].hittadeKirurgKoder.length > 0){
             var kirurgÅkoder = allaFiltreradeReads[i].hittadeKirurgKoder;
-            addScore(i, 14, "Kirurgiskt ingrepp under vårdtillfället");
+            addScore(i, 2, "Kirurgiskt ingrepp under vårdtillfället");
             if(allaFiltreradeReads[i].hasInfection)
                 hittaInfektionÅtgärdSamband(kirurgiDkoder, kirurgiInf, i, kirurgÅkoder[kirurgÅkoder.length - 1].datum, "kirurgiskt ingrepp");
         }
 
         if(allaFiltreradeReads[i].hittadRespirator.length > 0){
             var andStöd = allaFiltreradeReads[i].hittadRespirator;
-            addScore(i, 5, "Har fått andningsstöd under vårdtillfället");
+            addScore(i, 3, "Har fått andningsstöd under vårdtillfället");
             if(allaFiltreradeReads[i].hasInfection)
                 hittaInfektionÅtgärdSamband(respiratorDkoder, respInf, i, andStöd[andStöd.length - 1], "andningsstöd");
         }
     }
-
 }
 
+
 function hittaInfektionÅtgärdSamband(sökDKoder, sökord, index, åtgärdDatum, åtgärd){
-    var fannDkod = false;
-    var fannInfiText = false;
+    var fannSambandUnderVtfKod = false;
+    var fannSambandUnderVtfText = false;
+    var fannSambandEfterVtfKod = false;
+    var fannSambandEfterVtfText = false;
+    var hittadeKoder = allaFiltreradeReads[index].hittadeDKoder;
 
-    if (allaFiltreradeReads[index].hittadeDKoder.length > 0) {
-        for (var i = 0; i < allaFiltreradeReads[index].hittadeDKoder.length; i++) {
-            if(sökDKoder.test(allaFiltreradeReads[index].hittadeDKoder[i])){
-                if(allaFiltreradeReads[index].infDebut >= åtgärdDatum)
-                    fannDkod = true;
-                    break;
+    if (hittadeKoder.length > 0) {
+        for (var i = 0; i < hittadeKoder.length; i++) {
+
+            if(sökDKoder.test(hittadeKoder[i].kod)){
+                if(allaFiltreradeReads[index].infDebut > åtgärdDatum)
+                    fannSambandUnderVtfKod = true;
+
+                if(hittadeKoder[i].Datum > åtgärdDatum && hittadeKoder[i].Datum > allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum)
+                    fannSambandEfterVtfKod = true;
+
             }
         }
     }
 
-    if (allaFiltreradeReads[index].infekteradeTexter.length > 0) {
-        for (var j = 0; j < allaFiltreradeReads[index].infekteradeTexter.length; j++) {
-            if(sökord.test(allaFiltreradeReads[index].infekteradeTexter[j].Fritext)){
-                if(allaFiltreradeReads[index].infDebut >= åtgärdDatum)
-                    fannInfiText = true;
-                    break;
+    var infText = allaFiltreradeReads[index].infekteradeTexter;
+
+    if (infText.length > 0) {
+        for (var j = 0; j < infText.length; j++) {
+            if(sökord.test(infText[j].Fritext)){
+
+                if(allaFiltreradeReads[index].infDebut > åtgärdDatum)
+                    fannSambandUnderVtfText = true;
+
+                if(infText[j].Datum > åtgärdDatum && infText[j].Datum > allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum)
+                    fannSambandEfterVtfText = true;
+
             }
         }
     }
 
-    if(fannDkod && fannInfiText){
-        addScore(index, 25, "Journaltext och diagnoskoder tyder på infektion i samband med " + åtgärd);
+    if(fannSambandUnderVtfKod){
+        addScore(index, 5, "Diagnoskod tyder på infektion i samband med " + åtgärd);
     } else {
-        if(fannDkod)
-            addScore(index, 15, "Diagnoskoder tyder på infektion i samband med " + åtgärd);
-        if(fannInfiText)
-            addScore(index, 10, "Journaltext tyder på infektion i samband med " + åtgärd);
+        if(fannSambandUnderVtfKodText)
+            addScore(index, 6, "Journaltext tyder på infektion i samband med " + åtgärd);
     }
+    
+    if(fannSambandEfterVtfKod){
+        addScore(index, 4, "Diagnoskod tyder samband mellan " + åtgärd + " och infektion efter utskrivning");
+    } else {
+        if(fannSambandEfterVtfText)
+            addScore(index, 25, "Journaltext tyder samband mellan " + åtgärd + " och infektion efter utskrivning");
+    }
+
+
 }

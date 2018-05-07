@@ -8,7 +8,7 @@ var antibiotika = [];
 function analyseMedicinering() {
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
         if(allaFiltreradeReads[i].hittadRiskMedicin.length > 0)
-            addScore(i, 1, "Har ordinerats cytostatika, steroider, immunhämmande läkemedel eller antibiotika <90 dagar innan vårdtillfället");
+            addScore(i, 21, "Har ordinerats cytostatika, steroider, immunhämmande läkemedel eller antibiotika <90 dagar innan vårdtillfället");
     }
 }
 

@@ -1,3 +1,6 @@
+//Diagnoskoder för olika VRI:er
+var VRIkoder = /T880|T802|T814|T826|T835|T836|T814|T818|A047/i;
+var infektionEfterVtf = null;
 
 /**
 * Ska kolla utifrån resultat från epikrisen, feber, mikrobiologi svar
@@ -24,19 +27,24 @@ function analyseInfectionData() {
                 if(allaFiltreradeReads[i].hittadeDKoder[k].tillfälle == "Vårdtillfälle"){
                     harInf = true;
                     tmpKoder.push(allaFiltreradeReads[i].hittadeDKoder[k].kod);
+
+                    if(VRIkoder.test(allaFiltreradeReads[i].hittadeDKoder[k].kod)){
+                        addScore(index, 19, "Diagnoskod för VRI funnen under vårdtillfället!");
+                    }
                 }
             }
-            addScore(i, 50, "Diagnoskoder för infektion funna för vårdtillfället: " + tmpKoder.join(", "));
+            addScore(i, 20, "Diagnoskoder för infektion funna för vårdtillfället: " + tmpKoder.join(", "));
         }
+
         if(allaFiltreradeReads[i].hittadFeber.length > 0 && !harInf)
-            addScore(i, 8, "Feber under vårdtiden");
+            addScore(i, 7, "Feber under vårdtiden");
             //hittaFeberDebuter()
         if(allaFiltreradeReads[i].hittadeOdlingar.length > 0 && !harInf)
             addScore(i, 8, "Hittade odlingar");
         if(crp.length > 0 && !harInf)
-            addScore(i, 8, "Högt CRP");
+            addScore(i, 9, "Högt CRP");
         if(leukocyter.length > 0 && !harInf)
-            addScore(i, 8, "LPK utanför intervall");
+            addScore(i, 10, "LPK utanför intervall");
 
         if(allaFiltreradeReads[i].Score < 50)
             checkIfDatesMatch(i);
@@ -60,19 +68,33 @@ function analyseInfectionData() {
 * @param {Integer} index Anger vilket vårdtillfälle i listan allaFiltreradeReads som ska behandlas
 */
 function hittasInfEfterUtskrivning(index){
+
     var utDatum = allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum;
     var journaltexter = allaFiltreradeReads[index].infekteradeTexter;
     var dkoder = allaFiltreradeReads[index].hittadeDKoder;
+    var onlyScoreForFirstFinding = true;
+
+    for (var j = 0; j < dkoder.length; j++) {
+        if(dkoder[j].datum > utDatum){
+            if (onlyScoreForFirstFinding) {
+                addScore(index, 14, "Diagnoskod som tyder på infektion efter utskrivning");
+                infektionEfterVtf = dkoder[j].datum;
+            }
+
+            if(VRIkoder.test(dkoder[j].kod)){
+                addScore(index, 19, "Diagnoskod för VRI funnen efter vårdtillfället!");
+                infektionEfterVtf = dkoder[j].datum;
+            }
+
+            onlyScoreForFirstFinding = false;
+        }
+    }
 
     for (var i = 0; i < journaltexter.length; i++) {
         if(journaltexter[i].Datum > utDatum){
-            addScore(index, 15, "Journaltexter som tyder på infektion efter utskrivning");
-            break;
-        }
-    }
-    for (var j = 0; j < dkoder.length; j++) {
-        if(dkoder[j].datum > utDatum){
-            addScore(index, 15, "Diagnoskoder för infektion funna efter utskrivning");
+            addScore(index, 12, "Journaltext som tyder på infektion efter utskrivning");
+            onlyScoreForFirstFinding = false;
+            infektionEfterVtf = journaltexter[i].Datum;
             break;
         }
     }
@@ -80,7 +102,7 @@ function hittasInfEfterUtskrivning(index){
 
 
 /**
-* Kollar vilken tid efter inskrivningsdatum som febern uppstått, om >48h ge poäng annars dra av om det inte finns åtgärder gjorda innan
+* Kollar vilken tid efter inskrivningsdatum som inf uppstått, om >48h ge poäng annars dra av om det inte finns åtgärder gjorda innan
 * Tar i nuläget inte hänsyn till om multipla febrar förekommit under vårdtiden
 *  @param {Integer} index Anger vilket vårdtillfälle i listan allaFiltreradeReads som ska behandlas
 */
@@ -88,13 +110,13 @@ function infITidEfterInskrivning(index){
 
     infDebut = allaFiltreradeReads[index].InfDebut;
     if(infDebut - allaFiltreradeReads[index].Vårdtillfälle.Inskrivningsdatum > 48*60*60*1000 && infDebut < allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum){
-        addScore(index, 20, "Infektion dök upp >48h efter inskrivning");
+        addScore(index, 11, "Infektion dök upp >48h efter inskrivning");
     } else {
         if(index == 0 && finnsÅtgärderInnanFörstaVtf(index)){
-            addScore(index, 15, "Inskriven för infektion efter tidigare kontakt med vård");
+            addScore(index, 13, "Inskriven för infektion efter tidigare kontakt med vård");
         }
         else{
-            addScore(index, -30, "Infektion dök upp inom 48h efter inskrivning");
+            addScore(index, 15, "Infektion dök upp inom 48h efter inskrivning");
         }
     }
 }
@@ -139,7 +161,7 @@ function checkIfDatesMatch(index){
     var odlingLista = allaFiltreradeReads[index].hittadeOdlingar; // 3-5 dygn
     var kemLista = allaFiltreradeReads[index].hittadeKemSvar; // 1-4 h
     var feberDebut, kemDebut, odlingDebut;
-    
+
     if(feberLista.length > 0){
         feberDebut = feberLista[feberLista.length - 1].datum;
     } else {
@@ -160,17 +182,17 @@ function checkIfDatesMatch(index){
     if(feberDebut !== 0){
         if(odlingDebut !== 0){
             if((odlingDebut - feberDebut) < 864000000 && odlingDebut > feberDebut) //864000000 = 10 dygn
-                addScore(index, 9, "Odling funnen samtidigt som feber");
+                addScore(index, 16, "Odling funnen samtidigt som feber");
         }
         if(kemDebut !== 0){
             if((kemDebut - feberDebut) < 86400000) //86400000 = 24h, 14400000 = 4h
-                addScore(index, 9, "Onormalt CRP eller LPK funnet samtidigt som feber");
+                addScore(index, 17, "Onormalt CRP eller LPK funnet samtidigt som feber");
         }
     } else {
         if(kemDebut !== 0){
             if(odlingDebut !== 0){
                 if((odlingDebut - kemDebut) < 691200000 && odlingDebut > kemDebut) //691200000 = 8 dygn
-                    addScore(index, 9, "Ingen feber men odling funnen samtidigt som onormalt CRP eller LPK");
+                    addScore(index, 18, "Ingen feber men odling funnen samtidigt som onormalt CRP eller LPK");
             }
         }
     }

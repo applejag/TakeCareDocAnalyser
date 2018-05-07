@@ -253,7 +253,6 @@ function hittaKirurgi() {
 
 /**
 * Letar igenom en tillhandahållen kodlista efter, på förhand definierade, intressanta koder
-* Om en diagnoskod för VRI hittas kommer även 100 poäng läggas till för aktuellt vårdtillfälle
 *
 * @param {List} kodLista en lista med koder som ska sökas igenom
 * @param {String} tillfälleTyp en string som anger om det är öppenvård eller vårdtillfället
@@ -272,9 +271,6 @@ function compareKoder(kodLista, tillfälleTyp, datumet, index, chosenSearchList,
             var koddata = {kod: kodLista[s], tillfälle: tillfälleTyp, datum: datumet};
             allaFiltreradeReads[index][pushHere].push(koddata);
 
-            if(VRIkoder.test(koddata.kod)){
-                addScore(index, 100, "Diagnoskod för VRI funnen!");
-            }
         }
     }
 }
