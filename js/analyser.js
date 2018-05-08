@@ -6,6 +6,7 @@ var allaFiltreradeReads = [];
 
 function analyseData() {
     console.log("[!] PATIANT DATA GET IN LINE FOR INSPECTION\n[!] THIS IS YOUR EVALUATION DAY");
+    sättIhopVTF();
     sorteraVTF();
 
     hittaInfarter();
@@ -64,27 +65,45 @@ function checkLongestVårdtillfälle() {
  */
 function sättIhopVTF(){
     var vtf = read.Vårdtillfällen;
-    var nya
     var ettdygn = 24*60*60*1000; //ms
-    
+    var satellit = false;
+
+    // äldst först
+    vtf.sort(function(a,b) {
+        return a.Inskrivningsdatum - b.Inskrivningsdatum;
+    });
+
     if (vtf.length > 0){
-        for (var i = 0; i < vtf.length-1; i++) {
-            var äldre = vtf[+1];
-            if (äldre) {
-                if ((vtf[i].Inskrivningsdatum - äldre.Utskrivningsdatum) < ettdygn) {
-                    vtf[i].Rubrik = vtf[i].Rubrik + " - Satellit"
-                    vtf[i].Inskrivningsdatum = äldre.Inskrivningsdatum;
-                    vtf[i].Diagnoser = vtf[i].Diagnoser.concat(äldre.Diagnoser);
-                    vtf[i].Åtgärder = vtf[i].Åtgärder.concat(äldre.Åtgärder);
-                    read.Vårdtillfällen.splice(i+1);
+        for (var i = 0; i < vtf.length; i++) {
+            var senareVTF = vtf[i+1];
+            if (senareVTF) {
+                if ((senareVTF.Inskrivningsdatum - vtf[i].Utskrivningsdatum) < ettdygn) {
+                    if(!satellit){
+                        vtf[i].Rubrik = vtf[i].Rubrik + " - Satellit";
+                        satellit = true;
+                    }
+                    vtf[i].Utskrivningsdatum = senareVTF.Utskrivningsdatum;
+                    vtf[i].Diagnoser = sättIhopListaUtanDubletter(vtf[i].Diagnoser, senareVTF.Diagnoser);
+                    vtf[i].Åtgärder = sättIhopListaUtanDubletter(vtf[i].Åtgärder, senareVTF.Åtgärder);
+                    vtf.splice(i+1, 1);
                     i--;
                 }
             }
-            else{
+            else {
                 break;
             }
         }
     }
+}
+
+function sättIhopListaUtanDubletter(lista1, lista2){
+    for (var i = 0; i < lista1.length; i++) {
+        for (var j = 0; j < lista2.length; j++) {
+            if(lista1[i] == lista2[j])
+                lista2.splice(j, 1);
+        }
+    }
+    return lista1.concat(lista2);
 }
 
 /**
@@ -99,7 +118,7 @@ function sorteraVTF() {
     var blacklist = ["Vårdtillfällen", "ParsedDocuments", "DatumMin", "DatumMax"];
     allaFiltreradeReads = [];
     var dateMin = new Date(2017, 0, 15);
-    var dateMax = new Date(2017, 2, 15);
+    var dateMax = new Date(2017, 2, 20);
 
     // Äldst först
     read.Vårdtillfällen.sort(function(a,b) {

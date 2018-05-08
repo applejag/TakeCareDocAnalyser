@@ -37,7 +37,6 @@ function analyseInfectionData() {
 
         if(allaFiltreradeReads[i].hittadFeber.length > 0 && !harInf)
             addScore(i, 7, "Feber under vårdtiden");
-            //hittaFeberDebuter()
         if(allaFiltreradeReads[i].hittadeOdlingar.length > 0 && !harInf)
             addScore(i, 8, "Hittade odlingar");
         if(crp.length > 0 && !harInf)
