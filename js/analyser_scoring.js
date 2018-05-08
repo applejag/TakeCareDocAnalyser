@@ -25,7 +25,8 @@ var scoreKoder = [{scoreKod: "ING01", score: 14, orsak: ""}, {scoreKod: "ING02",
         {scoreKod: "INF13", score: 100, orsak: ""}, {scoreKod: "INF14", score: 50, orsak: ""},
         {scoreKod: "MED01", score: 5, orsak: ""},
         {scoreKod: "SJU01", score: 1, orsak: ""}, {scoreKod: "SJU02", score: 1, orsak: ""},
-        {scoreKod: "SJU03", score: 1, orsak: ""}, {scoreKod: "ING08", score: 25, orsak: ""}];
+        {scoreKod: "SJU03", score: 1, orsak: ""}, {scoreKod: "ING08", score: 25, orsak: ""},
+        {scoreKod: "MED02", score: 10, orsak: ""}];
 
 /**
  * Lägg till eller ta bort poäng för någon del av analysen.
@@ -83,6 +84,7 @@ INF     (Infektionskoder)
 
 MED     (Medicineringskoder)
 01    5, "Har ordinerats läkemedel bla bla... <90 dager innan vtf";                     (21)
+02    10, "Kan finnas samband mellan åtgärder och ordinerad antibiotika"                (26)
 
 SJU     (Sjukdomskoder)
 01    1, 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för'+sjukdom+': '+koder); (22)

@@ -58,13 +58,41 @@ function checkLongestVårdtillfälle() {
         "(" + Math.round(days) + " dagar!)");
 }
 
+/**
+ * I de fall en patient flyttats mellan avdelningar och fått flera olika vårdtillfällen
+ * sätter denna funktion ihop dem till ett
+ */
+function sättIhopVTF(){
+    var vtf = read.Vårdtillfällen;
+    var nya
+    var ettdygn = 24*60*60*1000; //ms
+    
+    if (vtf.length > 0){
+        for (var i = 0; i < vtf.length-1; i++) {
+            var äldre = vtf[+1];
+            if (äldre) {
+                if ((vtf[i].Inskrivningsdatum - äldre.Utskrivningsdatum) < ettdygn) {
+                    vtf[i].Rubrik = vtf[i].Rubrik + " - Satellit"
+                    vtf[i].Inskrivningsdatum = äldre.Inskrivningsdatum;
+                    vtf[i].Diagnoser = vtf[i].Diagnoser.concat(äldre.Diagnoser);
+                    vtf[i].Åtgärder = vtf[i].Åtgärder.concat(äldre.Åtgärder);
+                    read.Vårdtillfällen.splice(i+1);
+                    i--;
+                }
+            }
+            else{
+                break;
+            }
+        }
+    }
+}
 
 /**
-* Sorterar alla dokument och parar ihop dem tillsammans med ett vårdtillfälle i ett objekt
-* Alla dessa objekt placeras i en lista.
-* Dokumenten sorteras så att alla dokument f.o.m. ett inskr. datum till det följande inskr. datumet
-* tillhör det tidigare vårdtillfället. Det äldsta vårdtillfället tilldelas även de dokument som daterats tidigare än det.
-*/
+ * Sorterar alla dokument och parar ihop dem tillsammans med ett vårdtillfälle i ett objekt
+ * Alla dessa objekt placeras i en lista.
+ * Dokumenten sorteras så att alla dokument f.o.m. ett inskr. datum till det följande inskr. datumet
+ * tillhör det tidigare vårdtillfället. Det äldsta vårdtillfället tilldelas även de dokument som daterats tidigare än det.
+ */
 
 function sorteraVTF() {
     var VTFnummer = 0;
