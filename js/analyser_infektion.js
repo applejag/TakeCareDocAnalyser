@@ -31,7 +31,7 @@ function analyseInfectionData() {
                     tmpKoder.push(allaFiltreradeReads[i].hittadeDKoder[k].kod);
 
                     if(VRIkoder.test(allaFiltreradeReads[i].hittadeDKoder[k].kod)){
-                        addScore(index, 19, "");
+                        addScore(i, 19, "");
                     }
                 }
             }
