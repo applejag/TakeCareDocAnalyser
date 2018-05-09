@@ -12,28 +12,28 @@ function analyseÅtgärder(){
         if(allaFiltreradeReads[i].hittadeInfarter.length > 0){
             var infarter = allaFiltreradeReads[i].hittadeInfarter;
             addScore(i, 0, "Har haft infart(er) under vårdtillfället");
-            if(allaFiltreradeReads[i].hasInfection)
+            ifallaFiltreradeReads[i].InfDebut.length > 0)
                 hittaInfektionÅtgärdSamband(infartDkoder, infartInf, i, infarter[infarter.length - 1].inDatum, "en infart");
         }
 
         if(allaFiltreradeReads[i].hittadeDrän.length > 0){
             var drän = allaFiltreradeReads[i].hittadeDrän;
             addScore(i, 1, "Har haft dränage under vårdtillfället");
-            if(allaFiltreradeReads[i].hasInfection)
+            if(allaFiltreradeReads[i].InfDebut.length > 0)
                 hittaInfektionÅtgärdSamband(dränDkoder, dränInf, i, drän[drän.length - 1].inDatum, "dränage");
         }
 
         if(allaFiltreradeReads[i].hittadeKirurgKoder.length > 0){
             var kirurgÅkoder = allaFiltreradeReads[i].hittadeKirurgKoder;
             addScore(i, 2, "Kirurgiskt ingrepp under vårdtillfället");
-            if(allaFiltreradeReads[i].hasInfection)
+            if(allaFiltreradeReads[i].InfDebut.length > 0)
                 hittaInfektionÅtgärdSamband(kirurgiDkoder, kirurgiInf, i, kirurgÅkoder[kirurgÅkoder.length - 1].datum, "kirurgiskt ingrepp");
         }
 
         if(allaFiltreradeReads[i].hittadRespirator.length > 0){
             var andStöd = allaFiltreradeReads[i].hittadRespirator;
             addScore(i, 3, "Har fått andningsstöd under vårdtillfället");
-            if(allaFiltreradeReads[i].hasInfection)
+            if(allaFiltreradeReads[i].InfDebut.length > 0)
                 hittaInfektionÅtgärdSamband(respiratorDkoder, respInf, i, andStöd[andStöd.length - 1], "andningsstöd");
         }
     }
@@ -51,8 +51,10 @@ function hittaInfektionÅtgärdSamband(sökDKoder, sökord, index, åtgärdDatum
         for (var i = 0; i < hittadeKoder.length; i++) {
 
             if(sökDKoder.test(hittadeKoder[i].kod)){
-                if(allaFiltreradeReads[index].infDebut > åtgärdDatum)
-                    fannSambandUnderVtfKod = true;
+                for (var k = 0; k < allaFiltreradeReads[index].InfDebut.length; k++) {
+                    if(allaFiltreradeReads[index].InfDebut[k] > åtgärdDatum)
+                        fannSambandUnderVtfKod = true;
+                }
 
                 if(hittadeKoder[i].Datum > åtgärdDatum && hittadeKoder[i].Datum > allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum)
                     fannSambandEfterVtfKod = true;
@@ -67,7 +69,7 @@ function hittaInfektionÅtgärdSamband(sökDKoder, sökord, index, åtgärdDatum
         for (var j = 0; j < infText.length; j++) {
             if(sökord.test(infText[j].Fritext)){
 
-                if(allaFiltreradeReads[index].infDebut > åtgärdDatum)
+                if(infText[j].Datum > åtgärdDatum)
                     fannSambandUnderVtfText = true;
 
                 if(infText[j].Datum > åtgärdDatum && infText[j].Datum > allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum)
