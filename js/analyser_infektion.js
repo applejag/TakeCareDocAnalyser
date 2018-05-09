@@ -229,7 +229,7 @@ function checkIfDatesMatch(index, feberDebut){
                 count++;
             }
         }
-        for (var j = 0; j < array.length; j++) {
+        for (var j = 0; j < kemSvarLista.length; j++) {
             if((kemSvarLista[j] - feberDebut) < 86400000 && kemSvarLista[j] > feberDebut){ //86400000 = 24h, 14400000 = 4h
                 addScore(index, 17, "");
                 count++;
