@@ -117,8 +117,8 @@ function sorteraVTF() {
     var VTFnummer = 0;
     var blacklist = ["Vårdtillfällen", "ParsedDocuments", "DatumMin", "DatumMax"];
     allaFiltreradeReads = [];
-    var dateMin = new Date(2017, 0, 15);
-    var dateMax = new Date(2017, 2, 20);
+    var dateMin = new Date(2017, 1, 1);
+    var dateMax = new Date(2017, 2, 1);
 
     // Äldst först
     read.Vårdtillfällen.sort(function(a,b) {
@@ -154,7 +154,7 @@ function sorteraVTF() {
                     if (dok.Datum < tillfälle.Inskrivningsdatum && VTFnummer !== 0)
                         continue;
                     // Skippa om det "tillhör" yngre
-                    if (yngre && dok.Datum >= yngre.Inskrivningsdatum && yngre.Inskrivningsdatum < read.DatumMax)
+                    if (yngre && dok.Datum >= yngre.Inskrivningsdatum && yngre.Inskrivningsdatum < dateMax)
                         continue;
 
                     filtreradRead[dokTyp].push(dok);

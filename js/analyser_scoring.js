@@ -11,22 +11,33 @@ allaFiltreradeReads[0..n]: {
     }
 }
 */
-
-var scoreKoder = [{scoreKod: "ING01", score: 14, orsak: ""}, {scoreKod: "ING02", score: 10, orsak: ""},
-        {scoreKod: "ING03", score: 14, orsak: ""}, {scoreKod: "ING04", score: 5, orsak: ""},
-        {scoreKod: "ING05", score: 25, orsak: ""}, {scoreKod: "ING06", score: 15, orsak: ""},
-        {scoreKod: "ING07", score: 10, orsak: ""},
-        {scoreKod: "INF01", score: 8, orsak: ""}, {scoreKod: "INF02", score: 8, orsak: ""},
-        {scoreKod: "INF03", score: 8, orsak: ""}, {scoreKod: "INF04", score: 8, orsak: ""},
-        {scoreKod: "INF05", score: 25, orsak: ""}, {scoreKod: "INF06", score: 25, orsak: ""},
-        {scoreKod: "INF07", score: 25, orsak: ""}, {scoreKod: "INF08", score: 25, orsak: ""},
-        {scoreKod: "INF09", score: -30, orsak: ""}, {scoreKod: "INF10", score: 9, orsak: ""},
-        {scoreKod: "INF11", score: 9, orsak: ""}, {scoreKod: "INF12", score: 9, orsak: ""},
-        {scoreKod: "INF13", score: 100, orsak: ""}, {scoreKod: "INF14", score: 50, orsak: ""},
-        {scoreKod: "MED01", score: 5, orsak: ""},
-        {scoreKod: "SJU01", score: 1, orsak: ""}, {scoreKod: "SJU02", score: 1, orsak: ""},
-        {scoreKod: "SJU03", score: 1, orsak: ""}, {scoreKod: "ING08", score: 25, orsak: ""},
-        {scoreKod: "MED02", score: 10, orsak: ""}];
+var scoreKoder = [{scoreKod: "ING01", score: 14, orsak: "Har haft infart(er) under vårdtillfället"},
+                {scoreKod: "ING02", score: 10, orsak: "Har haft dränage under vårdtillfället"},
+                {scoreKod: "ING03", score: 14, orsak: "Kirurgiskt ingrepp under vårdtillfället"},
+                {scoreKod: "ING04", score: 5, orsak: "Har fått andningsstöd under vårdtillfället"},
+                {scoreKod: "ING05", score: 25, orsak: ""},
+                {scoreKod: "ING06", score: 15, orsak: ""},
+                {scoreKod: "ING07", score: 10, orsak: ""},
+                {scoreKod: "INF01", score: 8, orsak: "Feber under vårdtiden"},
+                {scoreKod: "INF02", score: 10, orsak: "Hittade odlingar"},
+                {scoreKod: "INF03", score: 8, orsak: "Högt CRP"},
+                {scoreKod: "INF04", score: 8, orsak: "LPK utanför intervall"},
+                {scoreKod: "INF05", score: 25, orsak: "Infektion dök upp >48h efter inskrivning"},
+                {scoreKod: "INF06", score: 25, orsak: "Journaltexter som tyder på infektion efter utskrivning"},
+                {scoreKod: "INF07", score: 25, orsak: "Inskriven för infektion efter tidigare kontakt med vård"},
+                {scoreKod: "INF08", score: 25, orsak: "Diagnoskoder för infektion funna efter utskrivning"},
+                {scoreKod: "INF09", score: -30, orsak: "Infektion dök upp inom 48h efter inskrivning"},
+                {scoreKod: "INF10", score: 9, orsak: "Odling funnen samtidigt som feber"},
+                {scoreKod: "INF11", score: 9, orsak: "Onormalt CRP eller LPK funnet samtidigt som feber"},
+                {scoreKod: "INF12", score: 9, orsak: "Ingen feber men odling funnen samtidigt som onormalt CRP eller LPK"},
+                {scoreKod: "INF13", score: 100, orsak: "Diagnoskod för VRI funnen!"},
+                {scoreKod: "INF14", score: 40, orsak: ""},
+                {scoreKod: "MED01", score: 5, orsak: "Har ordinerats cytostatika, steroider, immunhämmande läkemedel eller antibiotika <90 dagar innan vårdtillfället"},
+                {scoreKod: "SJU01", score: 1, orsak: ""},
+                {scoreKod: "SJU02", score: 1, orsak: ""},
+                {scoreKod: "SJU03", score: 1, orsak: ""},
+                {scoreKod: "ING08", score: 25, orsak: ""},
+                {scoreKod: "MED02", score: 10, orsak: ""}];
 
 /**
  * Lägg till eller ta bort poäng för någon del av analysen.
@@ -46,7 +57,9 @@ function addScore(vtf_index, scoreCode_index, reason_comment) {
     if (!(vtf_object.ScoringHistory instanceof Array)) vtf_object.ScoringHistory = [];
     if (!isNumber(vtf_object.Score)) vtf_object.Score = 0;
 
-    scoreKoder[scoreCode_index].orsak = reason_comment;
+    if(reason_comment != ""){
+        scoreKoder[scoreCode_index].orsak = reason_comment;
+    }
 
     vtf_object.ScoringHistory.push(scoreKoder[scoreCode_index]);
     vtf_object.Score += scoreKoder[scoreCode_index].score;
@@ -57,7 +70,7 @@ function addScore(vtf_index, scoreCode_index, reason_comment) {
 
 /*
 ING     (Ingreppskoder)                                                                 Index i listan
-01    14, "Har haft infart(er) under vårdtillfället");                                  (0)
+01    14, "Har haft infart(er) under vårdtillfället"                                    (0)
 02    10, "Har haft dränage under vårdtillfället");                                     (1)
 03    14, "Kirurgiskt ingrepp under vårdtillfället");                                   (2)
 04    5, "Har fått andningsstöd under vårdtillfället");                                 (3)
@@ -68,7 +81,7 @@ ING     (Ingreppskoder)                                                         
 
 INF     (Infektionskoder)
 01    8, "Feber under vårdtiden");                                                      (7)
-02    8, "Hittade odlingar");                                                           (8)
+02    10, "Hittade odlingar");                                                           (8)
 03    8, "Högt CRP");                                                                   (9)
 04    8, "LPK utanför intervall");                                                      (10)
 05    20, "Infektion dök upp >48h efter inskrivning");                                  (11)
@@ -80,7 +93,7 @@ INF     (Infektionskoder)
 11    9, "Onormalt CRP eller LPK funnet samtidigt som feber");                          (17)
 12    9, "Ingen feber men odling funnen samtidigt som onormalt CRP eller LPK");         (18)
 13    100, "Diagnoskod för VRI funnen!");                                               (19)
-14    50, "Diagnoskoder för infektion funna för vårdtillfället:"+tmpKoder.join(", "));  (20)
+14    40, "Diagnoskoder för infektion funna för vårdtillfället:"+tmpKoder.join(", "));  (20)
 
 MED     (Medicineringskoder)
 01    5, "Har ordinerats läkemedel bla bla... <90 dager innan vtf";                     (21)

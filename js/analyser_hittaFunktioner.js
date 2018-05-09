@@ -11,25 +11,6 @@ var intressantaDKoder = ["(A|B|T814|T802|T835|T880|T802|T814|T826|T835|T836|T814
 var VRIkoder = /T880|T802|T814|T826|T835|T836|T814|T818|A047/i;
 
 /**
-*
-*/
-function hittaInfDebut(index){
-    var feber = allaFiltreradeReads[index].hittadFeber;
-    var kemSvar = allaFiltreradeReads[index].hittadeKemSvar;
-    var odlingar = allaFiltreradeReads[index].hittadeOdlingar;
-
-    if(feber.length > 0) // FIXA DATUMEN!!
-        return feber[feber.length - 1].datum;
-    if(kemSvar.length > 0)
-        return kemSvar[kemSvar.length - 1].datum;
-    if(odlingar.length > 0)
-        return odlingar[odlingar.length - 1].datum;
-
-
-    return 0;
-}
-
-/**
 * Letar igenom läkemedelsordinationer efter intressanta läkemedel
 */
 function hittaMedicinering(){
