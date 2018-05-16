@@ -1,54 +1,6 @@
 
-/*
-
-cell = {
-    text: "" string,
-    html: "" string,
-    isItalic: bool,
-    isBold: bool
-}
-
-doc: {
-    head: {
-        id: "" string',
-        category: "" string,
-        data1: "" string,
-        data2: "" string,
-        datestring: "" string,
-        datetime: Date,
-    },
-
-    body[0..n]:
-        [1..n]: cell
-
-    notes[0..n]: cell,
-
-    tables[0..n]: {
-        head[1..n]: cell,
-
-        rows[1..n]: {
-            columns[1..n]: cell,
-            _th_cell_text: cell,
-        },
-
-        columns: {
-            _th_cell_text[0..n]: cell
-        }
-    },
-
-    trees[0..n]: tree
-}
-
-tree: {
-    title: cell,
-    content: cell,
-    children[0..n]: tree
-}
-
-*/
-
 /**
- * @type {ReadParsedDocuments}
+ * @type {ReadDocuments}
  */
 var read = {
     Vårdtillfällen: [],
@@ -67,7 +19,7 @@ var read = {
 };
 
 /**
- * @type {ReadParsedDocuments}
+ * @type {ReadDocuments}
  */
 var read_default = read.cloneDeep();
 
@@ -140,12 +92,12 @@ parser.addReader("Röntgen svar", function(doc) {
     read.RöntgenSvar.push({
         Rubrik: doc.head.data2,
         Datum: doc.head.datetime,
-        Remittent: findBodySecondColumn(doc.body, /^Remittent:?\s*$/i, true) || "",
-        Beställning: findBodySecondColumn(doc.body, /^Beställning:?\s*$/i, true) || "",
-        ÖnskadUndersökning: findBodySecondColumn(doc.body, /^Önskad\s*undersökning:?\s*$/i, true) || "",
-        Frågeställning: findBodySecondColumn(doc.body, /^Frågeställning:?\s*$/i, true) || "",
-        Svar: findBodySecondColumn(doc.body, /^Svar:?\s*$/i, true) || "",
-        Utlåtande: findBodySecondColumn(doc.body, /^Utlåtande:?\s*$/i, true) || ""
+        Remittent: findBodySecondColumnText(doc.body, /^Remittent:?\s*$/i, true) || "",
+        Beställning: findBodySecondColumnText(doc.body, /^Beställning:?\s*$/i, true) || "",
+        ÖnskadUndersökning: findBodySecondColumnText(doc.body, /^Önskad\s*undersökning:?\s*$/i, true) || "",
+        Frågeställning: findBodySecondColumnText(doc.body, /^Frågeställning:?\s*$/i, true) || "",
+        Svar: findBodySecondColumnText(doc.body, /^Svar:?\s*$/i, true) || "",
+        Utlåtande: findBodySecondColumnText(doc.body, /^Utlåtande:?\s*$/i, true) || ""
     });
 });
 
@@ -153,10 +105,10 @@ parser.addReader("Mikrobiologi svar", function(doc) {
     read.MikrobiologiSvar.push({
         Rubrik: doc.head.data2,
         Datum: doc.head.datetime,
-        Remittent: findBodySecondColumn(doc.body, /^Remittent:?\s*$/i, true) || "",
-        Undersökning: findBodySecondColumn(doc.body, /^Undersökning:?\s*$/i, true) || "",
-        Provmaterial: findBodySecondColumn(doc.body, /^Provmaterial:?\s*$/i, true) || "",
-        Svar: findBodySecondColumn(doc.body, /^Svar:?\s*$/i, true) || ""
+        Remittent: findBodySecondColumnText(doc.body, /^Remittent:?\s*$/i, true) || "",
+        Undersökning: findBodySecondColumnText(doc.body, /^Undersökning:?\s*$/i, true) || "",
+        Provmaterial: findBodySecondColumnText(doc.body, /^Provmaterial:?\s*$/i, true) || "",
+        Svar: findBodySecondColumnText(doc.body, /^Svar:?\s*$/i, true) || ""
     });
 });
 
@@ -208,16 +160,16 @@ parser.addReader("Mätvärde", function(doc) {
 
 parser.addReader("Vårdtillfälle", function(doc) {
     // Vårdenhet tabellen innehåller in/ut datum
-    var tab = findTableFirstRow(doc.tables, "Vårdenhet");
-    if (!tab) return; // next doc plz
+    var row = findTableFirstRow(doc.tables, "Vårdenhet");
+    if (!row) return; // next doc plz
 
     // Spara grejer
     read.Vårdtillfällen.push({
         Rubrik: doc.head.data2,
-        Inskrivningsdatum: parseDate(tab.Inskrivningsdatum.text),
-        Utskrivningsdatum: parseDate(tab.Utskrivningsdatum.text),
-        Diagnoser: findTableFirstColumn(doc.tables, "Diagnoser", true) || [],
-        Åtgärder: findTableFirstColumn(doc.tables, "Åtgärder", true) || []
+        Inskrivningsdatum: parseDate(row.Inskrivningsdatum.text),
+        Utskrivningsdatum: parseDate(row.Utskrivningsdatum.text),
+        Diagnoser: findTableFirstColumnText(doc.tables, "Diagnoser", true) || [],
+        Åtgärder: findTableFirstColumnText(doc.tables, "Åtgärder", true) || []
     });
 });
 
@@ -226,8 +178,8 @@ parser.addReader("Öppen vårdkontakt", function(doc) {
     read.ÖppnaVårdkontakter.push({
         Rubrik: doc.head.data2,
         Datum: doc.head.datetime,
-        Diagnoser: findTableFirstColumn(doc.tables, "Diagnoser", true) || [],
-        Åtgärder: findTableFirstColumn(doc.tables, "Åtgärder", true) || []
+        Diagnoser: findTableFirstColumnText(doc.tables, "Diagnoser", true) || [],
+        Åtgärder: findTableFirstColumnText(doc.tables, "Åtgärder", true) || []
     });
 });
 
@@ -270,16 +222,42 @@ function readAnalysisResultTable(tables) {
     return värden;
 }
 
-function findBodySecondColumn(body, firstColumnSearch, textOnly) {
+/**
+ * Find second columnd where first column matches {@link firstColumnSearch}
+ * @param {ParsedCell[][]} body Parsed document body
+ * @param {String} firstColumnSearch Text of first columns
+ * @returns {ParsedCell}
+ */
+function findBodySecondColumn(body, firstColumnSearch) {
     for (var i = 0; i < body.length; i++) {
         var row = body[i];
         if (row[0].text.search(firstColumnSearch) !== -1) {
-            return textOnly ? row[1].text : row[1];
+            return row[1];
         }
     }
     return null;
 }
 
+/**
+ * Find second columnd where first column matches {@link firstColumnSearch}
+ * @param {ParsedCell[][]} body Parsed document body
+ * @param {String} firstColumnSearch Text of first columns
+ * @returns {ParsedCell}
+ */
+function findBodySecondColumnText(body, firstColumnSearch) {
+    for (var i = 0; i < body.length; i++) {
+        var row = body[i];
+        if (row[0].text.search(firstColumnSearch) !== -1) {
+            return row[1].text;
+        }
+    }
+    return null;
+}
+
+/**
+ * @param {ParsedDocumentTree} tree 
+ * @returns {String}
+ */
 function flattenTreeContentText(tree) {
     var output = tree.content.text;
 
@@ -294,7 +272,11 @@ function flattenTreeContentText(tree) {
     return output;
 }
 
-// returns doctable || null
+/**
+ * @param {ParsedDocumentTable[]} tables List of tables
+ * @param {String} firstColumnName Header text of first column
+ * @returns {ParsedDocumentTable}
+ */
 function findTable(tables, firstColumnName) {
     var tab = tables.find(function(tbl) {
         return tbl.head[0].text === firstColumnName;
@@ -302,26 +284,42 @@ function findTable(tables, firstColumnName) {
     return tab || null;
 }
 
-// returns cell[] || null
-function findTableFirstRow(tables, firstColumnName, textOnly) {
+/**
+ * @param {ParsedDocumentTable[]} tables List of tables
+ * @param {String} firstColumnName Header text of first column
+ * @returns {ParsedDocumentTableRow}
+ */
+function findTableFirstRow(tables, firstColumnName) {
     var tab = findTable(tables, firstColumnName);
 
     if (!tab) return null;
-    if (textOnly) return tab.rows[firstColumnName].map(function(x) {
-        return x.text;
-    });
-
+    if (!tab.rows[0]) return null;
+    
     return tab.rows[0];
 }
 
-// return cell[] || null
-function findTableFirstColumn(tables, firstColumnName, textOnly) {
+/**
+ * @param {ParsedDocumentTable[]} tables List of tables
+ * @param {String} firstColumnName Header text of first column
+ * @returns {ParsedCell[]}
+ */
+function findTableFirstColumn(tables, firstColumnName) {
     var tab = findTable(tables, firstColumnName);
 
     if (!tab) return null;
-    if (textOnly) return tab.columns[firstColumnName].map(function(x) {
-        return x.text;
-    });
 
     return tab.columns[firstColumnName];
+}
+
+/**
+ * @param {ParsedDocumentTable[]} tables List of tables
+ * @param {String} firstColumnName Header text of first column
+ * @returns {String[]}
+ */
+function findTableFirstColumnText(tables, firstColumnName) {
+    var tab = findTable(tables, firstColumnName);
+
+    if (!tab) return null;
+
+    return tab.columns[firstColumnName].mapField('text');
 }

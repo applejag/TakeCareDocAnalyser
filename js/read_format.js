@@ -1,15 +1,15 @@
 
 /**
- * @typedef {Object} ReadParsedDocuments
- * @prop {ParsedVårdtillfälle[]} Vårdtillfällen
- * @prop {ParsedÖppenVårdkontakt[]} ÖppenVårdkontakter
- * @prop {ParsedMätvärde[]} Mätvärden
- * @prop {ParsedJournaltext[]} Journaltexter
- * @prop {ParsedMikrobiologiSvar[]} MikrobiologiSvar
- * @prop {ParsedRöntgenSvar[]} RöntgenSvar
- * @prop {ParsedKemlabSvar[]} KemlabSvar
- * @prop {ParsedMultidisciplinärtSvar[]} MultidisciplinäraSvar
- * @prop {ParsedLäkemedelsordination[]} Läkemedelsordinationer
+ * @typedef {Object} ReadDocuments
+ * @prop {ReadVårdtillfälle[]} Vårdtillfällen
+ * @prop {ReadÖppenVårdkontakt[]} ÖppenVårdkontakter
+ * @prop {ReadMätvärde[]} Mätvärden
+ * @prop {ReadJournaltext[]} Journaltexter
+ * @prop {ReadMikrobiologiSvar[]} MikrobiologiSvar
+ * @prop {ReadRöntgenSvar[]} RöntgenSvar
+ * @prop {ReadKemlabSvar[]} KemlabSvar
+ * @prop {ReadMultidisciplinärtSvar[]} MultidisciplinäraSvar
+ * @prop {ReadLäkemedelsordination[]} Läkemedelsordinationer
  * 
  * @prop {Number[]} ParsedDocuments
  * @prop {Date} DatumMin
@@ -17,7 +17,7 @@
  */
 
 /**
- * @typedef {Object} ParsedVårdtillfälle
+ * @typedef {Object} ReadVårdtillfälle
  * @prop {String} Rubrik
  * @prop {Date} Inskrivningsdatum 
  * @prop {Date} Utskrivningsdatum 
@@ -26,7 +26,7 @@
  */
 
 /**
- * @typedef {Object} ParsedÖppenVårdkontakt
+ * @typedef {Object} ReadÖppenVårdkontakt
  * @prop {String} Rubrik
  * @prop {Date} Datum
  * @prop {String[]} Diagnoser
@@ -34,15 +34,19 @@
  */
 
 /**
- * @typedef {Object} ParsedMätvärde
+ * @typedef {Object} ReadMätvärde
  * @prop {String} Rubrik
  * @prop {Date} Datum
  * @prop {String} RegistreradAv
- * @prop {{x: string | number}} Värden
+ * @prop {ReadMätvärdeVärde} Värden
+ */
+/**
+ * @typedef {Object} ReadMätvärdeVärde
+ * @prop {String|Number} [x]
  */
 
 /**
- * @typedef {Object} ParsedJournaltext
+ * @typedef {Object} ReadJournaltext
  * @prop {String} Rubrik
  * @prop {Date} Datum
  * @prop {String} Signeringsansvarig
@@ -51,7 +55,7 @@
  */
 
 /**
- * @typedef {Object} ParsedMikrobiologiSvar
+ * @typedef {Object} ReadMikrobiologiSvar
  * @prop {String} Rubrik
  * @prop {Date} Datum
  * @prop {String} Remittent
@@ -61,7 +65,7 @@
  */
 
 /**
- * @typedef {Object} ParsedRöntgenSvar
+ * @typedef {Object} ReadRöntgenSvar
  * @prop {String} Rubrik
  * @prop {Date} Datum
  * @prop {String} Remittent
@@ -73,7 +77,7 @@
  */
 
 /**
- * @typedef {Object} ParsedKemlabSvar
+ * @typedef {Object} ReadKemlabSvar
  * @prop {String} Rubrik
  * @prop {Date} Datum
  * @prop {String} Sjukhus
@@ -83,7 +87,7 @@
  */
 
 /**
- * @typedef {Object} ParsedMultidisciplinärtSvar
+ * @typedef {Object} ReadMultidisciplinärtSvar
  * @prop {String} Rubrik
  * @prop {Date} Datum
  * @prop {String} Remittent
@@ -101,10 +105,64 @@
  */
 
 /**
- * @typedef {Object} ParsedLäkemedelsordination
+ * @typedef {Object} ReadLäkemedelsordination
  * @prop {String} Rubrik
  * @prop {Date} Datum
  * @prop {Date} Utsättningsdatum
  * @prop {String[]} Läkemedel
  */
 
+
+/* -------------------------- */
+
+
+/**
+ * @typedef {Object} ParsedCell
+ * @prop {String} text Text from cell content
+ * @prop {String} html Cell content in raw HTML
+ * @prop {Boolean} isItalic True if cell content is italic
+ * @prop {Boolean} isBold True if cell content is bold
+ */
+
+/**
+ * @typedef {Object} ParsedDocumentHead
+ * @prop {String} category Document category, ex: "Mätvärde"
+ * @prop {String} data1 First data column in header, ex: "Tillväxtkurva"
+ * @prop {String} data2 Second data column in header (usually department), ex: "H - Barn"
+ * @prop {String} datestring Raw string of document timestamp cell
+ * @prop {Date} datetime Date object based of {@link datestring}
+ */
+
+/**
+ * @typedef {Object} ParsedDocumentTable
+ * @prop {ParsedCell[]} head Table header cells
+ * @prop {ParsedDocumentTableRow[]} rows Table cells divided into rows
+ * @prop {ParsedDocumentTableColumn} columns Table cells divided into columns
+ */
+
+/**
+ * @typedef {Object} ParsedDocumentTableRow
+ * @prop {ParsedCell[]} columns Cells in this row
+ * @prop {ParsedCell} [_head_cell_text_] Cell dynamically indexed via text in header cell
+ */
+/**
+ * @typedef {Object} ParsedDocumentTableColumn
+ * @prop {ParsedCell[]} [_head_cell_text_] Cells in this column, dynamically indexed via text in header cell
+ */
+
+/**
+ * @typedef {Object} ParsedDocumentTree
+ * @prop {ParsedCell} title Title cell for this branch
+ * @prop {ParsedCell} content Content cell for this branch
+ * @prop {ParsedDocumentTree[]} children Inner trees for this branch
+ */
+
+/**
+ * @typedef {Object} ParsedDocument
+ * @prop {Number} id Hashed ID of the entire document
+ * @prop {ParsedDocumentHead} head Document head (meta) data
+ * @prop {ParsedCell[][]} body Jagged array of all cells in document
+ * @prop {ParsedCell[]} notes Document notes (first starting rows with italic)
+ * @prop {ParsedDocumentTable[]} tables Tables found in document
+ * @prop {ParsedDocumentTree[]} trees Trees found in document
+ */

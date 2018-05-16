@@ -1,12 +1,18 @@
 
-(function() {
+/**
+ * @typedef {Object} ReaderFunctionObject
+ * @prop {RegExp|String} search
+ * @prop {function(ParsedDocument)} func
+ */
+
+var parser = (function() {
     var parser = {};
-    window.parser = parser;
     parser.isParsed = false;
     parser.isCrashed = false;
     parser.isAnalysed = false;
     parser.isExported = false;
     parser.isImported = false;
+    /** @type {ParsedDocument[]} */
     parser.lastParse = [];
 
     var input = document.getElementById("input");
@@ -18,8 +24,13 @@
     var parse_time_max = document.getElementById("parse_time_max");
     var consolelog = document.getElementById("consolelog");
     var timer = null;
+    /** @type {ReaderFunctionObject[]} */
     var readerFunctions = [];
 
+    /**
+     * @param {RegExp|String} search 
+     * @param {function(ParsedDocument)} func 
+     */
     parser.addReader = function(search, func) {
         readerFunctions.push({
             search: search,
@@ -42,6 +53,10 @@
         getTimespan('DatumMax', parse_time_max);
     }
 
+    /**
+     * @param {String} category Document category
+     * @returns {ReaderFunctionObject}
+     */
     function getReader(category) {
         for (var i = 0; i < readerFunctions.length; i++) {
             var reader = readerFunctions[i];
@@ -57,6 +72,9 @@
         return null;
     }
 
+    /**
+     * @param {ParsedDocument[]} parsed Parsed documents
+     */
     function runReader(parsed) {
         var rereads = 0;
         var unknownCategories = [];
@@ -85,6 +103,10 @@
             console.warn("There were "+rereads+" documents that were already parsed, or was identical with a previously parsed document.");
     }
 
+    /**
+     * @param {String} title 
+     * @param {Error} error 
+     */
     function setError(title, error)
     {
         var div = document.getElementById("parse_error");
@@ -105,6 +127,12 @@
         }
     }
 
+    /**
+     * 
+     * @param {String} verb Action verb. Used for status logging
+     * @param {function(Number)} func Callback function. Called with a `Date.now()` timestamp as first param.
+     *  If function returns a string, then that is used in status logging. Else the {@link verb} is used.
+     */
     function execFunc(verb, func) {
         var start = Date.now();
         parser.isCrashed = false;
@@ -424,6 +452,9 @@
         });
     };
 
+    /**
+     * @returns {ParsedDocument[]}
+     */
     function getParsedDocuments() {
         var documentsData = [];
 
@@ -457,6 +488,10 @@
         return documentsData;
     }
 
+    /**
+     * @param {HTMLElement} elem 
+     * @returns {ParsedCell}
+     */
     function elemToCellObj(elem) {
         var firstChild = elem.children[0];
         var p = firstChild && firstChild.tagName == "P" ? firstChild : null;
@@ -472,10 +507,18 @@
         };
     }
 
+    /**
+     * @param {HTMLElement} doc 
+     * @returns {Number}
+     */
     function getDocId(doc) {
         return doc.innerHTML.hashCode();
     }
 
+    /**
+     * @param {HTMLElement} doc 
+     * @returns {ParsedDocumentHead}
+     */
     function getDocHeader(doc) {
         var headList = doc.getElementsByClassName('header');
         if (headList.length == 0) return null;
@@ -495,6 +538,10 @@
         };
     }
 
+    /**
+     * @param {HTMLElement} doc 
+     * @returns {ParsedCell[]}
+     */
     function getDocNotes(doc) {
         var dataList = doc.getElementsByClassName('data');
         if (dataList.length == 0) return null;
@@ -510,6 +557,10 @@
         return notes;
     }
 
+    /**
+     * @param {HTMLElement} doc 
+     * @returns {ParsedCell[][]}
+     */
     function getDocBody(doc) {
         var dataList = doc.getElementsByClassName('data');
         if (dataList.length == 0) return null;
@@ -531,11 +582,18 @@
         return body;
     }
 
+    /**
+     * @param {ParsedCell[][]} body 
+     * @returns {ParsedDocumentTable[]}
+     */
     function getDocBodyTables(body) {
         var tables = [];
 
+        /** @type {ParsedCell[]} */
         var thead = null;
+        /** @type {ParsedDocumentTableRow[]} */
         var tbodyrows = null;
+        /** @type {ParsedDocumentTableColumn} */
         var tbodycols = null;
 
         for (var i = 0; i < body.length; i++)
@@ -601,6 +659,10 @@
         return tables;
     }
 
+    /**
+     * @param {ParsedCell[][]} body 
+     * @returns {ParsedDocumentTree[]}
+     */
     function getDocBodyTrees(body) {
         var trees = [];
         var i = 0;
@@ -690,4 +752,6 @@
     // input.addEventListener("DOMNodeInserted", startParseTimer, false);
     // input.addEventListener("DOMNodeRemoved", startParseTimer, false);
     // input.addEventListener("DOMCharacterDataModified", startParseTimer, false);
+
+    return parser;
 })();
