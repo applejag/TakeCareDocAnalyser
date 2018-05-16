@@ -40,6 +40,7 @@
                             <legend>Actions</legend>
                             <div class="btn-group">
                                 <input id="parse_analyse" class="input" type="submit" value="Analyse saved data" />
+                                <button id="parse_score_text" class="input" type="button" onclick="parser.parseScoreText()">Parse score</button>
                             </div>
                         </fieldset>
                     </div>
@@ -211,7 +212,7 @@
         <script type="text/javascript" src="js/tools.js"></script>
         <script type="text/javascript" src="js/parser.js"></script>
         <script type="text/javascript" src="js/readers.js"></script>
-
+        
         <script type="text/javascript" src="js/analyser_scoring.js"></script>
         <script type="text/javascript" src="js/analyser_atc.js"></script>
         <script type="text/javascript" src="js/analyser_medicinering.js"></script>
@@ -220,5 +221,7 @@
         <script type="text/javascript" src="js/analyser_åtgärder.js"></script>
         <script type="text/javascript" src="js/analyser_hittaFunktioner.js"></script>
         <script type="text/javascript" src="js/analyser.js"></script>
+
+        <script type="text/javascript" src="js/_get_vtf_scores.js"></script>
     </body>
 </html>

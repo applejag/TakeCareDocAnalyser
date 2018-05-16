@@ -452,6 +452,12 @@ var parser = (function() {
         });
     };
 
+    parser.parseScoreText = function() {
+        execFunc("Parsing score", function(start) {
+            saved.innerText = _get_vtf_scores(input.innerText);
+        });
+    };
+
     /**
      * @returns {ParsedDocument[]}
      */
