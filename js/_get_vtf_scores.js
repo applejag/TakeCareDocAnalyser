@@ -1,14 +1,14 @@
 
-var sample_patient_text = `"[ +125 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 14:22 → 2017-02-05 01:10
- +1 Some anledning, vad vet ""jag"" MED01
- -7 Lorem ipsum SJU77
-"	JA	512
-"[ +35 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 14:22 → 2017-02-05 01:10
- +99 Nalle puh sjukan ING01
- -0 Lika bra som +0 :) INF84
-[ -18 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 14:22 → 2017-02-05 01:10
- +51 Plåster på foten FOT01
-"	JA	512`;
+var sample_patient_text = '"[ +125 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 14:22 → 2017-02-05 01:10\n'+
+    ' +1 Some anledning, vad vet ""jag"" MED01\n'+
+    ' -7 Lorem ipsum SJU77\n'+
+    '"	JA	512\n'+
+    '"[ +35 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 14:22 → 2017-02-05 01:10\n'+
+    ' +99 Nalle puh sjukan ING01\n'+
+    ' -0 Lika bra som +0 :) INF84\n'+
+    '[ -18 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 14:22 → 2017-02-05 01:10\n'+
+    ' +51 Plåster på foten FOT01\n'+
+    '"	JA	512';
 
 var _get_vtf_scores = (function() {
     /**
@@ -21,7 +21,7 @@ var _get_vtf_scores = (function() {
         
         var matches = [];
         var match;
-        while (match = pattern.exec(input))
+        while ((match = pattern.exec(input)))
             matches.push(match);
 
         return matches;
@@ -40,13 +40,13 @@ var _get_vtf_scores = (function() {
     function splitVTF(text) {
         var pattern = /^\[ [+-]\d+ \][^[]+$/gm;
 
-        return getAllMatches(text, pattern).map(m => m[0]).map(vtf => {
+        return getAllMatches(text, pattern).mapField(0).map(function(vtf) {
             var titlePattern = /^\[ [+-]\d+ ] (.*)$/m;
             var koderPattern = /^ *[+-].*?([A-Z]{3}\d\d)$/gm;
 
             var title = titlePattern.exec(vtf)[1];
             console.log(vtf);
-            var koder = getAllMatches(vtf, koderPattern).map(m => m[1]);
+            var koder = getAllMatches(vtf, koderPattern).mapField(1);
 
             return {
                 title: title,
@@ -71,12 +71,12 @@ var _get_vtf_scores = (function() {
         var pattern = /^"((?:""|[^"])+)"\t(JA|NEJ)\t(\d+)$/gm;
         var vtfList = [];
 
-        getAllMatches(input, pattern).forEach(m_pat => {
+        getAllMatches(input, pattern).forEach(function (m_pat) {
             var text = m_pat[1];
             var vri = m_pat[2] === "JA";
-            var id = parseInt(m_pat[3]);
+            var id = parseInt(m_pat[3], 10);
 
-            splitVTF(text).forEach(vtf => {
+            splitVTF(text).forEach(function (vtf) {
                 vtf.id = id;
                 vtf.vri = vri;
 
@@ -86,21 +86,17 @@ var _get_vtf_scores = (function() {
 
         return vtfList;
     }
-
-    /**
-     * @param {Patient} patient 
-     * @returns {String}
-     */
-    function stringifyPatient(patient) {
-        return JSON.stringify(patient);
-    }
-
+    
     /**
      * @param {String} input
      * @returns {String}
      */
     function _get_vtf_scores(input) {
-        return `[\n${splitPatients(input).map(stringifyPatient).map(s=>"\t"+s).join("\n")}\n]`;
+        function stringifyPatient(patient) {
+            return '\t' + JSON.stringify(patient);
+        }
+
+        return '[\n'+splitPatients(input).map(stringifyPatient).join("\n")+'\n]';
     }
     
     return _get_vtf_scores;
