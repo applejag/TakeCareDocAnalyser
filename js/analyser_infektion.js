@@ -1,5 +1,5 @@
 //Diagnoskoder för olika VRI:er
-var VRIkoder = /T880|T802|T814|T826|T835|T836|T814|T818|A047/i;
+var VRIkoder = /T880|T802|T814|T826|T835|T836|T814|T818|A047|T827/i;
 
 /**
 * Ska kolla utifrån resultat från epikrisen, feber, mikrobiologi svar
@@ -23,28 +23,28 @@ function analyseInfectionData() {
                 crp.push(allaFiltreradeReads[i].hittadeKemSvar[j]);
         }
 
-        if(allaFiltreradeReads[i].hittadeDKoder.length > 0) {
+        if (allaFiltreradeReads[i].hittadeDKoder.length > 0) {
             var tmpKoder = [];
-            for(var k = 0; k < allaFiltreradeReads[i].hittadeDKoder.length; k++){
-                if(allaFiltreradeReads[i].hittadeDKoder[k].tillfälle == "Vårdtillfälle"){
+            for (var k = 0; k < allaFiltreradeReads[i].hittadeDKoder.length; k++){
+                //if (allaFiltreradeReads[i].hittadeDKoder[k].tillfälle == "Vårdtillfälle"){
                     harInf = true;
                     tmpKoder.push(allaFiltreradeReads[i].hittadeDKoder[k].kod);
 
-                    if(VRIkoder.test(allaFiltreradeReads[i].hittadeDKoder[k].kod)){
+                    if (VRIkoder.test(allaFiltreradeReads[i].hittadeDKoder[k].kod)){
                         addScore(i, 19, "Diagnoskod för VRI funnen: " + allaFiltreradeReads[i].hittadeDKoder[k].kod);
                     }
-                }
+                //}
             }
             addScore(i, 20, "Diagnoskoder för infektion funna för vårdtillfället: " + tmpKoder.join(", "));
         }
 
-        if(allaFiltreradeReads[i].hittadFeber.length > 0 && !harInf)
+        if(allaFiltreradeReads[i].hittadFeber.length > 0)
             addScore(i, 7, "");
-        if(allaFiltreradeReads[i].hittadeOdlingar.length > 0 && !harInf)
+        if(allaFiltreradeReads[i].hittadeOdlingar.length > 0)  // NYTT, FÖR KARTLÄGGNING AV KODER OCH POÄNG
             addScore(i, 8, "");
-        if(crp.length > 0 && !harInf)
+        if(crp.length > 0)
             addScore(i, 9, "");
-        if(leukocyter.length > 0 && !harInf)
+        if(leukocyter.length > 0)
             addScore(i, 10, "");
 
         // if(allaFiltreradeReads[i].Score < 50)
@@ -79,18 +79,19 @@ function hittasInfEfterUtskrivning(index){
         if(dkoder[j].datum > utDatum){
             if (onlyScoreForFirstFinding) {
                 addScore(index, 14, "");
-                infektionEfterVtf = dkoder[j].datum;
+                //infektionEfterVtf = dkoder[j].datum;
             }
 
             if(VRIkoder.test(dkoder[j].kod)){
                 addScore(index, 19, "");
-                infektionEfterVtf = dkoder[j].datum;
+                //infektionEfterVtf = dkoder[j].datum;
             }
 
             onlyScoreForFirstFinding = false;
         }
     }
 
+    onlyScoreForFirstFinding = true;                    // NYTT
     for (var i = 0; i < journaltexter.length; i++) {
         if(journaltexter[i].Datum > utDatum){
             if(onlyScoreForFirstFinding){
@@ -104,13 +105,13 @@ function hittasInfEfterUtskrivning(index){
 
 /**
 * Kollar vilken tid efter inskrivningsdatum som inf uppstått, om >48h ge poäng annars dra av om det inte finns åtgärder gjorda innan
-* Tar i nuläget inte hänsyn till om multipla febrar förekommit under vårdtiden
+* Om det finns flera infektioner under vtf dras inga poäng
 *  @param {Integer} index Anger vilket vårdtillfälle i listan allaFiltreradeReads som ska behandlas
 */
 function infITidEfterInskrivning(index){
 
-    infDebut = allaFiltreradeReads[index].InfDebut[i];
-    if(infDebut - allaFiltreradeReads[index].Vårdtillfälle.Inskrivningsdatum > 48*60*60*1000 && infDebut < allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum){
+    infDebut = allaFiltreradeReads[index].InfDebut[0];
+    if(infDebut - allaFiltreradeReads[index].Vårdtillfälle.Inskrivningsdatum > 48*60*60*1000){  // NYTT
         addScore(index, 11, "");
 
     } else {
@@ -163,31 +164,42 @@ function hittaInfDebuter(index){
     var kemSvar = allaFiltreradeReads[index].hittadeKemSvar;
     var odlingar = allaFiltreradeReads[index].hittadeOdlingar;
     var tvådygn = 2*24*60*60*1000;
+    var feberList = [];
+    var kemList = [];
     var list = [];
 
     if(feber.length > 0){
-        list.push(feber[feber.length - 1].datum);
+        feberList.push(feber[feber.length - 1].datum);
         for (var i = feber.length - 2; i > 0; i--) {
             if((feber[i-1] - feber[i]) > tvådygn)
-                list.push(feber[i-1]);
+                feberList.push(feber[i-1]);
         }
     }
-    // else {
-    //     if(kemSvar.length > 0){
-    //         list.push(kemSvar[kemSvar.length - 1].datum);
-    //     } else {
-    //         if(odlingar.length > 0)
-    //             return odlingar[odlingar.length - 1].datum;
-    //     }
-    //
-    // }
-    if(list.length > 0){
-        for(var j = 0; j < list.length; j++){
-            if(!checkIfDatesMatch(index, list[j]))
-                list.splice(j, 1);
+
+    if(kemSvar.length > 0){
+        kemList.push(kemSvar[kemSvar.length - 1].datum);
+        for (var k = kemSvar.length - 2; k > 0; k--) {
+            if((kemSvar[k-1] - kemSvar[k]) > tvådygn)
+                kemList.push(kemSvar[k-1]);
+        }
+    }
+    
+    if(feberList.length > 0){
+        for(var j = 0; j < feberList.length; j++){
+            if(checkIfDatesMatch(index, feberList[j], 0))
+                list.push(feberList[j]);
         }
     } else {
-        checkIfDatesMatch(index, 0);
+        for(var l = 0; l < list.length; l++){
+            if(checkIfDatesMatch(index, 0, kemList[l]))
+                list.push(kemList[l]);
+        }
+    }
+
+    if(list.length == 0 && allaFiltreradeReads[index].hasInfection){
+        if(allaFiltreradeReads[index].infekteradeTexter.length > 0){
+            list.push(allaFiltreradeReads[index].infekteradeTexter.datum);    
+        }
     }
 
     return list;
@@ -199,51 +211,37 @@ function hittaInfDebuter(index){
 * Om ingen feber finns jämförs kemsvar och odling, +10 om odling < 4 dygn efter kemsvar
 * @param index - Index för det vårdtillfälle du vill undersöka
 */
-function checkIfDatesMatch(index, feberDebut){
+function checkIfDatesMatch(index, feberDebut, kemDebut){
     var feberLista = allaFiltreradeReads[index].hittadFeber;
     var odlingLista = allaFiltreradeReads[index].hittadeOdlingar; // 3-5 dygn
     var kemLista = allaFiltreradeReads[index].hittadeKemSvar; // 1-4 h
-    var kemDebut, odlingDebut;
-    //
-    // if(feberLista.length > 0){
-    //     feberDebut = feberLista[feberLista.length - 1].datum;
-    // } else {
-    //     feberDebut = 0;
-    // }
-    if(kemLista.length > 0){
-        kemDebut = kemLista[kemLista.length - 1].datum;
-    } else {
-        kemDebut = 0;
-    }
-    if(odlingLista.length > 0){
-        odlingDebut = odlingLista[odlingLista.length - 1].datum;
-    } else {
-        odlingDebut = 0;
-    }
+    
 
     var count = 0;
-    if(feberDebut !== 0){
+    if(feberDebut != 0){
         for (var i = 0; i < odlingLista.length; i++){
             if((odlingLista[i] - feberDebut) < 864000000 && odlingLista[i] > feberDebut){ //864000000 = 10 dygn
                 addScore(index, 16, "");
                 count++;
+                break;
             }
         }
         for (var j = 0; j < kemLista.length; j++) {
-            if((kemLista[j] - feberDebut) < 86400000 && kemLista[j] > feberDebut){ //86400000 = 24h, 14400000 = 4h
+            if((kemLista[j].datum - feberDebut) < 86400000 && kemLista[j].datum > feberDebut){ //86400000 = 24h, 14400000 = 4h
                 addScore(index, 17, "");
                 count++;
+                break;
             }
         }
         if(count >= 1)
             return true;
     } else {
-        if(kemDebut !== 0){
-            if(odlingDebut !== 0){
-                if((odlingDebut - kemDebut) < 691200000 && odlingDebut > kemDebut) //691200000 = 8 dygn
-                    addScore(index, 18, "");
+        for (var k = 0; k < odlingLista.length; k++) {
+            
+            if((odlingLista[k].datum - kemDebut) < 691200000 && odlingLista[k].datum > kemDebut){ //691200000 = 8 dygn
+                addScore(index, 18, "");
+                return true;
             }
-            allaFiltreradeReads[index].InfDebut.push(kemDebut);
         }
     }
     return false;

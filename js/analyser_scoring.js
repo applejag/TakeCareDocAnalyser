@@ -11,7 +11,7 @@ allaFiltreradeReads[0..n]: {
     }
 }
 */
-var scoreKoder = [{scoreKod: "ING01", score: 14, orsak: "Har haft infart(er) under vårdtillfället"},
+var scoreKoder = [{scoreKod: "ING01", score: 14, orsak: "Har haft urinavledning under vårdtillfället"},
                 {scoreKod: "ING02", score: 10, orsak: "Har haft dränage under vårdtillfället"},
                 {scoreKod: "ING03", score: 14, orsak: "Kirurgiskt ingrepp under vårdtillfället"},
                 {scoreKod: "ING04", score: 5, orsak: "Har fått andningsstöd under vårdtillfället"},
@@ -37,7 +37,8 @@ var scoreKoder = [{scoreKod: "ING01", score: 14, orsak: "Har haft infart(er) und
                 {scoreKod: "SJU02", score: 1, orsak: ""},
                 {scoreKod: "SJU03", score: 1, orsak: ""},
                 {scoreKod: "ING08", score: 25, orsak: ""},
-                {scoreKod: "MED02", score: 10, orsak: ""}];
+                {scoreKod: "MED02", score: 10, orsak: ""},
+                {scoreKod: "ING09", score: 14, orsak: "Haft central infart under vårdtillfället"}];
 
 /**
  * Lägg till eller ta bort poäng för någon del av analysen.
@@ -70,7 +71,7 @@ function addScore(vtf_index, scoreCode_index, reason_comment) {
 
 /*
 ING     (Ingreppskoder)                                                                 Index i listan
-01    14, "Har haft infart(er) under vårdtillfället"                                    (0)
+01    14, "Har haft KAD under vårdtillfället"                                           (0)
 02    10, "Har haft dränage under vårdtillfället");                                     (1)
 03    14, "Kirurgiskt ingrepp under vårdtillfället");                                   (2)
 04    5, "Har fått andningsstöd under vårdtillfället");                                 (3)
@@ -78,6 +79,7 @@ ING     (Ingreppskoder)                                                         
 06    25, "Diagnoskoder tyder på infektion i samband med " + åtgärd);                   (5) Antingen denna eller (6)
 07    25, "Journaltext tyder på infektion i samband med " + åtgärd);                    (6)
 08    25, "Journaltext tyder samband mellan " + åtgärd " och infektion efter utskrivning"(25)
+09    14, "Haft CVK under vtf"                                                          (27)
 
 INF     (Infektionskoder)
 01    8, "Feber under vårdtiden");                                                      (7)
