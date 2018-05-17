@@ -1,3 +1,16 @@
+
+/**
+ * @typedef {Object} VTF
+ * @prop {Boolean} vri
+ * @prop {Number} id
+ * @prop {String} title
+ * @prop {String[]} koder
+ * 
+ * @prop {Number} score
+ * @prop {String} formatted
+ */
+
+/** @type {VTF[]} */
 var data = [
 	{"title":"Vårdtillfälle (H - Hematolog avd M73 - Satellit) 2017-01-18 14:48 → 2017-02-06 14:30","koder":["SJU01","INF14","INF08","ING01","ING03","MED01"],"id":1,"vri":true},
 	{"title":"Vårdtillfälle (S - B15 Hematologiavd) 2017-02-21 03:00 → 2017-03-02 13:56","koder":["SJU01","INF14","ING01","ING03","MED01"],"id":1,"vri":true},
@@ -362,6 +375,7 @@ var data = [
 	{"title":"Vårdtillfälle (S - Urolog A25b) 2017-02-27 18:00 → 2017-02-28 18:31","koder":["SJU01","ING01","ING03","MED01"],"id":286,"vri":false}
 ];
 
+/** @type {Object<string, Number>} */
 var koder = {
     ING01:	169,
     ING02:	218,
@@ -393,14 +407,19 @@ var koder = {
     SJU03:	0
 };
 
+// Assign scores
 data.forEach(element => {
     element.score = element.koder
             .map(k => koder[k])
             .reduce((a,b)=>a+b, 0);
 });
 
+// Sort by score
 data.sort((a,b) => b.score - a.score);
 
+// Stringify
+/** @param {VTF} x
+ * @returns {String} */
 var formatter = x => {
     var score = x.score >= 0 ? "+"+x.score : x.score.toString();
     return `[ ${score} ]\t#${x.id}  \t${x.title}`;
@@ -410,6 +429,7 @@ data.forEach(element => {
     element.formatted = formatter(element);
 });
 
+// Compose into single string
 var readme = `## VRI:
 ${data.filter(x => x.vri).map(x => x.formatted).join("\n")}
 
