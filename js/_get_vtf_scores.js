@@ -68,12 +68,12 @@ var _get_vtf_scores = (function() {
      * @returns {Patient[]}
      */
     function splitPatients(input) {
-        var pattern = /^"((?:""|[^"])+)"\t(JA|NEJ)\t(\d+)$/gm;
+        var pattern = /^"((?:""|[^"])+)"\t(JA|NEJ)\t(\d+)$/gmi;
         var vtfList = [];
 
         getAllMatches(input, pattern).forEach(function (m_pat) {
             var text = m_pat[1];
-            var vri = m_pat[2] === "JA";
+            var vri = m_pat[2].toUpperCase() === "JA";
             var id = parseInt(m_pat[3], 10);
 
             splitVTF(text).forEach(function (vtf) {
