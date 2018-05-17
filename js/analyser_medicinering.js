@@ -44,7 +44,8 @@ var antibiotika = ["Doxycyklin EQL Pharma, EQL Pharma, tablett 100 mg","Doxyferm
 function analyseMedicinering() {
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
         if(allaFiltreradeReads[i].hittadRiskMedicin.length > 0)
-            addScore(i, 21, "");
+            // Har ordinerats cytostatika, steroider, immunhämmande läkemedel eller antibiotika <90 dagar innan vårdtillfället
+            addScore(i, "MED01");
     }
 }
 
@@ -125,7 +126,8 @@ function antibiotikaAnalys() {
         }
 
         if (åtgärder.length > 0) {
-            addScore(i, 26, "Kan finnas samband mellan " + åtgärder.join(", ") + " och ordinerad antibiotika");
+            // Kan finnas samband mellan åtgärdskod(er) och ordinerad antibiotika
+            addScore(i, "MED26", "Kan finnas samband mellan " + åtgärder.join(", ") + " och ordinerad antibiotika");
         }
     }
 

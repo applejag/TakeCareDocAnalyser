@@ -11,28 +11,32 @@ function analyseÅtgärder(){
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
         if(allaFiltreradeReads[i].hittadeInfarter.length > 0){
             var infarter = allaFiltreradeReads[i].hittadeInfarter;
-            addScore(i, 0, "Har haft infart(er) under vårdtillfället");
+            // Har haft infart(er) under vårdtillfället
+            addScore(i, "ING01");
             if(allaFiltreradeReads[i].InfDebut.length > 0)
                 hittaInfektionÅtgärdSamband(infartDkoder, infartInf, i, infarter[infarter.length - 1].inDatum, "en infart");
         }
 
         if(allaFiltreradeReads[i].hittadeDrän.length > 0){
             var drän = allaFiltreradeReads[i].hittadeDrän;
-            addScore(i, 1, "Har haft dränage under vårdtillfället");
+            // Har haft dränage under vårdtillfället
+            addScore(i, "ING02");
             if(allaFiltreradeReads[i].InfDebut.length > 0)
                 hittaInfektionÅtgärdSamband(dränDkoder, dränInf, i, drän[drän.length - 1].inDatum, "dränage");
         }
 
         if(allaFiltreradeReads[i].hittadeKirurgKoder.length > 0){
             var kirurgÅkoder = allaFiltreradeReads[i].hittadeKirurgKoder;
-            addScore(i, 2, "Kirurgiskt ingrepp under vårdtillfället");
+            // Kirurgiskt ingrepp under vårdtillfället
+            addScore(i, "ING03");
             if(allaFiltreradeReads[i].InfDebut.length > 0)
                 hittaInfektionÅtgärdSamband(kirurgiDkoder, kirurgiInf, i, kirurgÅkoder[kirurgÅkoder.length - 1].datum, "kirurgiskt ingrepp");
         }
 
         if(allaFiltreradeReads[i].hittadRespirator.length > 0){
             var andStöd = allaFiltreradeReads[i].hittadRespirator;
-            addScore(i, 3, "Har fått andningsstöd under vårdtillfället");
+            // Har fått andningsstöd under vårdtillfället
+            addScore(i, "ING04");
             if(allaFiltreradeReads[i].InfDebut.length > 0)
                 hittaInfektionÅtgärdSamband(respiratorDkoder, respInf, i, andStöd[andStöd.length - 1], "andningsstöd");
         }
@@ -80,17 +84,21 @@ function hittaInfektionÅtgärdSamband(sökDKoder, sökord, index, åtgärdDatum
     }
 
     if(fannSambandUnderVtfKod){
-        addScore(index, 5, "Diagnoskod tyder på infektion i samband med " + åtgärd);
+        // Diagnoskod tyder på infektion i samband med åtgärdskoder
+        addScore(index, "ING06", "Diagnoskod tyder på infektion i samband med " + åtgärd);
     } else {
         if(fannSambandUnderVtfText)
-            addScore(index, 6, "Journaltext tyder på infektion i samband med " + åtgärd);
+            // Journaltext tyder på infektion i samband med åtgärdskoder
+            addScore(index, "ING07", "Journaltext tyder på infektion i samband med " + åtgärd);
     }
 
     if(fannSambandEfterVtfKod){
-        addScore(index, 4, "Diagnoskod tyder samband mellan " + åtgärd + " och infektion efter utskrivning");
+        // Diagnoskod tyder samband mellan åtgärdskod och infektion efter utskrivning
+        addScore(index, "ING05", "Diagnoskod tyder samband mellan " + åtgärd + " och infektion efter utskrivning");
     } else {
         if(fannSambandEfterVtfText)
-            addScore(index, 25, "Journaltext tyder samband mellan " + åtgärd + " och infektion efter utskrivning");
+            // Journaltext tyder samband mellan åtgärdkod och infektion efter utskrivning
+            addScore(index, "ING08", "Journaltext tyder samband mellan " + åtgärd + " och infektion efter utskrivning");
     }
 
 

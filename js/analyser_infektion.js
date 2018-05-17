@@ -31,21 +31,26 @@ function analyseInfectionData() {
                     tmpKoder.push(allaFiltreradeReads[i].hittadeDKoder[k].kod);
 
                     if(VRIkoder.test(allaFiltreradeReads[i].hittadeDKoder[k].kod)){
-                        addScore(i, 19, "Diagnoskod för VRI funnen: " + allaFiltreradeReads[i].hittadeDKoder[k].kod);
+                        // Diagnoskod(er) för infektion
+                        addScore(i, "INF13", "Diagnoskod för VRI funnen: " + allaFiltreradeReads[i].hittadeDKoder[k].kod);
                     }
                 }
             }
-            addScore(i, 20, "Diagnoskoder för infektion funna för vårdtillfället: " + tmpKoder.join(", "));
+            addScore(i, "INF14", "Diagnoskoder för infektion funna för vårdtillfället: " + tmpKoder.join(", "));
         }
 
         if(allaFiltreradeReads[i].hittadFeber.length > 0 && !harInf)
-            addScore(i, 7, "");
+            // Feber under vårdtiden
+            addScore(i, "INF01");
         if(allaFiltreradeReads[i].hittadeOdlingar.length > 0 && !harInf)
-            addScore(i, 8, "");
+            // Hittade odlingar
+            addScore(i, "INF02");
         if(crp.length > 0 && !harInf)
-            addScore(i, 9, "");
+            // Högt CRP
+            addScore(i, "INF03");
         if(leukocyter.length > 0 && !harInf)
-            addScore(i, 10, "");
+            // LPK utanför intervall
+            addScore(i, "INF04");
 
         // if(allaFiltreradeReads[i].Score < 50)
         //     checkIfDatesMatch(i);
@@ -78,12 +83,14 @@ function hittasInfEfterUtskrivning(index){
     for (var j = 0; j < dkoder.length; j++) {
         if(dkoder[j].datum > utDatum){
             if (onlyScoreForFirstFinding) {
-                addScore(index, 14, "");
+                // Diagnoskoder för infektion funna efter utskrivning
+                addScore(index, "INF08");
                 infektionEfterVtf = dkoder[j].datum;
             }
 
             if(VRIkoder.test(dkoder[j].kod)){
-                addScore(index, 19, "");
+                // Diagnoskod för VRI funnen!
+                addScore(index, "INF13");
                 infektionEfterVtf = dkoder[j].datum;
             }
 
@@ -94,7 +101,8 @@ function hittasInfEfterUtskrivning(index){
     for (var i = 0; i < journaltexter.length; i++) {
         if(journaltexter[i].Datum > utDatum){
             if(onlyScoreForFirstFinding){
-                addScore(index, 12, "");
+                // Journaltexter som tyder på infektion efter utskrivning
+                addScore(index, "INF06");
                 onlyScoreForFirstFinding = false;
             }
         }
@@ -111,15 +119,18 @@ function infITidEfterInskrivning(index){
 
     infDebut = allaFiltreradeReads[index].InfDebut[i];
     if(infDebut - allaFiltreradeReads[index].Vårdtillfälle.Inskrivningsdatum > 48*60*60*1000 && infDebut < allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum){
-        addScore(index, 11, "");
+        // Infektion dök upp >48h efter inskrivning
+        addScore(index, "INF05");
 
     } else {
         if(index == 0 && finnsÅtgärderInnanFörstaVtf(index)){
-            addScore(index, 13, "");
+            // Inskriven för infektion efter tidigare kontakt med vård
+            addScore(index, "INF07");
         }
         else{
             if(allaFiltreradeReads[index].InfDebut.length == 1){
-                addScore(index, 15, "");
+                // Infektion dök upp inom 48h efter inskrivning
+                addScore(index, "INF09");
             }
         }
     }
@@ -225,13 +236,15 @@ function checkIfDatesMatch(index, feberDebut){
     if(feberDebut !== 0){
         for (var i = 0; i < odlingLista.length; i++){
             if((odlingLista[i] - feberDebut) < 864000000 && odlingLista[i] > feberDebut){ //864000000 = 10 dygn
-                addScore(index, 16, "");
+                // Odling funnen samtidigt som feber
+                addScore(index, "INF10");
                 count++;
             }
         }
         for (var j = 0; j < kemLista.length; j++) {
             if((kemLista[j] - feberDebut) < 86400000 && kemLista[j] > feberDebut){ //86400000 = 24h, 14400000 = 4h
-                addScore(index, 17, "");
+                // Onormalt CRP eller LPK funnet samtidigt som feber
+                addScore(index, "INF11");
                 count++;
             }
         }
@@ -241,7 +254,8 @@ function checkIfDatesMatch(index, feberDebut){
         if(kemDebut !== 0){
             if(odlingDebut !== 0){
                 if((odlingDebut - kemDebut) < 691200000 && odlingDebut > kemDebut) //691200000 = 8 dygn
-                    addScore(index, 18, "");
+                    // Ingen feber men odling funnen samtidigt som onormalt CRP eller LPK
+                    addScore(index, "INF12");
             }
             allaFiltreradeReads[index].InfDebut.push(kemDebut);
         }
