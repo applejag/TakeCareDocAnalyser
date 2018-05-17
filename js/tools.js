@@ -268,7 +268,7 @@ String.prototype.splitSentences = (function() {
     function splitSentences() {
         var matches = this.match(regex);
         return matches ? matches.map(trimmer) : [];
-    };
+    }
 
     return splitSentences;
 })();
