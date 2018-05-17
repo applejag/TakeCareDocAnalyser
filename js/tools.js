@@ -1,3 +1,13 @@
+/**
+ * Add a number of days to a date
+ * @param {Date} date 
+ * @param {Number} days 
+ */
+function addDays(date, days) {
+    var result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+}
 
 /**
  * Generates a random number from `lower` (inclusive) to `upper` (exclusive).

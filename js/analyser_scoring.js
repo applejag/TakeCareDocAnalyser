@@ -39,7 +39,7 @@ var scoreKoder = {
     INF13: /*19*/ {score: 100, orsak: "Diagnoskod för VRI funnen!"},
     INF14: /*20*/ {score: 40, orsak: "Diagnoskoder för infektion funna för vårdtillfället"},
     // ING - Kirurgiska ingrepp
-    ING01: /*00*/ {score: 14, orsak: "Har haft infart(er) under vårdtillfället"},
+    ING01: /*00*/ {score: 14, orsak: "Har haft någon typ av KAD under vårdtillfället"},
     ING02: /*01*/ {score: 10, orsak: "Har haft dränage under vårdtillfället"},
     ING03: /*02*/ {score: 14, orsak: "Kirurgiskt ingrepp under vårdtillfället"},
     ING04: /*03*/ {score: 5, orsak: "Har fått andningsstöd under vårdtillfället"},
@@ -47,6 +47,7 @@ var scoreKoder = {
     ING06: /*05*/ {score: 15, orsak: "Diagnoskod tyder på infektion i samband med åtgärdskoder"},
     ING07: /*06*/ {score: 10, orsak: "Journaltext tyder på infektion i samband med åtgärdskoder"},
     ING08: /*25*/ {score: 25, orsak: "Journaltext tyder samband mellan åtgärdkod och infektion efter utskrivning"},
+    ING09: /*27*/ {score: 14, orsak: "Haft central infart under vårdtillfället"},
     // MED - Medicinering
     MED01: /*21*/ {score: 5, orsak: "Har ordinerats cytostatika, steroider, immunhämmande läkemedel eller antibiotika <90 dagar innan vårdtillfället"},
     MED02: /*26*/ {score: 10, orsak: "Kan finnas samband mellan åtgärdskod(er) och ordinerad antibiotika"},

@@ -6,7 +6,8 @@ var allaFiltreradeReads = [];
 
 function analyseData() {
     console.log("[!] PATIANT DATA GET IN LINE FOR INSPECTION\n[!] THIS IS YOUR EVALUATION DAY");
-    sättIhopVTF();
+    hittaOplaneradInskrivning();
+    grupperaVTF();
     sorteraVTF();
 
     hittaInfarter();
@@ -63,7 +64,7 @@ function checkLongestVårdtillfälle() {
  * I de fall en patient flyttats mellan avdelningar och fått flera olika vårdtillfällen
  * sätter denna funktion ihop dem till ett
  */
-function sättIhopVTF(){
+function grupperaVTF(){
     var vtf = read.Vårdtillfällen;
     var ettdygn = 24*60*60*1000; //ms
     var satellit = false;
@@ -117,7 +118,7 @@ function sorteraVTF() {
     var VTFnummer = 0;
     var blacklist = ["Vårdtillfällen", "ParsedDocuments", "DatumMin", "DatumMax"];
     allaFiltreradeReads = [];
-    var dateMin = new Date(2017, 1, 1);
+    var dateMin = new Date(2000, 1, 1);
     var dateMax = new Date(2017, 2, 1);
 
     // Äldst först
@@ -173,11 +174,11 @@ function hittaOplaneradInskrivning(){
     var nyttVTF = false;
     var ettDygn = 1*24*60*60*1000; // i ms
 
-    for (var i = 0; i < read.ÖppenVårdkontakter.length; i++) {
-        var övk = read.ÖppenVårdkontakter[i];
+    for (var i = 0; i < read.ÖppnaVårdkontakter.length; i++) {
+        var övk = read.ÖppnaVårdkontakter[i];
         for (var j = 0; j < övk.Åtgärder.length; j++) {
             if(övk.Åtgärder[j] == "XS100"){
-                kanskeNyaVTF.push(övk.Datum);
+                kanskeNyaVTF.push(övk);
             }
         }
     }
@@ -186,18 +187,18 @@ function hittaOplaneradInskrivning(){
         for (var l = 0; l < read.Vårdtillfällen.length; l++) {
             vtf = read.Vårdtillfällen[l];
 
-            if((vtf.Inskrivningsdatum - kanskeNyaVTF[k]) < ettDygn){
+            if((vtf.Inskrivningsdatum - kanskeNyaVTF[k].Datum) < ettDygn){
                 nyttVTF = false;
                 break;
             }
             nyttVTF = true;
         }
         read.Vårdtillfällen.push({
-            Rubrik: doc.head.data2,
-            Inskrivningsdatum: parseDate(tab.Inskrivningsdatum.text),
-            Utskrivningsdatum: parseDate(tab.Utskrivningsdatum.text),
-            Diagnoser: findTableFirstColumn(doc.tables, "Diagnoser", true) || [],
-            Åtgärder: findTableFirstColumn(doc.tables, "Åtgärder", true) || []
+            Rubrik: "Oplanerat vårdtillfälle på B15 eller A25b",
+            Inskrivningsdatum: övk.Datum,
+            Utskrivningsdatum: addDays(övk.Datum, 1),
+            Diagnoser: övk.Diagnoser,
+            Åtgärder: övk.Åtgärder
         });
     }
 }
@@ -230,9 +231,14 @@ function printData(){
             console.log(allaFiltreradeReads[v].hittadeDKoder[kd].kod);
         }
         console.log("");
-        console.log("Insatta infarter:");
-        for (var ii = 0; ii < allaFiltreradeReads[v].hittadeInfarter.length; ii++) {
-            console.log(allaFiltreradeReads[v].hittadeInfarter[ii].typAvInfart + " " + allaFiltreradeReads[v].hittadeInfarter[ii].inDatum.toString().substring(0, 15) + " - " + allaFiltreradeReads[v].hittadeInfarter[ii].utDatum.toString().substring(0, 15));
+        console.log("Typer av CVK:");
+        for (var ii = 0; ii < allaFiltreradeReads[v].hittadCVK.length; ii++) {
+            console.log(allaFiltreradeReads[v].hittadCVK[ii].typAvInfart + " " + allaFiltreradeReads[v].hittadCVK[ii].inDatum.toString().substring(0, 15) + " - " + allaFiltreradeReads[v].hittadCVK[ii].utDatum.toString().substring(0, 15));
+        }
+        console.log("");
+        console.log("Typer av KAD:");
+        for (var f = 0; f < allaFiltreradeReads[v].hittadKAD.length; f++) {
+            console.log(allaFiltreradeReads[v].hittadKAD[f].typAvInfart + " " + allaFiltreradeReads[v].hittadKAD[f].inDatum.toString().substring(0, 15) + " - " + allaFiltreradeReads[v].hittadKAD[f].utDatum.toString().substring(0, 15));
         }
         console.log("");
         console.log("Kemsvar:");
