@@ -1,13 +1,13 @@
 
 var sample_patient_text = `"[ +125 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 14:22 → 2017-02-05 01:10
-+1 Some anledning, vad vet ""jag"" MED01
--7 Lorem ipsum SJU77
+ +1 Some anledning, vad vet ""jag"" MED01
+ -7 Lorem ipsum SJU77
 "	JA	512
 "[ +35 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 14:22 → 2017-02-05 01:10
-+99 Nalle puh sjukan ING01
--0 Lika bra som +0 :) INF84
+ +99 Nalle puh sjukan ING01
+ -0 Lika bra som +0 :) INF84
 [ -18 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 14:22 → 2017-02-05 01:10
-+51 Plåster på foten FOT01
+ +51 Plåster på foten FOT01
 "	JA	512`;
 
 var _get_vtf_scores = (function() {
