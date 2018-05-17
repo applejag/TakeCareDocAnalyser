@@ -153,15 +153,20 @@ var _get_vtf_scores = (function() {
         }
 
         var patients = splitPatients(input);
+        var patientsVRI = patients.filter(function(pat) {return pat.vri;});
+        var patientsNoVRI = patients.filter(function(pat) {return !pat.vri;});
+
         var codes = countCodes(patients);
 
-        var patientsString = '[\n'+patients.map(stringifyPatient).join(",\n")+'\n]';
+        var patientsVRIString = '# VRI VTF:\n[\n'+patientsVRI.map(stringifyPatient).join(",\n")+'\n]';
+        var patientsNoVRIString = '# !VRI VTF:\n[\n'+patientsNoVRI.map(stringifyPatient).join(",\n")+'\n]';
         var codesString = '# Koder:\n' + codes.map(stringifyCode).join("\n");
         var vtfString = '# VTF: ' + patients.length;
         var vriString = '# VRI: ' + patients.filter(function(vtf) {return vtf.vri;}).length;
 
         return [
-            patientsString,
+            patientsVRIString,
+            patientsNoVRIString,
             vtfString,
             vriString,
             codesString
