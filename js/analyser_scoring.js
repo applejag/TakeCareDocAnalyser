@@ -90,6 +90,7 @@ function addScore(vtf_index, score_key, reason_override) {
     if (reason_override) {
         // Create copy
         score = {
+            scoreKod: score.scoreKod,
             score: score.score,
             orsak: reason_override
         };
