@@ -96,7 +96,7 @@ var _get_vtf_scores = (function() {
             return '\t' + JSON.stringify(patient);
         }
 
-        return '[\n'+splitPatients(input).map(stringifyPatient).join("\n")+'\n]';
+        return '[\n'+splitPatients(input).map(stringifyPatient).join(",\n")+'\n]';
     }
     
     return _get_vtf_scores;
