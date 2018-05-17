@@ -147,20 +147,24 @@ function infITidEfterInskrivning(index){
 function finnsÅtgärderInnanFörstaVtf(index){
     var vtf = allaFiltreradeReads[index];
 
-    for(var i = 0; i < vtf.hittadeInfarter.length - 1; i++){
-        if(vtf.hittadeInfarter[i].inDatum < vtf.Vårdtillfälle.Inskrivningsdatum)
+    for(var i = 0; i < vtf.hittadCVK.length; i++){
+        if(vtf.hittadCVK[i].inDatum < vtf.Vårdtillfälle.Inskrivningsdatum)
             return true;
     }
-    for(var j = 0; j < vtf.hittadeDrän.length - 1; j++){
+    for(var m = 0; m < vtf.hittadKAD.length; m++){
+        if(vtf.hittadKAD[m].inDatum < vtf.Vårdtillfälle.Inskrivningsdatum)
+            return true;
+    }
+    for(var j = 0; j < vtf.hittadeDrän.length; j++){
         if(vtf.hittadeDrän[j].inDatum < vtf.Vårdtillfälle.Inskrivningsdatum)
             return true;
     }
-    for(var k = 0; k < vtf.hittadeKirurgKoder.length - 1; k++){
+    for(var k = 0; k < vtf.hittadeKirurgKoder.length; k++){
         if(vtf.hittadeKirurgKoder[k].datum < vtf.Vårdtillfälle.Inskrivningsdatum)
             return true;
     }
-    for(var l = 0; l < vtf.hittadRespirator.length - 1; l++){
-        if(vtf.hittadeInfarter[l].datum < vtf.Vårdtillfälle.Inskrivningsdatum)
+    for(var l = 0; l < vtf.hittadRespirator.length; l++){
+        if(vtf.hittadRespirator[l].datum < vtf.Vårdtillfälle.Inskrivningsdatum)
             return true;
     }
 
