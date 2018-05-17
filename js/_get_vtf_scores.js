@@ -42,7 +42,7 @@ var _get_vtf_scores = (function() {
 
         return getAllMatches(text, pattern).mapField(0).map(function(vtf) {
             var titlePattern = /^\[ [+-]\d+ ] (.*)$/m;
-            var koderPattern = /^ *[+-].*?([A-Z]{3}\d\d)$/gm;
+            var koderPattern = /^[  ]*[+-].*?([A-Z]{3}\d\d)$/gm;
 
             var title = titlePattern.exec(vtf)[1];
             console.log(vtf);
@@ -69,6 +69,7 @@ var _get_vtf_scores = (function() {
      */
     function splitPatients(input) {
         var pattern = /^"((?:""|[^"])+)"\t(JA|NEJ)\t(\d+)$/gmi;
+        /** @type {Patient[]} */
         var vtfList = [];
 
         getAllMatches(input, pattern).forEach(function (m_pat) {
@@ -84,7 +85,51 @@ var _get_vtf_scores = (function() {
             });
         });
 
+        // return vtfList.filter(function(vtf) {
+        //     return vtf.koder.length > 0;
+        // });
         return vtfList;
+    }
+
+    /**
+     * @typedef {Object} CountedCode
+     * @prop {String} kod
+     * @prop {Number} count
+     */
+
+    /**
+     * @param {Patient[]} patients 
+     * @returns {CountedCode[]}
+     */
+    function countCodes(patients) {
+        var codes = {};
+
+        for (var kod in scoreKoder) {
+            if (scoreKoder.hasOwnProperty(kod)) {
+                codes[kod] = 0;
+            }
+        }
+
+        patients.forEach(function(pat) {
+            for (var i = 0; i < pat.koder.length; i++) {
+                var kod = pat.koder[i];
+                codes[kod]++;
+            }
+        });
+
+        var codesArr = [];
+        for (var kod in codes) {
+            if (codes.hasOwnProperty(kod)) {
+                var count = codes[kod];
+                codesArr.push({kod:kod,count:count});
+            }
+        }
+
+        codesArr.sort(function(a,b) {
+            return a.kod > b.kod;
+        });
+
+        return codesArr;
     }
     
     /**
@@ -92,11 +137,30 @@ var _get_vtf_scores = (function() {
      * @returns {String}
      */
     function _get_vtf_scores(input) {
+        /** @param {Patient} patient */
         function stringifyPatient(patient) {
             return '\t' + JSON.stringify(patient);
         }
 
-        return '[\n'+splitPatients(input).map(stringifyPatient).join(",\n")+'\n]';
+        /** @param {CountedCode} code */
+        function stringifyCode(code) {
+            return code.kod + '\t' + code.count;
+        }
+
+        var patients = splitPatients(input);
+        var codes = countCodes(patients);
+
+        var patientsString = '[\n'+patients.map(stringifyPatient).join(",\n")+'\n]';
+        var codesString = '# Koder:\n' + codes.map(stringifyCode).join("\n");
+        var vtfString = '# VTF: ' + patients.length;
+        var vriString = '# VRI: ' + patients.filter(function(vtf) {return vtf.vri;}).length;
+
+        return [
+            patientsString,
+            vtfString,
+            vriString,
+            codesString
+        ].join('\n\n');
     }
     
     return _get_vtf_scores;
