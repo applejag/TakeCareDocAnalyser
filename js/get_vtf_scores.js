@@ -131,7 +131,7 @@ var _get_vtf_scores = (function() {
         }
 
         codesArr.sort(function(a,b) {
-            return a.kod > b.kod;
+            return a.kod.localeCompare(b.kod);
         });
 
         return codesArr;

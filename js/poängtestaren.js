@@ -390,7 +390,7 @@ var koder = {
     MED02:	0,
     SJU01:	158,
     SJU02:	78,
-    SJU03:	0,
+    SJU03:	0
 };
 
 data.forEach(element => {
