@@ -1,5 +1,40 @@
 
 /**
+ * @typedef {Object} HittatVärde
+ * @prop {String} Värde Källan på det funna värdet.
+ * @prop {String} Dokument Namn på det dokument typ som fann värdet.
+ * @prop {Date} Datum Datum på det dokument som fann värdet.
+ */
+
+/**
+ * @typedef {Object} HittatSjukdomsResultat
+ * @prop {HittatVärde[]} Njursjukdomar Lista på hittade värden som tyder på njursjukdomar.
+ * @prop {HittatVärde[]} Diabetes Lista på hittade värden som tyder på diabetes.
+ * @prop {HittatVärde[]} Lungsjukdomar Lista på hittade värden som tyder på lungsjukdomar.
+ * @prop {HittatVärde[]} Cancer Lista på hittade värden som tyder på cancer.
+ * @prop {HittatVärde[]} KardiovaskuläraSjukdomar Lista på hittade värden som tyder på kardiovaskulära sjukdomar.
+ */
+
+/**
+ * @typedef {Object} FiltreradRead
+ * @prop {ReadVårdtillfälle} Vårdtillfälle
+ * @prop {ReadÖppenVårdkontakt[]} ÖppenVårdkontakter
+ * @prop {ReadMätvärde[]} Mätvärden
+ * @prop {ReadJournaltext[]} Journaltexter
+ * @prop {ReadMikrobiologiSvar[]} MikrobiologiSvar
+ * @prop {ReadRöntgenSvar[]} RöntgenSvar
+ * @prop {ReadKemlabSvar[]} KemlabSvar
+ * @prop {ReadMultidisciplinärtSvar[]} MultidisciplinäraSvar
+ * @prop {ReadLäkemedelsordination[]} Läkemedelsordinationer
+ * 
+ * @prop {HittatSjukdomsResultat} hittadeSjukdomarICD10 Listor med sjukdomsresultat baserat på ICD-10 diagnoskoder.
+ * @prop {HittatSjukdomsResultat} hittadeSjukdomarEpikris Listor med sjukdomsresultat baserat på journaltext från epikriser.
+ * @prop {HittatSjukdomsResultat} hittadeSjukdomarKVÅ Listor med sjukdomsresultat baserat på KVÅ koder (Åtgärdskoder).
+ */
+
+/* -------------------------- */
+
+/**
  * @typedef {Object} ReadDocuments
  * @prop {ReadVårdtillfälle[]} Vårdtillfällen
  * @prop {ReadÖppenVårdkontakt[]} ÖppenVårdkontakter

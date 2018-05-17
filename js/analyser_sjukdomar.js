@@ -1,27 +1,4 @@
 
-/**
- * @typedef {Object} HittatVärde
- * @prop {String} Värde Källan på det funna värdet.
- * @prop {String} Dokument Namn på det dokument typ som fann värdet.
- * @prop {Date} Datum Datum på det dokument som fann värdet.
- */
-
-/**
- * @typedef {Object} HittatSjukdomsResultat
- * @prop {HittatVärde[]} Njursjukdomar Lista på hittade värden som tyder på njursjukdomar.
- * @prop {HittatVärde[]} Diabetes Lista på hittade värden som tyder på diabetes.
- * @prop {HittatVärde[]} Lungsjukdomar Lista på hittade värden som tyder på lungsjukdomar.
- * @prop {HittatVärde[]} Cancer Lista på hittade värden som tyder på cancer.
- * @prop {HittatVärde[]} KardiovaskuläraSjukdomar Lista på hittade värden som tyder på kardiovaskulära sjukdomar.
- */
-
-/**
- * @typedef {Object} FiltreradRead
- * @prop {HittatSjukdomsResultat} hittadeSjukdomarICD10 Listor med sjukdomsresultat baserat på ICD-10 diagnoskoder.
- * @prop {HittatSjukdomsResultat} hittadeSjukdomarEpikris Listor med sjukdomsresultat baserat på journaltext från epikriser.
- * @prop {HittatSjukdomsResultat} hittadeSjukdomarKVÅ Listor med sjukdomsresultat baserat på KVÅ koder (Åtgärdskoder).
- */
-
 function _d() {
     var _ = Array.from(arguments).mapField('source');
     return new RegExp('^(?:'+_.join('|')+').*$', 'i');
@@ -142,7 +119,8 @@ function findSjukdomarInVtfAndÖvk() {
                 }
                 if (funnaICD10.length > 0) {
                     var koder = funnaICD10.mapField('Värde').join(', ');
-                    addScore(ri, 22, 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
+                    // Hittade ICD-10 diagnoskoder för sjukdom
+                    addScore(ri, "SJU01", 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
                 }
             }
             
@@ -161,7 +139,7 @@ function findSjukdomarInVtfAndÖvk() {
                 }
                 if (funnaEpikris.length > 0) {
                     var texter = funnaEpikris.mapField('Värde').join('", "');
-                    addScore(ri, 23, 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
+                    addScore(ri, "SJU02", 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
                 }
             }
 
@@ -181,7 +159,8 @@ function findSjukdomarInVtfAndÖvk() {
                 }
                 if (funnaKVÅ.length > 0) {
                     var koder2 = funnaKVÅ.mapField('Värde').join(', ');
-                    addScore(ri, 24, 'Hittade '+funnaKVÅ.length+'st KVÅ koder för ' + sjukdom+': '+koder2);
+                    // Hittade KVÅ koder för sjukdom
+                    addScore(ri, "SJU03", 'Hittade '+funnaKVÅ.length+'st KVÅ koder för ' + sjukdom+': '+koder2);
                 }
             }
 
