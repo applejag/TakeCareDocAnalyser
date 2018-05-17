@@ -30,6 +30,8 @@
  * @prop {HittatSjukdomsResultat} hittadeSjukdomarICD10 Listor med sjukdomsresultat baserat på ICD-10 diagnoskoder.
  * @prop {HittatSjukdomsResultat} hittadeSjukdomarEpikris Listor med sjukdomsresultat baserat på journaltext från epikriser.
  * @prop {HittatSjukdomsResultat} hittadeSjukdomarKVÅ Listor med sjukdomsresultat baserat på KVÅ koder (Åtgärdskoder).
+ * 
+ * @prop {ScoreKod[]} ScoringHistory
  */
 
 /* -------------------------- */

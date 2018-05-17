@@ -314,7 +314,7 @@ var parser = (function() {
                 var item = item_template.cloneDeep();
                 foreachElementByClass(item, 'score-delta', _setScore(hist.score));
                 foreachElementByClass(item, 'score-reason', _setText(hist.orsak));
-                foreachElementByClass(item, 'score-code', _setText(hist.scoreKod));
+                foreachElementByClass(item, 'score-code', _setText("("+hist.scoreKod+")"));
                 item_container.appendChild(item);
             }
         }
