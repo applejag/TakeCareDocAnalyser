@@ -12,13 +12,13 @@ var sample_patient_text = '"[ +125 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 1
 
 var _get_vtf_scores = (function() {
     /**
-     * @param {String} input 
-     * @param {RegExp} pattern 
+     * @param {String} input
+     * @param {RegExp} pattern
      * @returns {RegExpExecArray[]}
      */
     function getAllMatches(input, pattern) {
         if (!pattern.global) return pattern.exec(input);
-        
+
         var matches = [];
         var match;
         while ((match = pattern.exec(input)))
@@ -34,7 +34,7 @@ var _get_vtf_scores = (function() {
      */
 
     /**
-     * @param {text} text 
+     * @param {text} text
      * @returns {VTF[]}
      */
     function splitVTF(text) {
@@ -42,7 +42,7 @@ var _get_vtf_scores = (function() {
 
         return getAllMatches(text, pattern).mapField(0).map(function(vtf) {
             var titlePattern = /^\[ [+-]\d+ ] (.*)$/m;
-            var koderPattern = /^[  ]*[+-].*?([A-Z]{3}\d\d)$/gm;
+            var koderPattern = /^[   ]*[+-].*?([A-Z]{3}\d\d)$/gm;
 
             var title = titlePattern.exec(vtf)[1];
             console.log(vtf);
@@ -54,7 +54,7 @@ var _get_vtf_scores = (function() {
             };
         });
     }
-    
+
     /**
      * @typedef {Object} Patient
      * @prop {Boolean} vri
@@ -64,7 +64,7 @@ var _get_vtf_scores = (function() {
      */
 
     /**
-     * @param {String} input 
+     * @param {String} input
      * @returns {Patient[]}
      */
     function splitPatients(input) {
@@ -99,7 +99,7 @@ var _get_vtf_scores = (function() {
      */
 
     /**
-     * @param {Patient[]} patients 
+     * @param {Patient[]} patients
      * @returns {CountedCode[]}
      */
     function countCodes(patients) {
@@ -136,7 +136,7 @@ var _get_vtf_scores = (function() {
 
         return codesArr;
     }
-    
+
     /**
      * @param {String} input
      * @returns {String}
@@ -172,6 +172,6 @@ var _get_vtf_scores = (function() {
             codesString
         ].join('\n\n');
     }
-    
+
     return _get_vtf_scores;
 })();
