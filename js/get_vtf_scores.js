@@ -68,7 +68,7 @@ var _get_vtf_scores = (function() {
      * @returns {Patient[]}
      */
     function splitPatients(input) {
-        var pattern = /^"((?:""|[^"])+)"\t(JA|NEJ)\t(\d+)$/gmi;
+        var pattern = /^"((?:""|[^"])+)"[\t ](JA|NEJ)[\t ](\d+)$/gmi;
         /** @type {Patient[]} */
         var vtfList = [];
 
