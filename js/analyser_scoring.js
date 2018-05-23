@@ -13,6 +13,7 @@ allaFiltreradeReads[0..n]: {
 */
 var ingFaktor = 0.6;
 var infFaktor = 0.5;
+var sambandFaktor = 0.6;
 /**
  * @typedef {Object} ScoreKod
  * @prop {String} scoreKod Unique code, ex: "INF13"
@@ -44,10 +45,10 @@ var scoreKoder = {
     ING02: /*01*/ {score: 1.914*ingFaktor, orsak: "Har haft dränage under vårdtillfället"},
     ING03: /*02*/ {score: 0.328*ingFaktor, orsak: "Kirurgiskt ingrepp under vårdtillfället"},
     ING04: /*03*/ {score: 0.283*ingFaktor, orsak: "Har fått andningsstöd under vårdtillfället"},
-    ING05: /*04*/ {score: 0.001, orsak: "Diagnoskod tyder samband mellan åtgärdskod och infektion efter utskrivning"},
-    ING06: /*05*/ {score: 3.227, orsak: "Diagnoskod tyder på infektion i samband med åtgärdskoder"},
-    ING07: /*06*/ {score: 2.093, orsak: "Journaltext tyder på infektion i samband med åtgärdskoder"},
-    ING08: /*25*/ {score: 1.278, orsak: "Journaltext tyder samband mellan åtgärdkod och infektion efter utskrivning"},
+    ING05: /*04*/ {score: 0.001*sambandFaktor, orsak: "Diagnoskod tyder samband mellan åtgärdskod och infektion efter utskrivning"},
+    ING06: /*05*/ {score: 3.227*sambandFaktor, orsak: "Diagnoskod tyder på infektion i samband med åtgärdskoder"},
+    ING07: /*06*/ {score: 2.093*sambandFaktor, orsak: "Journaltext tyder på infektion i samband med åtgärdskoder"},
+    ING08: /*25*/ {score: 1.278*sambandFaktor, orsak: "Journaltext tyder samband mellan åtgärdkod och infektion efter utskrivning"},
     ING09: /*27*/ {score: 3.207*ingFaktor, orsak: "Haft central infart under vårdtillfället"},
     // MED - Medicinering
     MED01: /*21*/ {score: 0.001, orsak: "Har ordinerats cytostatika, steroider, immunhämmande läkemedel eller antibiotika <90 dagar innan vårdtillfället"},
