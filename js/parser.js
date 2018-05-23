@@ -28,8 +28,8 @@ var parser = (function() {
     var readerFunctions = [];
 
     /**
-     * @param {RegExp|String} search 
-     * @param {function(ParsedDocument)} func 
+     * @param {RegExp|String} search
+     * @param {function(ParsedDocument)} func
      */
     parser.addReader = function(search, func) {
         readerFunctions.push({
@@ -104,8 +104,8 @@ var parser = (function() {
     }
 
     /**
-     * @param {String} title 
-     * @param {Error} error 
+     * @param {String} title
+     * @param {Error} error
      */
     function setError(title, error)
     {
@@ -128,7 +128,7 @@ var parser = (function() {
     }
 
     /**
-     * 
+     *
      * @param {String} verb Action verb. Used for status logging
      * @param {function(Number)} func Callback function. Called with a `Date.now()` timestamp as first param.
      *  If function returns a string, then that is used in status logging. Else the {@link verb} is used.
@@ -229,7 +229,7 @@ var parser = (function() {
 
             add (
                 "[",
-                fread.Score,
+                fread.VRIsannolikhet + "%",
                 "]",
                 "Vårdtillfälle",
                 "("+fread.Vårdtillfälle.Rubrik+")",
@@ -299,7 +299,7 @@ var parser = (function() {
 
             var clone = template.cloneDeep();
             clone.removeAttribute('id');
-            foreachElementByClass(clone, 'score-total', _setScore(fread.Score));
+            foreachElementByClass(clone, 'score-total', _setText(fread.VRIsannolikhet + "%"));
             foreachElementByClass(clone, 'score-date-min', _setText(formatDateTime(fread.Vårdtillfälle.Inskrivningsdatum)));
             foreachElementByClass(clone, 'score-date-max', _setText(formatDateTime(fread.Vårdtillfälle.Utskrivningsdatum)));
             foreachElementByClass(clone, 'score-rubrik', _setText(fread.Vårdtillfälle.Rubrik));
@@ -495,7 +495,7 @@ var parser = (function() {
     }
 
     /**
-     * @param {HTMLElement} elem 
+     * @param {HTMLElement} elem
      * @returns {ParsedCell}
      */
     function elemToCellObj(elem) {
@@ -514,7 +514,7 @@ var parser = (function() {
     }
 
     /**
-     * @param {HTMLElement} doc 
+     * @param {HTMLElement} doc
      * @returns {Number}
      */
     function getDocId(doc) {
@@ -522,7 +522,7 @@ var parser = (function() {
     }
 
     /**
-     * @param {HTMLElement} doc 
+     * @param {HTMLElement} doc
      * @returns {ParsedDocumentHead}
      */
     function getDocHeader(doc) {
@@ -545,7 +545,7 @@ var parser = (function() {
     }
 
     /**
-     * @param {HTMLElement} doc 
+     * @param {HTMLElement} doc
      * @returns {ParsedCell[]}
      */
     function getDocNotes(doc) {
@@ -564,7 +564,7 @@ var parser = (function() {
     }
 
     /**
-     * @param {HTMLElement} doc 
+     * @param {HTMLElement} doc
      * @returns {ParsedCell[][]}
      */
     function getDocBody(doc) {
@@ -589,7 +589,7 @@ var parser = (function() {
     }
 
     /**
-     * @param {ParsedCell[][]} body 
+     * @param {ParsedCell[][]} body
      * @returns {ParsedDocumentTable[]}
      */
     function getDocBodyTables(body) {
@@ -666,7 +666,7 @@ var parser = (function() {
     }
 
     /**
-     * @param {ParsedCell[][]} body 
+     * @param {ParsedCell[][]} body
      * @returns {ParsedDocumentTree[]}
      */
     function getDocBodyTrees(body) {
