@@ -27,7 +27,7 @@ function analyseData() {
     analyseÅtgärder();
     analyseMedicinering();
     //checkLongestVårdtillfälle();
-
+    calcVRIprobability();
     printData();
 
 }
@@ -195,10 +195,10 @@ function hittaOplaneradInskrivning(){
         }
         read.Vårdtillfällen.push({
             Rubrik: "Oplanerat vårdtillfälle på B15 eller A25b",
-            Inskrivningsdatum: övk.Datum,
-            Utskrivningsdatum: addDays(övk.Datum, 1),
-            Diagnoser: övk.Diagnoser,
-            Åtgärder: övk.Åtgärder
+            Inskrivningsdatum: kanskeNyaVTF[k].Datum,
+            Utskrivningsdatum: addDays(kanskeNyaVTF[k].Datum, 1),
+            Diagnoser: kanskeNyaVTF[k].Diagnoser,
+            Åtgärder: kanskeNyaVTF[k].Åtgärder
         });
     }
 }
@@ -265,8 +265,8 @@ function printData(){
         for (var i = 0; i < allaFiltreradeReads[v].ScoringHistory.length; i++) {
             console.log(allaFiltreradeReads[v].ScoringHistory[i].score + " : " + allaFiltreradeReads[v].ScoringHistory[i].orsak);
         }
-        console.log("= " + allaFiltreradeReads[v].Score);
-        if(allaFiltreradeReads[v].Score >= 80)
+        console.log("= " + allaFiltreradeReads[v].VRIsannolikhet + "%");
+        if(allaFiltreradeReads[v].VRIsannolikhet > 90)
             console.log("Misstänkt VRI!");
     }
 }
