@@ -118,7 +118,7 @@ function sorteraVTF() {
     var VTFnummer = 0;
     var blacklist = ["Vårdtillfällen", "ParsedDocuments", "DatumMin", "DatumMax"];
     allaFiltreradeReads = [];
-    var dateMin = new Date(2000, 1, 1);
+    var dateMin = new Date(2017, 1, 1);
     var dateMax = new Date(2017, 2, 1);
 
     // Äldst först
