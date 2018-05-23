@@ -11,11 +11,13 @@ function _w() {
 
 var sjukdomsRegExp = {
     Njursjukdomar: {
+        index: 1,
         icd10: _d(
             /N[0-2][0-9]/ // N00-N29
         )
     },
     Diabetes: {
+        index: 2,
         icd10: _d(
             /E1[0-4]/ // E10-E14
         ),
@@ -24,12 +26,14 @@ var sjukdomsRegExp = {
         )
     },
     Lungsjukdomar: {
+        index: 3,
         icd10: _d(
             /J4[0-6]/, // J40-J46
             /D860/ // D86.0
         )
     },
     Cancer: {
+        index: 4,
         icd10: _d(
             /(?:C[0-8][0-9]|C9[0-7])/, // C00-C97
             /D0[0-9]/, // D00-D09
@@ -44,6 +48,7 @@ var sjukdomsRegExp = {
         )
     },
     KardiovaskuläraSjukdomar: {
+        index: 5,
         icd10: _d(
             ///I109/, // I10.9, hypertoni
             /I2[0-5]/, // I20-I25
@@ -98,6 +103,10 @@ function findSjukdomarInVtfAndÖvk() {
         fread.hittadeSjukdomarEpikris = {};
         fread.hittadeSjukdomarKVÅ = {};
 
+        var anyICD10 = false,
+            anyEpikris = false,
+            anyKVÅ = false;
+
         // För varje sjukdomskategori...
         for (var sjukdom in sjukdomsRegExp) {
             if (!sjukdomsRegExp.hasOwnProperty(sjukdom)) continue;
@@ -120,9 +129,10 @@ function findSjukdomarInVtfAndÖvk() {
                 if (funnaICD10.length > 0) {
                     var koder = funnaICD10.mapField('Värde').join(', ');
                     // Hittade ICD-10 diagnoskoder för sjukdom
-                    addScore(ri, "SJU01", 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för ' + sjukdom+': '+koder);
+                    anyICD10 = true;
+                    addScore(ri, "SJU1"+sjukdomsRegExp[sjukdom].index, 'Hittade '+funnaICD10.length+'st ICD-10 diagnoskoder för '+sjukdom+': '+koder)
                 }
-            }
+            }// if icd-10
             
 
             var funnaEpikris = [];
@@ -139,9 +149,10 @@ function findSjukdomarInVtfAndÖvk() {
                 }
                 if (funnaEpikris.length > 0) {
                     var texter = funnaEpikris.mapField('Värde').join('", "');
-                    addScore(ri, "SJU02", 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
+                    anyEpikris = true;
+                    addScore(ri, "SJU2"+sjukdomsRegExp[sjukdom].index, 'Hittade spår i epikriser för ' + sjukdom + ' (från nyckelord "'+texter+'")');
                 }
-            }
+            }// if epikris
 
             var funnaKVÅ = [];
             fread.hittadeSjukdomarKVÅ[sjukdom] = funnaKVÅ;
@@ -159,11 +170,15 @@ function findSjukdomarInVtfAndÖvk() {
                 }
                 if (funnaKVÅ.length > 0) {
                     var koder2 = funnaKVÅ.mapField('Värde').join(', ');
+                    anyKVÅ = true;
                     // Hittade KVÅ koder för sjukdom
-                    addScore(ri, "SJU03", 'Hittade '+funnaKVÅ.length+'st KVÅ koder för ' + sjukdom+': '+koder2);
+                    addScore(ri, "SJU3"+sjukdomsRegExp[sjukdom].index, 'Hittade '+funnaKVÅ.length+'st KVÅ koder för ' + sjukdom+': '+koder2);
                 }
-            }
+            }// if kvå
+        }// foreach sjukdom
 
-        }
+        if (anyICD10) addScore(ri, "SJU10", 'Hittade ICD-10 diagnoskoder för sjukdom.');
+        if (anyEpikris) addScore(ri, "SJU20", 'Hittade spår i epikriser för sjukdom.');
+        if (anyKVÅ) addScore(ri, "SJU30", 'Hittade KVÅ koder för sjukdom.');
     }
 }

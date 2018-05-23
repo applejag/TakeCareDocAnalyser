@@ -52,9 +52,24 @@ var scoreKoder = {
     MED01: /*21*/ {score: 5, orsak: "Har ordinerats cytostatika, steroider, immunhämmande läkemedel eller antibiotika <90 dagar innan vårdtillfället"},
     MED02: /*26*/ {score: 10, orsak: "Kan finnas samband mellan åtgärdskod(er) och ordinerad antibiotika"},
     // SJU - Sjukdomar
-    SJU01: /*22*/ {score: 1, orsak: "Hittade ICD-10 diagnoskoder för sjukdom"},
-    SJU02: /*23*/ {score: 1, orsak: "Hittade spår i epikriser för sjukdom"},
-    SJU03: /*24*/ {score: 1, orsak: "Hittade KVÅ koder för sjukdom"}
+    SJU10: /*22*/ {score: 1, orsak: "Hittade ICD-10 diagnoskoder för sjukdom"},
+    SJU11: {score: 1, orsak: "Hittade ICD-10 diagnoskod för Njursjukdomar"},
+    SJU12: {score: 1, orsak: "Hittade ICD-10 diagnoskod för Diabetes"},
+    SJU13: {score: 1, orsak: "Hittade ICD-10 diagnoskod för Lungsjukdomar"},
+    SJU14: {score: 1, orsak: "Hittade ICD-10 diagnoskod för Cancer"},
+    SJU15: {score: 1, orsak: "Hittade ICD-10 diagnoskod för Kardiovaskulära Sjukdomar"},
+    SJU20: /*23*/ {score: 1, orsak: "Hittade spår i epikriser för sjukdom"},
+    SJU21: {score: 1, orsak: "Hittade spår i epikriser för Njursjukdomar"},
+    SJU22: {score: 1, orsak: "Hittade spår i epikriser för Diabetes"},
+    SJU23: {score: 1, orsak: "Hittade spår i epikriser för Lungsjukdomar"},
+    SJU24: {score: 1, orsak: "Hittade spår i epikriser för Cancer"},
+    SJU25: {score: 1, orsak: "Hittade spår i epikriser för Kardiovaskulära Sjukdomar"},
+    SJU30: /*24*/ {score: 1, orsak: "Hittade KVÅ koder för sjukdom"},
+    SJU31: {score: 1, orsak: "Hittade KVÅ koder för Njursjukdomar"},
+    SJU32: {score: 1, orsak: "Hittade KVÅ koder för Diabetes"},
+    SJU33: {score: 1, orsak: "Hittade KVÅ koder för Lungsjukdomar"},
+    SJU34: {score: 1, orsak: "Hittade KVÅ koder för Cancer"},
+    SJU35: {score: 1, orsak: "Hittade KVÅ koder för Kardiovaskulära Sjukdomar"}
 };
 
 for (var kod in scoreKoder) {
