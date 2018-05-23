@@ -1,3 +1,7 @@
 {
-    "esversion": 3
+    "esversion": 3,
+    "latedef": true,
+    "undef": true,
+    "browser": true,
+    "devel": true
 }
