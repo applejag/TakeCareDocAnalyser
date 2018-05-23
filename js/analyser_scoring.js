@@ -113,6 +113,6 @@ function calcVRIprobability(){
 
         p_VRI = 100*(Math.exp(beta0 + vtfScore)/(1 + Math.exp(beta0 + vtfScore)));
 
-        allaFiltreradeReads[i].VRIsannolikhet = p_VRI;
+        allaFiltreradeReads[i].VRIsannolikhet = p_VRI.toFixed(2);
     }
 }
