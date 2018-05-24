@@ -70,18 +70,18 @@ var _get_vtf_scores = (function() {
      * @returns {Patient[]}
      */
     function splitPatients(input) {
-        var pattern = /^"((?:""|[^"])+)"[\t ](JA|NEJ|JA\s*&\s*NEJ|NEJ\s*&\s*JA)[\t ](\d+)$/gmi;
-        var pattern2 = /^"((?:""|[^"])+)"[\t ](\d+)[\t ](JA|NEJ|JA\s*&\s*NEJ|NEJ\s*&\s*JA)$/gmi;
+        var pattern = /^"((?:""|[^"])+)"[\t ](?<vri>JA|NEJ|JA\s*&\s*NEJ|NEJ\s*&\s*JA)[\t ](?<id>\d+)$/gmi;
+        var pattern2 = /^"((?:""|[^"])+)"[\t ](?<id>\d+)[\t ](?<vri>JA|NEJ|JA\s*&\s*NEJ|NEJ\s*&\s*JA)$/gmi;
         /** @type {Patient[]} */
         var vtfList = [];
 
         var patients = getAllMatches(input, pattern);
-        if (patients.length === 0) getAllMatches(input, pattern2);
+        if (patients.length === 0) patients = getAllMatches(input, pattern2);
 
         patients.forEach(function (m_pat) {
             var text = m_pat[1];
-            var vri = m_pat[2].toUpperCase().indexOf("JA") !== -1;
-            var id = parseInt(m_pat[3], 10);
+            var vri = m_pat.groups.vri.toUpperCase().indexOf("JA") !== -1;
+            var id = parseInt(m_pat.groups.id, 10);
 
             splitVTF(text).forEach(function (vtf) {
                 vtf.id = id;
