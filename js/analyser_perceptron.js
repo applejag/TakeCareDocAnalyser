@@ -8,6 +8,14 @@
  * @prop {Boolean} vri True/false if is infected. Used in learning algo
  */
 
+/** @type {ScoreKod[]} */
+var koder = [];
+for (var key in scoreKoder) {
+    if (scoreKoder.hasOwnProperty(key)) {
+        koder.push(scoreKoder[key]);
+    }
+}
+
 /**
  * @param {VTF} vtf 
  * @returns {Number[]}
@@ -15,8 +23,8 @@
 function codesAsArray(vtf) {
     var array = [];
     
-    for (var i = 0; i < scoreKoder.length; i++) {
-        var kod = scoreKoder[i].scoreKod;
+    for (var i = 0; i < koder.length; i++) {
+        var kod = koder[i].scoreKod;
         array.push(vtf.koder.indexOf(kod) === -1 ? 0 : 1);
     }
 
@@ -25,6 +33,32 @@ function codesAsArray(vtf) {
 
 function percent(num) {
     return Math.floor(num * 10000) / 100 + "%";
+}
+
+/**
+ * 
+ * @param {VTF[]} vtf 
+ */
+function produceMatrix(vtf) {
+    var header = [
+        "Vårdtillfälle",
+        "Patient",
+        "VRI"
+    ].concat(koder.mapField("scoreKod")).join('\t');
+
+    var body = vtf.map(function(v) {
+        return [
+            v.title,
+            v.id,
+            v.vri ? 1 : 0
+        ].concat(codesAsArray(v)).join('\t');
+    });
+
+    var excel = [
+        header
+    ].concat(body).join('\n');
+
+    return excel;
 }
 
 /* ------------------------------------------------ */
