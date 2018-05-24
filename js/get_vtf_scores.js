@@ -1,3 +1,4 @@
+/* global scoreKoder */
 
 var sample_patient_text = '"[ +125 ] Vårdtillfälle (H - AWFA WFN) 2017-01-01 14:22 → 2017-02-05 01:10\n'+
     ' +1 Some anledning, vad vet ""jag"" MED01\n'+
@@ -21,8 +22,9 @@ var _get_vtf_scores = (function() {
 
         var matches = [];
         var match;
-        while ((match = pattern.exec(input)))
+        while ((match = pattern.exec(input))) {
             matches.push(match);
+        }
 
         return matches;
     }
@@ -38,10 +40,10 @@ var _get_vtf_scores = (function() {
      * @returns {VTF[]}
      */
     function splitVTF(text) {
-        var pattern = /^\[ [+-]\d+ \][^[]+$/gm;
+        var pattern = /^\[ (?:[+-]\d+|\d+\.?\d*%) \][^[]+$/gm;
 
         return getAllMatches(text, pattern).mapField(0).map(function(vtf) {
-            var titlePattern = /^\[ [+-]\d+ ] (.*)$/m;
+            var titlePattern = /^\[ (?:[+-]\d+|\d+\.?\d*%) ] (.*)$/m;
             var koderPattern = /^[   ]*[+-].*?([A-Z]{3}\d\d)$/gm;
 
             var title = titlePattern.exec(vtf)[1];
@@ -68,13 +70,13 @@ var _get_vtf_scores = (function() {
      * @returns {Patient[]}
      */
     function splitPatients(input) {
-        var pattern = /^"((?:""|[^"])+)"[\t ](JA|NEJ)[\t ](\d+)$/gmi;
+        var pattern = /^"((?:""|[^"])+)"[\t ](JA|NEJ|JA\s*&\s*NEJ|NEJ\s*&\s*JA)[\t ](\d+)$/gmi;
         /** @type {Patient[]} */
         var vtfList = [];
 
         getAllMatches(input, pattern).forEach(function (m_pat) {
             var text = m_pat[1];
-            var vri = m_pat[2].toUpperCase() === "JA";
+            var vri = m_pat[2].toUpperCase().indexOf("JA") !== -1;
             var id = parseInt(m_pat[3], 10);
 
             splitVTF(text).forEach(function (vtf) {
