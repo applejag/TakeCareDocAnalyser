@@ -7,15 +7,20 @@ var CVKInf = /((rodnad|inflammation|irritation|infektion)\s*(vid|i)|)|lokal\s*(i
 var dränInf = /(hud|lokal)\s*(infektion|irritation|inflammation)|abscess/i;
 var kirurgiInf = /sår+(infektion|inflammation|irritation)/i;
 var respInf = /(lung|inflammtion i|luftvägs)\s*(inflammation|infektion|lunga|luftvägar|lungor)|bronkit|pneumoni/i;
+var cvkScoreKod = ["ING05", "ING06", "ING07", "ING08"];
+var kadScoreKod = ["ING15", "ING16", "ING17", "ING18"];
+var andScoreKod = ["ING25", "ING26", "ING27", "ING28"];
+var kirurgScoreKod = ["ING35", "ING36", "ING37", "ING38"];
+var dränScoreKod = ["ING45", "ING46", "ING47", "ING48"];
 
 function analyseÅtgärder(){
     for (var i = 0; i < allaFiltreradeReads.length; i++) {
         if(allaFiltreradeReads[i].hittadCVK.length > 0){
             var cvk = allaFiltreradeReads[i].hittadCVK;
             // Haft central infart under vårdtillfället
-            addScore(i, "ING09", "Har haft någon typ av CVK under vårdtillfället");
+            addScore(i, "ING09");
             if(allaFiltreradeReads[i].hasInfection)
-                hittaInfektionÅtgärdSamband(infartDkoder, CVKInf, i, cvk[cvk.length - 1].inDatum, "CVK");
+                hittaInfektionÅtgärdSamband(infartDkoder, CVKInf, i, cvk[cvk.length - 1].inDatum, "CVK", cvkScoreKod);
         }
 
         if(allaFiltreradeReads[i].hittadKAD.length > 0){
@@ -23,7 +28,7 @@ function analyseÅtgärder(){
             // Har haft någon typ av KAD under vårdtillfället
             addScore(i, "ING01");
             if(allaFiltreradeReads[i].hasInfection)
-                hittaInfektionÅtgärdSamband(infartDkoder, KADInf, i, kad[kad.length - 1].inDatum, "KAD");
+                hittaInfektionÅtgärdSamband(infartDkoder, KADInf, i, kad[kad.length - 1].inDatum, "KAD", kadScoreKod);
         }
 
         if(allaFiltreradeReads[i].hittadeDrän.length > 0){
@@ -31,7 +36,7 @@ function analyseÅtgärder(){
             // Har haft dränage under vårdtillfället
             addScore(i, "ING02");
             if(allaFiltreradeReads[i].hasInfection)
-                hittaInfektionÅtgärdSamband(dränDkoder, dränInf, i, drän[drän.length - 1].inDatum, "dränage");
+                hittaInfektionÅtgärdSamband(dränDkoder, dränInf, i, drän[drän.length - 1].inDatum, "dränage", dränScoreKod);
         }
 
         if(allaFiltreradeReads[i].hittadeKirurgKoder.length > 0){
@@ -39,7 +44,7 @@ function analyseÅtgärder(){
             // Kirurgiskt ingrepp under vårdtillfället
             addScore(i, "ING03");
             if(allaFiltreradeReads[i].hasInfection)
-                hittaInfektionÅtgärdSamband(kirurgiDkoder, kirurgiInf, i, kirurgÅkoder[kirurgÅkoder.length - 1].datum, "kirurgiskt ingrepp");
+                hittaInfektionÅtgärdSamband(kirurgiDkoder, kirurgiInf, i, kirurgÅkoder[kirurgÅkoder.length - 1].datum, "kirurgiskt ingrepp", kirurgScoreKod);
         }
 
         if(allaFiltreradeReads[i].hittadRespirator.length > 0){
@@ -47,13 +52,13 @@ function analyseÅtgärder(){
             // Har fått andningsstöd under vårdtillfället
             addScore(i, "ING04");
             if(allaFiltreradeReads[i].hasInfection)
-                hittaInfektionÅtgärdSamband(respiratorDkoder, respInf, i, andStöd[andStöd.length - 1], "andningsstöd");
+                hittaInfektionÅtgärdSamband(respiratorDkoder, respInf, i, andStöd[andStöd.length - 1], "andningsstöd", andScoreKod);
         }
     }
 }
 
 
-function hittaInfektionÅtgärdSamband(sökDKoder, sökord, index, åtgärdDatum, åtgärd){
+function hittaInfektionÅtgärdSamband(sökDKoder, sökord, index, åtgärdDatum, åtgärd, scoreKod){
     var fannSambandUnderVtfKod = false;
     var fannSambandUnderVtfText = false;
     var fannSambandEfterVtfKod = false;
@@ -66,7 +71,7 @@ function hittaInfektionÅtgärdSamband(sökDKoder, sökord, index, åtgärdDatum
             if(sökDKoder.test(hittadeKoder[i].kod)){
                 if(åtgärdDatum < hittadeKoder[i].datum && hittadeKoder[i].datum <= allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum)
                     fannSambandUnderVtfKod = true;
-                
+
                 if(hittadeKoder[i].Datum > åtgärdDatum && hittadeKoder[i].datum > allaFiltreradeReads[index].Vårdtillfälle.Utskrivningsdatum)
                     fannSambandEfterVtfKod = true;
 
@@ -92,20 +97,20 @@ function hittaInfektionÅtgärdSamband(sökDKoder, sökord, index, åtgärdDatum
 
     if(fannSambandUnderVtfKod){
         // Diagnoskod tyder på infektion i samband med åtgärdskoder
-        addScore(index, "ING06", "Diagnoskod tyder på infektion i samband med " + åtgärd);
+        addScore(index, scoreKod[1]);
     } else {
         if(fannSambandUnderVtfText)
             // Journaltext tyder på infektion i samband med åtgärdskoder
-            addScore(index, "ING07", "Journaltext tyder på infektion i samband med " + åtgärd);
+            addScore(index, scoreKod[2]);
     }
 
     if(fannSambandEfterVtfKod){
         // Diagnoskod tyder samband mellan åtgärdskod och infektion efter utskrivning
-        addScore(index, "ING05", "Diagnoskod tyder samband mellan " + åtgärd + " och infektion efter utskrivning");
+        addScore(index, scoreKod[0]);
     } else {
         if(fannSambandEfterVtfText)
             // Journaltext tyder samband mellan åtgärdkod och infektion efter utskrivning
-            addScore(index, "ING08", "Journaltext tyder samband mellan " + åtgärd + " och infektion efter utskrivning");
+            addScore(index, scoreKod[3]);
     }
 
 

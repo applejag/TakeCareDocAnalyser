@@ -1,4 +1,4 @@
-
+﻿
 /*
 allaFiltreradeReads[0..n]: {
     /.../
@@ -20,6 +20,7 @@ var sambandFaktor = 0.6;
  * @prop {Number} score Points for given code
  * @prop {String} orsak Score description
  */
+
 
 /**
  * @type {Object<string, ScoreKod>}
@@ -45,11 +46,27 @@ var scoreKoder = {
     ING02: /*01*/ {score: 1.914*ingFaktor, orsak: "Har haft dränage under vårdtillfället"},
     ING03: /*02*/ {score: 0.328*ingFaktor, orsak: "Kirurgiskt ingrepp under vårdtillfället"},
     ING04: /*03*/ {score: 0.283*ingFaktor, orsak: "Har fått andningsstöd under vårdtillfället"},
-    ING05: /*04*/ {score: 0.001*sambandFaktor, orsak: "Diagnoskod tyder samband mellan åtgärdskod och infektion efter utskrivning"},
-    ING06: /*05*/ {score: 3.227*sambandFaktor, orsak: "Diagnoskod tyder på infektion i samband med åtgärdskoder"},
-    ING07: /*06*/ {score: 2.093*sambandFaktor, orsak: "Journaltext tyder på infektion i samband med åtgärdskoder"},
-    ING08: /*25*/ {score: 1.278*sambandFaktor, orsak: "Journaltext tyder samband mellan åtgärdkod och infektion efter utskrivning"},
-    ING09: /*27*/ {score: 3.207*ingFaktor, orsak: "Haft central infart under vårdtillfället"},
+    ING05: /*04*/ {score: 0.001*sambandFaktor, orsak: "Diagnoskod tyder samband mellan CVK och infektion efter utskrivning"},
+    ING06: /*05*/ {score: 2.227*sambandFaktor, orsak: "Diagnoskod tyder på infektion i samband med CVK"},
+    ING07: /*06*/ {score: 2.093*sambandFaktor, orsak: "Journaltext tyder på infektion i samband med CVK"},
+    ING08: /*25*/ {score: 1.278*sambandFaktor, orsak: "Journaltext tyder samband mellan CVK och infektion efter utskrivning"},
+    ING09: /*27*/ {score: 1.207*ingFaktor, orsak: "Haft central infart under vårdtillfället"},
+    ING15: /*04*/ {score: 0.001*sambandFaktor, orsak: "Diagnoskod tyder samband mellan KAD och infektion efter utskrivning"},
+    ING16: /*05*/ {score: 1.227*sambandFaktor, orsak: "Diagnoskod tyder på infektion i samband med KAD"},
+    ING17: /*06*/ {score: 1.093*sambandFaktor, orsak: "Journaltext tyder på infektion i samband med KAD"},
+    ING18: /*25*/ {score: 1.278*sambandFaktor, orsak: "Journaltext tyder samband mellan KAD och infektion efter utskrivning"},
+    ING25: /*04*/ {score: 0.001*sambandFaktor, orsak: "Diagnoskod tyder samband mellan andningsstöd och infektion efter utskrivning"},
+    ING26: /*05*/ {score: 1.227*sambandFaktor, orsak: "Diagnoskod tyder på infektion i samband med andningsstöd"},
+    ING27: /*06*/ {score: 1.093*sambandFaktor, orsak: "Journaltext tyder på infektion i samband med andningsstöd"},
+    ING28: /*25*/ {score: 1.278*sambandFaktor, orsak: "Journaltext tyder samband mellan andningsstöd och infektion efter utskrivning"},
+    ING35: /*04*/ {score: 1.001*sambandFaktor, orsak: "Diagnoskod tyder samband mellan kirurgiskt ingrepp och infektion efter utskrivning"},
+    ING36: /*05*/ {score: 1.227*sambandFaktor, orsak: "Diagnoskod tyder på infektion i samband med kirurgiskt ingrepp"},
+    ING37: /*06*/ {score: 1.293*sambandFaktor, orsak: "Journaltext tyder på infektion i samband med kirurgiskt ingrepp"},
+    ING38: /*25*/ {score: 1.078*sambandFaktor, orsak: "Journaltext tyder samband mellan kirurgiskt ingrepp och infektion efter utskrivning"},
+    ING45: /*04*/ {score: 1.001*sambandFaktor, orsak: "Diagnoskod tyder samband mellan dränage och infektion efter utskrivning"},
+    ING46: /*05*/ {score: 1.227*sambandFaktor, orsak: "Diagnoskod tyder på infektion i samband med dränage"},
+    ING47: /*06*/ {score: 1.093*sambandFaktor, orsak: "Journaltext tyder på infektion i samband med dränage"},
+    ING48: /*25*/ {score: 1.278*sambandFaktor, orsak: "Journaltext tyder samband mellan dränage och infektion efter utskrivning"},
     // MED - Medicinering
     MED01: /*21*/ {score: 0.001, orsak: "Har ordinerats cytostatika, steroider, immunhämmande läkemedel eller antibiotika <90 dagar innan vårdtillfället"},
     MED02: /*26*/ {score: 0.001, orsak: "Kan finnas samband mellan åtgärdskod(er) och ordinerad antibiotika"},
