@@ -3,5 +3,27 @@
     "latedef": true,
     "undef": true,
     "browser": true,
-    "devel": true
+    "devel": true,
+    "globals": {
+        "JSON": true,
+        
+        "allaFiltreradeReads": true,
+        "Perceptron": true,
+        "parser": true,
+        
+        "addDays": true,
+        "isRegExp": true,
+        "isString": true,
+        "isNumber": true,
+        "typeof2": true,
+        "formatDate": true,
+        "formatTime": true,
+        "formatDateTime": true,
+        "tryParseDate": true,
+        "parseDate": true,
+        "clearContent": true,
+        "selectText": true,
+        "focusAll": true,
+        "focusEnd": true
+    }
 }
