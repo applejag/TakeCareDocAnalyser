@@ -24,6 +24,7 @@ var sambandFaktor = 0.6;
 
 /**
  * @type {Object<string, ScoreKod>}
+ * @global
  */
 var scoreKoder = {
     // INF - Infektioner
