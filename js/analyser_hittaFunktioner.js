@@ -8,7 +8,7 @@ var intressantaDKoder = ["(A|B|T814|T802|T835|T880|T802|T814|T826|T835|T836|T814
             "J32|J37|J69|G0[1-8]|G61|M0[0-3]|M0[5-9]|M1[0-4]|M3[0-5]|M45|M46|M60|M63|M86|H01|H10|H16|H20|H30|H46|D709C)"];
 
 //Diagnoskoder för olika VRI:er
-var VRIkoder = /T880|T802|T814|T826|T835|T836|T814|T818|A047/i;
+var VRIkoder = /T880|T802|T814|T826|T835|T836|T814|T818|A047|T827/i;
 
 /**
 * Letar igenom läkemedelsordinationer efter intressanta läkemedel
@@ -137,7 +137,7 @@ function hittaOdlingarMikrobiologi() {
 * Letar i journaltextens fritext efter tecken på infektion. Resultat sparas i listan .infekteradeTexter
 */
 function findInfInJournaltext() {
-   
+
     var negativInf = /(ej|inte|ingen|inga tecken på|inga kända).*(infektion|infektionstecken|sepsis|infektera|rodnad|irritation|inflammation|bronkit)|infektionsklinik|desinfekt/i;
     //NANDA 00004 - risk för infektion
     var positivInf = /(infektion|NANDA 00004|sepsis|infektera|infektionstecken|rodnad|inflammation|abscess|irritation|bronkit|pneumoni)/i;
@@ -298,17 +298,17 @@ function hittaDrän() {
 * negerande ord förekommer tidigare i meningen. Alla olika typer av infarter letas efter en åt gången
 * och ett objekt med infartstyp och in- samt utdatum skapas sedan och placeras i listan .hittadeInfarter
 */
-function hittaInfarter() { 
+function hittaInfarter() {
     var inDatum = new Date();
     var utDatum = new Date();
     var matches = 0;
     var match = [];
     var negatives = /(vägrar|inte|ej|förnekar|ingen)/i;
     var infartsTyper = [[/KAD/i, /Urinavledning/i, /Suprapubiskateter/i],
-                        [/CVK/i, /Picc/i, /CDK/i, /Venport/i, /Nefrostomi/i, /Cystofix/i, /J-stent/i, /Pyelostomi/i, 
+                        [/CVK/i, /Picc/i, /CDK/i, /Venport/i, /Nefrostomi/i, /Cystofix/i, /J-stent/i, /Pyelostomi/i,
                         /Timankateter/i, /Hemodialyskateter/i, /Cystostomi/i, /SVP/i]];
 
-                    
+
     for (var v = 0; v < allaFiltreradeReads.length; v++) {
         var journaltexter = allaFiltreradeReads[v].Journaltexter;
         allaFiltreradeReads[v].hittadKAD = [];
@@ -322,7 +322,7 @@ function hittaInfarter() {
                 matches = 0;
                 for (var i = 0; i < journaltexter.length; i++) {
                     var journaltext = journaltexter[i].Fritext;
-    
+
                     if(infarter[j].test(journaltext)) {
                         match = infarter[j].exec(journaltext);
                         if(match.index >= 12){
@@ -330,7 +330,7 @@ function hittaInfarter() {
                         } else {
                             startIndex = 0;
                         }
-    
+
                         if(!negatives.test(journaltext.substr(startIndex, match.index))){
                             matches++;
                             if(matches == 1){
@@ -341,19 +341,19 @@ function hittaInfarter() {
                     }
                 }
                 if(matches > 0){
-                    var infartData = {typAvInfart: infarter[j].toString().substring(1, infarter[j].toString().length-2), 
-                        inDatum: inDatum, 
+                    var infartData = {typAvInfart: infarter[j].toString().substring(1, infarter[j].toString().length-2),
+                        inDatum: inDatum,
                         utDatum: utDatum};
-                    
+
                     if(f == 0)
                         allaFiltreradeReads[v].hittadKAD.push(infartData);
                     if(f == 1)
                         allaFiltreradeReads[v].hittadCVK.push(infartData);
-                    
-                    
+
+
                 }
             }
-        }    
-        
+        }
+
     }
 }
