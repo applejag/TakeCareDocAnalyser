@@ -32,6 +32,15 @@ function analyseData() {
 
 }
 
+/**
+ * Beräkna sannorlikhet för alla vårdtillfällen
+ */
+function calcVRIprobability() {
+    for (var i = 0; i < allaFiltreradeReads.length; i++) {
+        var vtfScore = allaFiltreradeReads[i].Score;
+        allaFiltreradeReads[i].VRIsannolikhet = calcProbability(vtfScore);
+    }
+}
 
 function checkLongestVårdtillfälle() {
     // Minst 1 tillfälle

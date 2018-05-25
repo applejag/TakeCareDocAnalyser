@@ -1,4 +1,4 @@
-/* global scoreKoder */
+/* global scoreKoderArray */
 
 /**
  * @typedef {Object} VTF
@@ -8,14 +8,6 @@
  * @prop {Boolean} vri True/false if is infected. Used in learning algo
  */
 
-/** @type {ScoreKod[]} */
-var koder = [];
-for (var key in scoreKoder) {
-    if (scoreKoder.hasOwnProperty(key)) {
-        koder.push(scoreKoder[key]);
-    }
-}
-
 /**
  * @param {VTF} vtf 
  * @returns {Number[]}
@@ -23,16 +15,29 @@ for (var key in scoreKoder) {
 function codesAsArray(vtf) {
     var array = [];
     
-    for (var i = 0; i < koder.length; i++) {
-        var kod = koder[i].scoreKod;
+    for (var i = 0; i < scoreKoderArray.length; i++) {
+        var kod = scoreKoderArray[i].scoreKod;
         array.push(vtf.koder.indexOf(kod) === -1 ? 0 : 1);
     }
 
     return array;
 }
-
+/**
+ * @param {Number} num
+ * @returns {String}
+ */
 function percent(num) {
     return Math.floor(num * 10000) / 100 + "%";
+}
+
+/**
+ * @param {Number} part 
+ * @param {Number} all 
+ * @returns {String}
+ */
+function percent2(part,all) {
+    var p = all === 0 ? 0 : part / all;
+    return Math.floor(p * 10000) / 100 + "% (" + part + "/" + all + ")";
 }
 
 /**
@@ -44,7 +49,7 @@ function produceMatrix(vtf) {
         "Vårdtillfälle",
         "Patient",
         "VRI"
-    ].concat(koder.mapField("scoreKod")).join('\t');
+    ].concat(scoreKoderArray.mapField("scoreKod")).join('\t');
 
     var body = vtf.map(function(v) {
         return [
@@ -105,13 +110,25 @@ function vtfTrain(vtf, network, iterations) {
         }
     }, 3500);
 
+    // Even out number of training cases a little
+    var train_true = vtf.filter(function(x) {return x.vri;});
+    var train_false = vtf.filter(function(x) {return !x.vri;});
+
+    var case_true = train_true.slice();
+    while (train_true.length < train_false.length + case_true.length) {
+        train_true = train_true.concat(case_true);
+    }
+
+    var train = train_true.concat(train_false);
+    train.shuffle();
+    
     for (var r = 0; r < iterations; r++) {
-        for (var i = 0; i < vtf.length; i++) {
-            progress = ((r * vtf.length + i + 1) / vtf.length / iterations);
+        for (var i = 0; i < train.length; i++) {
+            progress = ((r * train.length + i + 1) / train.length / iterations);
             loginfo();
 
-            var input = codesAsArray(vtf[i]);
-            var expected = vtf[i].vri ? 1 : 0;
+            var input = codesAsArray(train[i]);
+            var expected = train[i].vri ? 1 : 0;
             
             network.backward(input, [expected]);
         }
@@ -125,37 +142,56 @@ function vtfTrain(vtf, network, iterations) {
  */
 function doVTFTrain(vtf, iterations) {
     var network = new Perceptron.Trainer(new Perceptron.Network([
-        new Perceptron.Tensor(scoreKoder.length),
-        new Perceptron.Tensor(Math.floor(scoreKoder.length * 1.6), "tanh"),
-        new Perceptron.Tensor(Math.floor(scoreKoder.length * 1.3), "tanh"),
-        new Perceptron.Tensor(Math.floor(scoreKoder.length * 0.6), "tanh"),
+        new Perceptron.Tensor(scoreKoderArray.length),
+        new Perceptron.Tensor(Math.floor(scoreKoderArray.length * 1.6), "tanh"),
+        new Perceptron.Tensor(Math.floor(scoreKoderArray.length * 1.3), "tanh"),
+        new Perceptron.Tensor(Math.floor(scoreKoderArray.length * 0.6), "tanh"),
         new Perceptron.Tensor(1, "tanh")
     ]));
 
-    vtfTrain(network, iterations);
+    vtfTrain(vtf, network, iterations);
 
-    var correct = 0;
-    var correctOnVRI = 0;
-    var correctOnNonVRI = 0;
-    var totalVRI = vtf.filter(function(x) {return x.vri;}).length;
-    var results = [];
+    var results = {
+        Trues: 0,
+        Falses: 0,
+        Count: 0,
+        Positives: 0,
+        Negatives: 0,
+        TP: 0,
+        TN: 0,
+        FP: 0,
+        FN: 0
+    };
 
     for (var v = 0; v < vtf.length; v++) {
         var actual = network.forward(codesAsArray(vtf[v]))[0];
         var expected = vtf[v].vri;
-        results.push({expected: expected, actual: actual});
         var bActual = actual > 0.5;
+        results.Count++;
+
+        if (expected) results.Positives++;
+        else results.Negatives++;
 
         if (bActual === expected) {
-            correct++;
-            if (bActual) correctOnVRI++;
-            else correctOnNonVRI++;
+            // Correct, true result
+            results.Trues++;
+
+            if (bActual) results.TP++;
+            else results.TN++;
+        } else {
+            // Incorrect, false result
+            results.Falses++;
+
+            if (bActual) results.FP++;
+            else results.FN++;
         }
     }
 
-    console.log("Got " + percent(correct / vtf.length) + " correct!\n"+
-    "Correct VRI / #VRI: " + percent(correctOnVRI / totalVRI) + "\n"+
-    "Correct !VRI / #!VRI: " + percent(correctOnNonVRI / (vtf.length - totalVRI)));
+    console.log("Got " + percent2(results.Trues, results.Count) + " correct!\n"+
+    "Correctly diagnosed VRI: " + percent2(results.TP, results.Positives) + "\n"+
+    "Correctly diagnosed !VRI: " + percent2(results.TN, results.Negatives) + "\n"+
+    "Incorrectly diagnosed VRI: " + percent2(results.FP, results.Negatives) + "\n"+
+    "Incorrectly diagnosed !VRI: " + percent2(results.FN, results.Positives));
 
     return {results:results, network:network};
 }

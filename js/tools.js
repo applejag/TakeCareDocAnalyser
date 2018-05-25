@@ -196,6 +196,21 @@ Array.prototype.indexOfCaseInsensitive = function indexOfCaseInsensitive(value) 
 };
 
 /**
+ * Shuffles array in place.
+ * @param {Array} a items An array containing the items.
+ */
+Array.prototype.shuffle = function shuffle() {
+    var j, x, i;
+    for (i = this.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = this[i];
+        this[i] = this[j];
+        this[j] = x;
+    }
+    return this;
+};
+
+/**
  * Compares from the start of two strings character by character,
  * and returns the number of characters that matched.
  * @param {String} other Other string to compare with

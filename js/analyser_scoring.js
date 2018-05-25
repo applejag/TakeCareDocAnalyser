@@ -21,7 +21,6 @@ var sambandFaktor = 0.6;
  * @prop {String} orsak Score description
  */
 
-
 /**
  * @type {Object<string, ScoreKod>}
  * @global
@@ -92,11 +91,15 @@ var scoreKoder = {
     SJU35: {score: 1, orsak: "Hittade KVÅ koder för Kardiovaskulära Sjukdomar"}
 };
 
+/** @type {ScoreKod[]} */
+var scoreKoderArray = [];
 for (var kod in scoreKoder) {
     if (scoreKoder.hasOwnProperty(kod)) {
         scoreKoder[kod].scoreKod = kod;
+        scoreKoderArray.push(scoreKoder[kod]);
     }
 }
+
 
 /**
  * Lägg till eller ta bort poäng för någon del av analysen.
@@ -137,15 +140,13 @@ function addScore(vtf_index, score_key, reason_override) {
     return vtf_object.Score;
 }
 
-function calcVRIprobability(){
+/**
+ * @param {Number} score Sum of score-code scores
+ * @returns {Number}
+ */
+function calcProbability(score){
     var beta0 = -3.40;
-    var p_VRI = 0;
+    var p = 100*(Math.exp(beta0 + score)/(1 + Math.exp(beta0 + score)));
 
-    for (var i = 0; i < allaFiltreradeReads.length; i++) {
-        var vtfScore = allaFiltreradeReads[i].Score;
-
-        p_VRI = 100*(Math.exp(beta0 + vtfScore)/(1 + Math.exp(beta0 + vtfScore)));
-
-        allaFiltreradeReads[i].VRIsannolikhet = p_VRI.toFixed(2);
-    }
+    return p;
 }
