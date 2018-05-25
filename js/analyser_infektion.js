@@ -88,12 +88,6 @@ function hittasInfEfterUtskrivning(index){
                 //infektionEfterVtf = dkoder[j].datum;
             }
 
-            if(VRIkoder.test(dkoder[j].kod)){
-                // Diagnoskod för VRI funnen!
-                addScore(index, "INF13");
-                //infektionEfterVtf = dkoder[j].datum;
-            }
-
             onlyScoreForFirstFinding = false;
         }
     }
@@ -198,7 +192,7 @@ function hittaInfDebuter(index){
                 kemList.push(kemSvar[k-1]);
         }
     }
-    
+
     if(feberList.length > 0){
         for(var j = 0; j < feberList.length; j++){
             if(checkIfDatesMatch(index, feberList[j], 0))
@@ -213,7 +207,7 @@ function hittaInfDebuter(index){
 
     if(list.length == 0 && allaFiltreradeReads[index].hasInfection){
         if(allaFiltreradeReads[index].infekteradeTexter.length > 0){
-            list.push(allaFiltreradeReads[index].infekteradeTexter.datum);    
+            list.push(allaFiltreradeReads[index].infekteradeTexter.datum);
         }
     }
 
@@ -230,7 +224,7 @@ function checkIfDatesMatch(index, feberDebut, kemDebut){
     var feberLista = allaFiltreradeReads[index].hittadFeber;
     var odlingLista = allaFiltreradeReads[index].hittadeOdlingar; // 3-5 dygn
     var kemLista = allaFiltreradeReads[index].hittadeKemSvar; // 1-4 h
-    
+
 
     var count = 0;
     if(feberDebut != 0){
@@ -254,7 +248,7 @@ function checkIfDatesMatch(index, feberDebut, kemDebut){
             return true;
     } else {
         for (var k = 0; k < odlingLista.length; k++) {
-            
+
             if((odlingLista[k].datum - kemDebut) < 691200000 && odlingLista[k].datum > kemDebut){ //691200000 = 8 dygn
                 // Ingen feber men odling funnen samtidigt som onormalt CRP eller LPK
                 addScore(index, "INF12");

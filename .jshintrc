@@ -1,16 +1,14 @@
 {
     "esversion": 3,
-    "latedef": true,
-    "undef": true,
     "browser": true,
     "devel": true,
     "globals": {
         "JSON": true,
-        
+
         "allaFiltreradeReads": true,
         "Perceptron": true,
         "parser": true,
-        
+
         "addDays": true,
         "isRegExp": true,
         "isString": true,
